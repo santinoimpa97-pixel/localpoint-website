@@ -771,12 +771,17 @@ footer::before {
 
   nav {
     display: none;
-    width: 100%;
-    margin-top: 15px;
-    background: rgba(255, 255, 255, 0.95);
+    position: absolute;
+    top: 100%;
+    right: 20px;
+    width: auto;
+    min-width: 200px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.98);
     border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow);
+    padding: 15px 20px;
+    box-shadow: var(--shadow-hover);
+    z-index: 999;
   }
 
   nav.active {
