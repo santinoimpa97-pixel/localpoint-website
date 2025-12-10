@@ -5,7 +5,44 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LocalPoint - Centro Servizi Milazzo</title>
+
+  <!-- SEO Meta Tags -->
+  <title>LocalPoint - Centro Servizi Milazzo | Spedizioni, Pagamenti, Deposito Bagagli</title>
+  <meta name="description"
+    content="LocalPoint Milazzo: il tuo centro servizi di fiducia. Spedizioni nazionali e internazionali, punto ritiro pacchi, deposito bagagli a 4€/giorno, pagamenti bollettini, SPID, PEC e molto altro. Vicino al porto di Milazzo." />
+  <meta name="keywords"
+    content="LocalPoint, Milazzo, spedizioni, deposito bagagli, punto ritiro, Amazon, Vinted, BRT, pagamenti, bollettini, SPID, PEC, centro servizi, Isole Eolie" />
+  <meta name="author" content="LocalPoint Milazzo" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://local-point.it/" />
+
+  <!-- Open Graph / Facebook / WhatsApp -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://local-point.it/" />
+  <meta property="og:title" content="LocalPoint - Centro Servizi Milazzo" />
+  <meta property="og:description"
+    content="Spedizioni, deposito bagagli, punto ritiro pacchi, pagamenti e servizi digitali. Il tuo punto di riferimento a Milazzo, vicino al porto." />
+  <meta property="og:image" content="https://local-point.it/logo.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="it_IT" />
+  <meta property="og:site_name" content="LocalPoint Milazzo" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://local-point.it/" />
+  <meta name="twitter:title" content="LocalPoint - Centro Servizi Milazzo" />
+  <meta name="twitter:description"
+    content="Spedizioni, deposito bagagli, punto ritiro pacchi, pagamenti e servizi digitali. Il tuo punto di riferimento a Milazzo." />
+  <meta name="twitter:image" content="https://local-point.it/logo.png" />
+
+  <!-- Additional SEO -->
+  <meta name="geo.region" content="IT-ME" />
+  <meta name="geo.placename" content="Milazzo" />
+  <meta name="geo.position" content="38.2225;15.2405" />
+  <meta name="ICBM" content="38.2225, 15.2405" />
+
+  <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -24,6 +61,7 @@
           <li><a href="#services">Servizi</a></li>
           <li><a href="#shipping">Spedizioni</a></li>
           <li><a href="#luggage">Deposito</a></li>
+          <li><a href="#gallery">Galleria</a></li>
           <li><a href="#contact">Contatti</a></li>
         </ul>
       </nav>
@@ -221,6 +259,39 @@
       </div>
     </section>
 
+    <section id="gallery">
+      <div class="container">
+        <h2 class="section-title">Il Nostro Negozio</h2>
+        <p class="section-subtitle">Vieni a trovarci in Via Tenente Brigiano 6, a pochi passi dal porto</p>
+
+        <div class="gallery-grid">
+          <div class="gallery-item" onclick="openLightbox(0)">
+            <img src="/store-exterior.jpg" alt="LocalPoint Milazzo - Esterno del negozio" loading="lazy">
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-expand"></i>
+              <span>Esterno</span>
+            </div>
+          </div>
+          <div class="gallery-item" onclick="openLightbox(1)">
+            <img src="/store-interior.jpg" alt="LocalPoint Milazzo - Interno del negozio" loading="lazy">
+            <div class="gallery-overlay">
+              <i class="fa-solid fa-expand"></i>
+              <span>Interno</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+      <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+      <button class="lightbox-prev" onclick="event.stopPropagation(); changeLightboxImage(-1)">&#10094;</button>
+      <img id="lightbox-img" src="" alt="LocalPoint Gallery">
+      <button class="lightbox-next" onclick="event.stopPropagation(); changeLightboxImage(1)">&#10095;</button>
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+
     <section id="contact">
       <div class="container">
         <h2 class="section-title">Vieni a trovarci</h2>
@@ -252,6 +323,10 @@
               <div>
                 <h4>Orari</h4>
                 <p>Lun - Sab: 09:00 - 13:30 / 15:30 - 19:00</p>
+                <div id="open-status" class="open-status">
+                  <span class="status-dot"></span>
+                  <span class="status-text">Verifica in corso...</span>
+                </div>
               </div>
             </div>
           </div>
@@ -284,7 +359,235 @@
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
+  <!-- GDPR Cookie Banner -->
+  <div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-content">
+      <div class="cookie-text">
+        <i class="fa-solid fa-cookie-bite cookie-icon"></i>
+        <div>
+          <h4>🍪 Utilizziamo i cookie</h4>
+          <p>Questo sito utilizza cookie tecnici e di analisi per migliorare la tua esperienza.
+            Puoi accettare tutti i cookie o personalizzare le tue preferenze.</p>
+        </div>
+      </div>
+      <div class="cookie-buttons">
+        <button id="cookie-accept" class="cookie-btn accept">Accetta tutti</button>
+        <button id="cookie-reject" class="cookie-btn reject">Solo necessari</button>
+        <a href="#" class="cookie-link"
+          onclick="alert('Informativa Cookie: Utilizziamo cookie tecnici per il funzionamento del sito e cookie analitici (Google Analytics) per comprendere come i visitatori interagiscono con il sito. I cookie tecnici sono necessari per il corretto funzionamento. Puoi rifiutare i cookie analitici senza alcun impatto sulla navigazione. Per maggiori informazioni contattaci a localpointmilazzo@gmail.com'); return false;">Maggiori
+          info</a>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/src/main.js"></script>
+
+  <!-- Cookie Consent Script -->
+  <script>
+    (function () {
+      const banner = document.getElementById('cookie-banner');
+      const acceptBtn = document.getElementById('cookie-accept');
+      const rejectBtn = document.getElementById('cookie-reject');
+
+      // Check if user already made a choice
+      const cookieConsent = localStorage.getItem('cookieConsent');
+
+      if (cookieConsent === null) {
+        // Show banner if no choice made
+        setTimeout(() => {
+          banner.classList.add('show');
+        }, 1000);
+      } else if (cookieConsent === 'accepted') {
+        // Load analytics if accepted
+        loadAnalytics();
+      }
+
+      acceptBtn.addEventListener('click', function () {
+        localStorage.setItem('cookieConsent', 'accepted');
+        banner.classList.remove('show');
+        loadAnalytics();
+      });
+
+      rejectBtn.addEventListener('click', function () {
+        localStorage.setItem('cookieConsent', 'rejected');
+        banner.classList.remove('show');
+      });
+
+      function loadAnalytics() {
+        // Placeholder for Google Analytics
+        // Uncomment and add your GA ID when ready:
+        /*
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
+        document.head.appendChild(script);
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+        */
+        console.log('Analytics cookies accepted');
+      }
+    })();
+  </script>
+
+  <!-- Dynamic Opening Hours Script -->
+  <script>
+    (function () {
+      function updateOpenStatus() {
+        const statusElement = document.getElementById('open-status');
+        if (!statusElement) return;
+
+        // Get current time in Italian timezone (Europe/Rome)
+        const now = new Date();
+        const italianTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
+
+        const day = italianTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const hours = italianTime.getHours();
+        const minutes = italianTime.getMinutes();
+        const currentTime = hours * 60 + minutes; // Convert to minutes for easier comparison
+
+        // Business hours in minutes
+        const morningOpen = 9 * 60;      // 09:00
+        const morningClose = 13 * 60 + 30; // 13:30
+        const afternoonOpen = 15 * 60 + 30; // 15:30
+        const afternoonClose = 19 * 60;   // 19:00
+
+        let isOpen = false;
+        let statusText = '';
+        let nextOpenInfo = '';
+
+        // Sunday = 0, closed all day
+        if (day === 0) {
+          isOpen = false;
+          statusText = 'Chiuso';
+          nextOpenInfo = 'Riapriamo lunedì alle 09:00';
+        }
+        // Monday to Saturday (1-6)
+        else if (day >= 1 && day <= 6) {
+          // Morning hours: 09:00 - 13:30
+          if (currentTime >= morningOpen && currentTime < morningClose) {
+            isOpen = true;
+            statusText = 'Aperto ora';
+            const minutesLeft = morningClose - currentTime;
+            if (minutesLeft <= 30) {
+              nextOpenInfo = `Chiude tra ${minutesLeft} min per pausa pranzo`;
+            }
+          }
+          // Lunch break: 13:30 - 15:30
+          else if (currentTime >= morningClose && currentTime < afternoonOpen) {
+            isOpen = false;
+            statusText = 'Pausa pranzo';
+            const minutesToOpen = afternoonOpen - currentTime;
+            if (minutesToOpen <= 60) {
+              nextOpenInfo = `Riapriamo tra ${minutesToOpen} min`;
+            } else {
+              nextOpenInfo = 'Riapriamo alle 15:30';
+            }
+          }
+          // Afternoon hours: 15:30 - 19:00
+          else if (currentTime >= afternoonOpen && currentTime < afternoonClose) {
+            isOpen = true;
+            statusText = 'Aperto ora';
+            const minutesLeft = afternoonClose - currentTime;
+            if (minutesLeft <= 30) {
+              nextOpenInfo = `Chiude tra ${minutesLeft} min`;
+            }
+          }
+          // Before opening (< 09:00)
+          else if (currentTime < morningOpen) {
+            isOpen = false;
+            statusText = 'Chiuso';
+            const minutesToOpen = morningOpen - currentTime;
+            if (minutesToOpen <= 60) {
+              nextOpenInfo = `Apriamo tra ${minutesToOpen} min`;
+            } else {
+              nextOpenInfo = 'Apriamo alle 09:00';
+            }
+          }
+          // After closing (>= 19:00)
+          else {
+            isOpen = false;
+            statusText = 'Chiuso';
+            if (day === 6) {
+              nextOpenInfo = 'Riapriamo lunedì alle 09:00';
+            } else {
+              nextOpenInfo = 'Riapriamo domani alle 09:00';
+            }
+          }
+        }
+
+        // Update DOM
+        statusElement.className = 'open-status ' + (isOpen ? 'is-open' : 'is-closed');
+        statusElement.innerHTML = `
+          <span class="status-dot"></span>
+          <span class="status-text">${statusText}</span>
+          ${nextOpenInfo ? `<span class="status-info">${nextOpenInfo}</span>` : ''}
+        `;
+      }
+
+      // Run immediately
+      updateOpenStatus();
+
+      // Update every minute
+      setInterval(updateOpenStatus, 60000);
+    })();
+  </script>
+
+  <!-- Lightbox Gallery Script -->
+  <script>
+    const galleryImages = [
+      { src: '/store-exterior.jpg', caption: 'LocalPoint Milazzo - Esterno del negozio' },
+      { src: '/store-interior.jpg', caption: 'LocalPoint Milazzo - Interno accogliente' }
+    ];
+    let currentImageIndex = 0;
+
+    function openLightbox(index) {
+      currentImageIndex = index;
+      const lightbox = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+
+      img.src = galleryImages[index].src;
+      caption.textContent = galleryImages[index].caption;
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function changeLightboxImage(direction) {
+      currentImageIndex += direction;
+
+      // Loop around
+      if (currentImageIndex >= galleryImages.length) {
+        currentImageIndex = 0;
+      } else if (currentImageIndex < 0) {
+        currentImageIndex = galleryImages.length - 1;
+      }
+
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+
+      img.src = galleryImages[currentImageIndex].src;
+      caption.textContent = galleryImages[currentImageIndex].caption;
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function (e) {
+      const lightbox = document.getElementById('lightbox');
+      if (!lightbox.classList.contains('active')) return;
+
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') changeLightboxImage(-1);
+      if (e.key === 'ArrowRight') changeLightboxImage(1);
+    });
+  </script>
 </body>
 
 </html>
