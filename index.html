@@ -57,14 +57,28 @@
       </div>
       <nav id="nav">
         <ul>
-          <li><a href="#hero">Home</a></li>
-          <li><a href="#services">Servizi</a></li>
-          <li><a href="#shipping">Spedizioni</a></li>
-          <li><a href="#luggage">Deposito</a></li>
-          <li><a href="#gallery">Galleria</a></li>
-          <li><a href="#contact">Contatti</a></li>
+          <li><a href="#hero" data-i18n="nav.home">Home</a></li>
+          <li><a href="#services" data-i18n="nav.services">Servizi</a></li>
+          <li><a href="#shipping" data-i18n="nav.shipping">Spedizioni</a></li>
+          <li><a href="#luggage" data-i18n="nav.luggage">Deposito</a></li>
+          <li><a href="#gallery" data-i18n="nav.gallery">Galleria</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Contatti</a></li>
         </ul>
       </nav>
+      <!-- Language Selector -->
+      <div class="language-selector" id="language-selector">
+        <button class="lang-toggle" id="lang-toggle" aria-label="Seleziona lingua">
+          <span id="current-lang">🇮🇹</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="lang-dropdown" id="lang-dropdown">
+          <button class="lang-option" data-lang="it">🇮🇹 Italiano</button>
+          <button class="lang-option" data-lang="en">🇬🇧 English</button>
+          <button class="lang-option" data-lang="de">🇩🇪 Deutsch</button>
+          <button class="lang-option" data-lang="es">🇪🇸 Español</button>
+          <button class="lang-option" data-lang="fr">🇫🇷 Français</button>
+        </div>
+      </div>
       <button id="mobile-menu-btn" aria-label="Menu">
         <i class="fa-solid fa-bars"></i>
       </button>
@@ -74,65 +88,66 @@
   <main>
     <section id="hero">
       <div class="container hero-content">
-        <h1>Tutti i servizi di cui hai bisogno, <br>in un solo posto</h1>
-        <p>Spedizioni, pagamenti, deposito bagagli e molto altro. Il tuo punto di riferimento a Milazzo.</p>
+        <h1 data-i18n="hero.title">Tutti i servizi di cui hai bisogno, <br>in un solo posto</h1>
+        <p data-i18n="hero.subtitle">Spedizioni, pagamenti, deposito bagagli e molto altro. Il tuo punto di riferimento
+          a Milazzo.</p>
         <div class="hero-buttons">
-          <a href="#services" class="btn btn-primary">Scopri i Servizi</a>
-          <a href="#contact" class="btn btn-outline">Dove Siamo</a>
+          <a href="#services" class="btn btn-primary" data-i18n="hero.cta.services">Scopri i Servizi</a>
+          <a href="#contact" class="btn btn-outline" data-i18n="hero.cta.location">Dove Siamo</a>
         </div>
       </div>
     </section>
 
     <section id="services">
       <div class="container">
-        <h2 class="section-title">I Nostri Servizi</h2>
-        <p class="section-subtitle">Comodo, rapido e sicuro per residenti e turisti.</p>
+        <h2 class="section-title" data-i18n="services.title">I Nostri Servizi</h2>
+        <p class="section-subtitle" data-i18n="services.subtitle">Comodo, rapido e sicuro per residenti e turisti.</p>
 
         <div class="services-grid">
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-box-open"></i></div>
-            <h3>Spedizioni</h3>
-            <p>Nazionali e internazionali. Tariffe semplici e convenienti.</p>
+            <h3 data-i18n="services.shipping.title">Spedizioni</h3>
+            <p data-i18n="services.shipping.desc">Nazionali e internazionali. Tariffe semplici e convenienti.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-map-pin"></i></div>
-            <h3>Punto Ritiro</h3>
-            <p>Ritira qui i tuoi pacchi. Fermopoint Amazon, Vinted, e altri.</p>
+            <h3 data-i18n="services.pickup.title">Punto Ritiro</h3>
+            <p data-i18n="services.pickup.desc">Ritira qui i tuoi pacchi. Fermopoint Amazon, Vinted, e altri.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-suitcase"></i></div>
-            <h3>Deposito Bagagli</h3>
-            <p>Custodia sicura vicino al porto. Solo 4€ al giorno.</p>
+            <h3 data-i18n="services.luggage.title">Deposito Bagagli</h3>
+            <p data-i18n="services.luggage.desc">Custodia sicura vicino al porto. Solo 4€ al giorno.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-            <h3>Pagamenti</h3>
-            <p>Bollettini, bollo auto, PagoPA, F24.</p>
+            <h3 data-i18n="services.payments.title">Pagamenti</h3>
+            <p data-i18n="services.payments.desc">Bollettini, bollo auto, PagoPA, F24.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-mobile-screen"></i></div>
-            <h3>Ricariche</h3>
-            <p>Telefoniche, carte prepagate, conti gioco.</p>
+            <h3 data-i18n="services.topup.title">Ricariche</h3>
+            <p data-i18n="services.topup.desc">Telefoniche, carte prepagate, conti gioco.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-plane-departure"></i></div>
-            <h3>Transfer & Escursioni</h3>
-            <p>Transfer aeroporti e escursioni alle Isole Eolie.</p>
+            <h3 data-i18n="services.transfer.title">Transfer & Escursioni</h3>
+            <p data-i18n="services.transfer.desc">Transfer aeroporti e escursioni alle Isole Eolie.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-id-card"></i></div>
-            <h3>Servizi Digitali</h3>
-            <p>SPID, PEC, firma digitale, visure.</p>
+            <h3 data-i18n="services.digital.title">Servizi Digitali</h3>
+            <p data-i18n="services.digital.desc">SPID, PEC, firma digitale, visure.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-car"></i></div>
-            <h3>Noleggio</h3>
-            <p>Auto e scooter per muoverti in libertà.</p>
+            <h3 data-i18n="services.rental.title">Noleggio</h3>
+            <p data-i18n="services.rental.desc">Auto e scooter per muoverti in libertà.</p>
           </div>
           <div class="service-card">
             <div class="icon"><i class="fa-solid fa-bolt"></i></div>
-            <h3>Contratti Utenze</h3>
-            <p>WiFi, luce e gas. Attivazione e volture.</p>
+            <h3 data-i18n="services.utilities.title">Contratti Utenze</h3>
+            <p data-i18n="services.utilities.desc">WiFi, luce e gas. Attivazione e volture.</p>
           </div>
         </div>
       </div>
@@ -142,8 +157,9 @@
       <div class="container">
         <div class="split-layout">
           <div class="text-content">
-            <h2>Spedisci con Noi</h2>
-            <p>Tariffe nazionali semplici e convenienti. Imballaggio escluso. Tracking incluso.</p>
+            <h2 data-i18n="shipping.title">Spedisci con Noi</h2>
+            <p data-i18n="shipping.subtitle">Tariffe nazionali semplici e convenienti. Imballaggio escluso. Tracking
+              incluso.</p>
             <ul class="price-list">
               <li>
                 <span class="weight">0 - 3 kg</span>
@@ -185,9 +201,10 @@
       <div class="container">
         <div class="luggage-banner">
           <div class="content">
-            <h2>Deposito Bagagli</h2>
-            <div class="price-tag">4€ <small>/ giorno</small></div>
-            <p>Vicino al porto. Custodia sicura. Ideale per turisti e pendolari.</p>
+            <h2 data-i18n="luggage.title">Deposito Bagagli</h2>
+            <div class="price-tag"><span data-i18n="luggage.price">4€</span> <small data-i18n="luggage.perday">/
+                giorno</small></div>
+            <p data-i18n="luggage.desc">Vicino al porto. Custodia sicura. Ideale per turisti e pendolari.</p>
           </div>
         </div>
       </div>
@@ -195,8 +212,8 @@
 
     <section id="reviews">
       <div class="container">
-        <h2 class="section-title">Cosa dicono i nostri clienti</h2>
-        <p class="section-subtitle">Le recensioni di chi ci ha scelto</p>
+        <h2 class="section-title" data-i18n="reviews.title">Cosa dicono i nostri clienti</h2>
+        <p class="section-subtitle" data-i18n="reviews.subtitle">Le recensioni di chi ci ha scelto</p>
 
         <div class="reviews-grid">
           <div class="review-card">
@@ -207,13 +224,13 @@
               <i class="fa-solid fa-star"></i>
               <i class="fa-solid fa-star"></i>
             </div>
-            <p class="review-text">"Servizio eccellente! Ho spedito un pacco urgente e sono stati velocissimi e
-              professionali. Prezzi competitivi e personale molto gentile."</p>
+            <p class="review-text" data-i18n="reviews.1.text">"Servizio eccellente! Ho spedito un pacco urgente e sono
+              stati velocissimi e professionali. Prezzi competitivi e personale molto gentile."</p>
             <div class="review-author">
               <div class="author-avatar"><i class="fa-solid fa-user"></i></div>
               <div>
-                <h4>Marco R.</h4>
-                <span>Cliente verificato</span>
+                <h4 data-i18n="reviews.1.author">Marco R.</h4>
+                <span data-i18n="reviews.1.role">Cliente verificato</span>
               </div>
             </div>
           </div>
@@ -226,13 +243,13 @@
               <i class="fa-solid fa-star"></i>
               <i class="fa-solid fa-star"></i>
             </div>
-            <p class="review-text">"Utilizzo spesso il deposito bagagli prima di prendere il traghetto per le Eolie.
-              Comodo, sicuro e a un prezzo onesto. Consigliatissimo!"</p>
+            <p class="review-text" data-i18n="reviews.2.text">"Utilizzo spesso il deposito bagagli prima di prendere il
+              traghetto per le Eolie. Comodo, sicuro e a un prezzo onesto. Consigliatissimo!"</p>
             <div class="review-author">
               <div class="author-avatar"><i class="fa-solid fa-user"></i></div>
               <div>
-                <h4>Giulia T.</h4>
-                <span>Turista</span>
+                <h4 data-i18n="reviews.2.author">Giulia T.</h4>
+                <span data-i18n="reviews.2.role">Turista</span>
               </div>
             </div>
           </div>
@@ -245,13 +262,13 @@
               <i class="fa-solid fa-star"></i>
               <i class="fa-solid fa-star"></i>
             </div>
-            <p class="review-text">"Punto di riferimento per pagamenti e servizi. Mi hanno aiutato con lo SPID in modo
-              veloce e chiaro. Personale preparato e disponibile."</p>
+            <p class="review-text" data-i18n="reviews.3.text">"Punto di riferimento per pagamenti e servizi. Mi hanno
+              aiutato con lo SPID in modo veloce e chiaro. Personale preparato e disponibile."</p>
             <div class="review-author">
               <div class="author-avatar"><i class="fa-solid fa-user"></i></div>
               <div>
-                <h4>Antonio M.</h4>
-                <span>Residente</span>
+                <h4 data-i18n="reviews.3.author">Antonio M.</h4>
+                <span data-i18n="reviews.3.role">Residente</span>
               </div>
             </div>
           </div>
@@ -261,22 +278,23 @@
 
     <section id="gallery">
       <div class="container">
-        <h2 class="section-title">Il Nostro Negozio</h2>
-        <p class="section-subtitle">Vieni a trovarci in Via Tenente Brigiano 6, a pochi passi dal porto</p>
+        <h2 class="section-title" data-i18n="gallery.title">Il Nostro Negozio</h2>
+        <p class="section-subtitle" data-i18n="gallery.subtitle">Vieni a trovarci in Via Tenente Brigiano 6, a pochi
+          passi dal porto</p>
 
         <div class="gallery-grid">
           <div class="gallery-item" onclick="openLightbox(0)">
             <img src="/store-exterior.jpg" alt="LocalPoint Milazzo - Esterno del negozio" loading="lazy">
             <div class="gallery-overlay">
               <i class="fa-solid fa-expand"></i>
-              <span>Esterno</span>
+              <span data-i18n="gallery.exterior">Esterno</span>
             </div>
           </div>
           <div class="gallery-item" onclick="openLightbox(1)">
             <img src="/store-interior.jpg" alt="LocalPoint Milazzo - Interno del negozio" loading="lazy">
             <div class="gallery-overlay">
               <i class="fa-solid fa-expand"></i>
-              <span>Interno</span>
+              <span data-i18n="gallery.interior">Interno</span>
             </div>
           </div>
         </div>
@@ -294,35 +312,35 @@
 
     <section id="contact">
       <div class="container">
-        <h2 class="section-title">Vieni a trovarci</h2>
+        <h2 class="section-title" data-i18n="contact.title">Vieni a trovarci</h2>
         <div class="contact-grid">
           <div class="contact-info">
             <div class="info-item">
               <i class="fa-solid fa-location-dot"></i>
               <div>
-                <h4>Indirizzo</h4>
-                <p>Via Tenente Brigiano 6, 98057 Milazzo</p>
+                <h4 data-i18n="contact.address.label">Indirizzo</h4>
+                <p data-i18n="contact.address.value">Via Tenente Brigiano 6, 98057 Milazzo</p>
               </div>
             </div>
             <div class="info-item">
               <i class="fa-solid fa-phone"></i>
               <div>
-                <h4>Telefono</h4>
+                <h4 data-i18n="contact.phone.label">Telefono</h4>
                 <p><a href="tel:+393793283803">379 328 3803</a></p>
               </div>
             </div>
             <div class="info-item">
               <i class="fa-solid fa-envelope"></i>
               <div>
-                <h4>Email</h4>
+                <h4 data-i18n="contact.email.label">Email</h4>
                 <p><a href="mailto:localpointmilazzo@gmail.com">localpointmilazzo@gmail.com</a></p>
               </div>
             </div>
             <div class="info-item">
               <i class="fa-solid fa-clock"></i>
               <div>
-                <h4>Orari</h4>
-                <p>Lun - Sab: 09:00 - 13:30 / 15:30 - 19:00</p>
+                <h4 data-i18n="contact.hours.label">Orari</h4>
+                <p data-i18n="contact.hours.value">Lun - Sab: 09:00 - 13:30 / 15:30 - 19:00</p>
                 <div id="open-status" class="open-status">
                   <span class="status-dot"></span>
                   <span class="status-text">Verifica in corso...</span>
@@ -344,7 +362,7 @@
 
   <footer>
     <div class="container footer-content">
-      <p>&copy; 2025 LocalPoint Milazzo. Tutti i diritti riservati.</p>
+      <p data-i18n="footer.copyright">&copy; 2025 LocalPoint Milazzo. Tutti i diritti riservati.</p>
       <div class="socials">
         <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i
             class="fa-brands fa-facebook"></i></a>
@@ -365,15 +383,15 @@
       <div class="cookie-text">
         <i class="fa-solid fa-cookie-bite cookie-icon"></i>
         <div>
-          <h4>🍪 Utilizziamo i cookie</h4>
-          <p>Questo sito utilizza cookie tecnici e di analisi per migliorare la tua esperienza.
+          <h4 data-i18n="cookie.title">🍪 Utilizziamo i cookie</h4>
+          <p data-i18n="cookie.text">Questo sito utilizza cookie tecnici e di analisi per migliorare la tua esperienza.
             Puoi accettare tutti i cookie o personalizzare le tue preferenze.</p>
         </div>
       </div>
       <div class="cookie-buttons">
-        <button id="cookie-accept" class="cookie-btn accept">Accetta tutti</button>
-        <button id="cookie-reject" class="cookie-btn reject">Solo necessari</button>
-        <a href="#" class="cookie-link"
+        <button id="cookie-accept" class="cookie-btn accept" data-i18n="cookie.accept">Accetta tutti</button>
+        <button id="cookie-reject" class="cookie-btn reject" data-i18n="cookie.reject">Solo necessari</button>
+        <a href="#" class="cookie-link" data-i18n="cookie.moreinfo"
           onclick="alert('Informativa Cookie: Utilizziamo cookie tecnici per il funzionamento del sito e cookie analitici (Google Analytics) per comprendere come i visitatori interagiscono con il sito. I cookie tecnici sono necessari per il corretto funzionamento. Puoi rifiutare i cookie analitici senza alcun impatto sulla navigazione. Per maggiori informazioni contattaci a localpointmilazzo@gmail.com'); return false;">Maggiori
           info</a>
       </div>
@@ -433,106 +451,156 @@
   </script>
 
   <!-- Dynamic Opening Hours Script -->
-  <script>
-    (function () {
-      function updateOpenStatus() {
-        const statusElement = document.getElementById('open-status');
-        if (!statusElement) return;
+  <script type="module">
+    import { t, getCurrentLanguage } from '/src/translations.js';
 
-        // Get current time in Italian timezone (Europe/Rome)
-        const now = new Date();
-        const italianTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
+    function updateOpenStatus() {
+      const statusElement = document.getElementById('open-status');
+      if (!statusElement) return;
 
-        const day = italianTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-        const hours = italianTime.getHours();
-        const minutes = italianTime.getMinutes();
-        const currentTime = hours * 60 + minutes; // Convert to minutes for easier comparison
+      // Get current language
+      const lang = getCurrentLanguage();
 
-        // Business hours in minutes
-        const morningOpen = 9 * 60;      // 09:00
-        const morningClose = 13 * 60 + 30; // 13:30
-        const afternoonOpen = 15 * 60 + 30; // 15:30
-        const afternoonClose = 19 * 60;   // 19:00
+      // Get current time in Italian timezone (Europe/Rome)
+      const now = new Date();
+      const italianTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Rome' }));
 
-        let isOpen = false;
-        let statusText = '';
-        let nextOpenInfo = '';
+      const day = italianTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const hours = italianTime.getHours();
+      const minutes = italianTime.getMinutes();
+      const currentTime = hours * 60 + minutes; // Convert to minutes for easier comparison
 
-        // Sunday = 0, closed all day
-        if (day === 0) {
+      // Business hours in minutes
+      const morningOpen = 9 * 60;      // 09:00
+      const morningClose = 13 * 60 + 30; // 13:30
+      const afternoonOpen = 15 * 60 + 30; // 15:30
+      const afternoonClose = 19 * 60;   // 19:00
+
+      let isOpen = false;
+      let statusText = '';
+      let nextOpenInfo = '';
+
+      // Translated strings
+      const strings = {
+        open: t('contact.status.open', lang),
+        closed: t('contact.status.closed', lang),
+        lunchbreak: t('contact.status.lunchbreak', lang),
+        reopenMonday: t('contact.status.reopenMonday', lang),
+        reopenTomorrow: t('contact.status.reopenTomorrow', lang),
+        reopenAt: t('contact.status.reopenAt', lang),
+        openAt: t('contact.status.openAt', lang)
+      };
+
+      // Closing soon / opening soon messages by language
+      const closingSoon = {
+        it: (min) => `Chiude tra ${min} min per pausa pranzo`,
+        en: (min) => `Closes in ${min} min for lunch break`,
+        de: (min) => `Schließt in ${min} Min. für Mittagspause`,
+        es: (min) => `Cierra en ${min} min para almuerzo`,
+        fr: (min) => `Ferme dans ${min} min pour déjeuner`
+      };
+
+      const closingSoonEvening = {
+        it: (min) => `Chiude tra ${min} min`,
+        en: (min) => `Closes in ${min} min`,
+        de: (min) => `Schließt in ${min} Min.`,
+        es: (min) => `Cierra en ${min} min`,
+        fr: (min) => `Ferme dans ${min} min`
+      };
+
+      const reopeningSoon = {
+        it: (min) => `Riapriamo tra ${min} min`,
+        en: (min) => `Reopening in ${min} min`,
+        de: (min) => `Öffnet wieder in ${min} Min.`,
+        es: (min) => `Reabrimos en ${min} min`,
+        fr: (min) => `Réouverture dans ${min} min`
+      };
+
+      const openingSoon = {
+        it: (min) => `Apriamo tra ${min} min`,
+        en: (min) => `Opening in ${min} min`,
+        de: (min) => `Öffnet in ${min} Min.`,
+        es: (min) => `Abrimos en ${min} min`,
+        fr: (min) => `Ouverture dans ${min} min`
+      };
+
+      // Sunday = 0, closed all day
+      if (day === 0) {
+        isOpen = false;
+        statusText = strings.closed;
+        nextOpenInfo = strings.reopenMonday;
+      }
+      // Monday to Saturday (1-6)
+      else if (day >= 1 && day <= 6) {
+        // Morning hours: 09:00 - 13:30
+        if (currentTime >= morningOpen && currentTime < morningClose) {
+          isOpen = true;
+          statusText = strings.open;
+          const minutesLeft = morningClose - currentTime;
+          if (minutesLeft <= 30) {
+            nextOpenInfo = closingSoon[lang](minutesLeft);
+          }
+        }
+        // Lunch break: 13:30 - 15:30
+        else if (currentTime >= morningClose && currentTime < afternoonOpen) {
           isOpen = false;
-          statusText = 'Chiuso';
-          nextOpenInfo = 'Riapriamo lunedì alle 09:00';
-        }
-        // Monday to Saturday (1-6)
-        else if (day >= 1 && day <= 6) {
-          // Morning hours: 09:00 - 13:30
-          if (currentTime >= morningOpen && currentTime < morningClose) {
-            isOpen = true;
-            statusText = 'Aperto ora';
-            const minutesLeft = morningClose - currentTime;
-            if (minutesLeft <= 30) {
-              nextOpenInfo = `Chiude tra ${minutesLeft} min per pausa pranzo`;
-            }
-          }
-          // Lunch break: 13:30 - 15:30
-          else if (currentTime >= morningClose && currentTime < afternoonOpen) {
-            isOpen = false;
-            statusText = 'Pausa pranzo';
-            const minutesToOpen = afternoonOpen - currentTime;
-            if (minutesToOpen <= 60) {
-              nextOpenInfo = `Riapriamo tra ${minutesToOpen} min`;
-            } else {
-              nextOpenInfo = 'Riapriamo alle 15:30';
-            }
-          }
-          // Afternoon hours: 15:30 - 19:00
-          else if (currentTime >= afternoonOpen && currentTime < afternoonClose) {
-            isOpen = true;
-            statusText = 'Aperto ora';
-            const minutesLeft = afternoonClose - currentTime;
-            if (minutesLeft <= 30) {
-              nextOpenInfo = `Chiude tra ${minutesLeft} min`;
-            }
-          }
-          // Before opening (< 09:00)
-          else if (currentTime < morningOpen) {
-            isOpen = false;
-            statusText = 'Chiuso';
-            const minutesToOpen = morningOpen - currentTime;
-            if (minutesToOpen <= 60) {
-              nextOpenInfo = `Apriamo tra ${minutesToOpen} min`;
-            } else {
-              nextOpenInfo = 'Apriamo alle 09:00';
-            }
-          }
-          // After closing (>= 19:00)
-          else {
-            isOpen = false;
-            statusText = 'Chiuso';
-            if (day === 6) {
-              nextOpenInfo = 'Riapriamo lunedì alle 09:00';
-            } else {
-              nextOpenInfo = 'Riapriamo domani alle 09:00';
-            }
+          statusText = strings.lunchbreak;
+          const minutesToOpen = afternoonOpen - currentTime;
+          if (minutesToOpen <= 60) {
+            nextOpenInfo = reopeningSoon[lang](minutesToOpen);
+          } else {
+            nextOpenInfo = strings.reopenAt;
           }
         }
-
-        // Update DOM
-        statusElement.className = 'open-status ' + (isOpen ? 'is-open' : 'is-closed');
-        statusElement.innerHTML = `
-          <span class="status-dot"></span>
-          <span class="status-text">${statusText}</span>
-          ${nextOpenInfo ? `<span class="status-info">${nextOpenInfo}</span>` : ''}
-        `;
+        // Afternoon hours: 15:30 - 19:00
+        else if (currentTime >= afternoonOpen && currentTime < afternoonClose) {
+          isOpen = true;
+          statusText = strings.open;
+          const minutesLeft = afternoonClose - currentTime;
+          if (minutesLeft <= 30) {
+            nextOpenInfo = closingSoonEvening[lang](minutesLeft);
+          }
+        }
+        // Before opening (< 09:00)
+        else if (currentTime < morningOpen) {
+          isOpen = false;
+          statusText = strings.closed;
+          const minutesToOpen = morningOpen - currentTime;
+          if (minutesToOpen <= 60) {
+            nextOpenInfo = openingSoon[lang](minutesToOpen);
+          } else {
+            nextOpenInfo = strings.openAt;
+          }
+        }
+        // After closing (>= 19:00)
+        else {
+          isOpen = false;
+          statusText = strings.closed;
+          if (day === 6) {
+            nextOpenInfo = strings.reopenMonday;
+          } else {
+            nextOpenInfo = strings.reopenTomorrow;
+          }
+        }
       }
 
-      // Run immediately
-      updateOpenStatus();
+      // Update DOM
+      statusElement.className = 'open-status ' + (isOpen ? 'is-open' : 'is-closed');
+      statusElement.innerHTML = `
+        <span class="status-dot"></span>
+        <span class="status-text">${statusText}</span>
+        ${nextOpenInfo ? `<span class="status-info">${nextOpenInfo}</span>` : ''}
+      `;
+    }
 
-      // Update every minute
-      setInterval(updateOpenStatus, 60000);
-    })();
+    // Run immediately
+    updateOpenStatus();
+
+    // Update every minute
+    setInterval(updateOpenStatus, 60000);
+
+    // Update when language changes
+    window.addEventListener('languageChanged', updateOpenStatus);
   </script>
 
   <!-- Lightbox Gallery Script -->

@@ -1,4 +1,5 @@
 import './style.css'
+import { translations, languages, t, getCurrentLanguage, setLanguage } from './translations.js'
 
 // Mobile Menu Toggle
 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -21,7 +22,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     e.preventDefault();
     const targetId = this.getAttribute('href');
     if (targetId === '#') return;
-    
+
     const targetElement = document.querySelector(targetId);
     if (targetElement) {
       // Adjust for sticky header
@@ -36,3 +37,49 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
   });
 });
+
+// Language Selector
+const langSelector = document.getElementById('language-selector');
+const langToggle = document.getElementById('lang-toggle');
+const langDropdown = document.getElementById('lang-dropdown');
+const langOptions = document.querySelectorAll('.lang-option');
+
+// Toggle dropdown
+langToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  langSelector.classList.toggle('active');
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (!langSelector.contains(e.target)) {
+    langSelector.classList.remove('active');
+  }
+});
+
+// Handle language selection
+langOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    const lang = option.getAttribute('data-lang');
+    setLanguage(lang);
+    langSelector.classList.remove('active');
+
+    // Update active state
+    langOptions.forEach(opt => opt.classList.remove('active'));
+    option.classList.add('active');
+  });
+});
+
+// Initialize language on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const currentLang = getCurrentLanguage();
+  setLanguage(currentLang);
+
+  // Set active class on current language option
+  langOptions.forEach(opt => {
+    if (opt.getAttribute('data-lang') === currentLang) {
+      opt.classList.add('active');
+    }
+  });
+});
+
