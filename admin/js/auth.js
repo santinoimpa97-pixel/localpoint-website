@@ -19,7 +19,7 @@ if (loginForm) {
 
             if (error) throw error
 
-            window.location.href = './dashboard.html'
+            window.location.href = '/admin/dashboard.html'
         } catch (error) {
             errorMsg.textContent = "Errore: " + error.message
             errorMsg.classList.remove('hidden')
@@ -34,7 +34,7 @@ async function checkAuth() {
 
     // Se siamo nella pagina di login/index e l'utente è loggato -> vai alla dashboard
     if (session) {
-        window.location.href = './dashboard.html'
+        window.location.href = '/admin/dashboard.html'
     }
 }
 

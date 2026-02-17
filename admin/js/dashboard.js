@@ -14,7 +14,7 @@ const GOOGLE_REVIEW_URL = 'https://g.page/r/CQSpCw3gaeKjEAE/review'
 async function checkAuth() {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
-        window.location.href = './index.html'
+        window.location.href = '/admin/index.html'
     }
 }
 checkAuth()
@@ -75,7 +75,7 @@ window.switchView = switchView
 // Logout
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
     await supabase.auth.signOut()
-    window.location.href = './index.html'
+    window.location.href = '/admin/index.html'
 })
 
 
