@@ -430,25 +430,6 @@
                         </div>
                     </div>
 
-                    <!-- Action Bar -->
-                    <div class="flex flex-wrap items-center gap-3 bg-white p-4 rounded-xl shadow-sm">
-                        <span class="text-sm font-semibold text-gray-600">Filtra lista:</span>
-                        <select id="acc-filter-type"
-                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
-                            <option value="all">Tutti i tipi</option>
-                            <option value="income">💰 Solo Entrate</option>
-                            <option value="expense">💸 Solo Uscite</option>
-                        </select>
-                        <select id="acc-filter-category"
-                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
-                            <option value="all">Tutte le categorie</option>
-                        </select>
-                        <div class="flex-1"></div>
-                        <button id="acc-export-csv"
-                            class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
-                            📥 Scarica CSV
-                        </button>
-                    </div>
 
                     <!-- New Transaction Form -->
                     <div class="bg-white rounded-xl shadow-sm p-5">
@@ -494,12 +475,40 @@
                         </form>
                     </div>
 
+                    <!-- Action Bar (Filtra lista) -->
+                    <div class="flex flex-wrap items-center gap-3 bg-white p-4 rounded-xl shadow-sm">
+                        <span class="text-sm font-semibold text-gray-600">Filtra lista:</span>
+                        <select id="acc-filter-type"
+                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
+                            <option value="all">Tutti i tipi</option>
+                            <option value="income">💰 Solo Entrate</option>
+                            <option value="expense">💸 Solo Uscite</option>
+                        </select>
+                        <select id="acc-filter-category"
+                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
+                            <option value="all">Tutte le categorie</option>
+                        </select>
+                        <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-md border border-gray-200">
+                            <span class="text-xs font-bold text-gray-400 px-1">DAL</span>
+                            <input type="date" id="acc-date-from"
+                                class="border-none bg-transparent text-sm focus:ring-0 p-0">
+                            <span class="text-xs font-bold text-gray-400 px-1">AL</span>
+                            <input type="date" id="acc-date-to"
+                                class="border-none bg-transparent text-sm focus:ring-0 p-0">
+                        </div>
+                        <input type="text" id="acc-search" placeholder="🔍 Cerca transazione..."
+                            class="rounded-md border-gray-200 shadow-sm p-2 border text-sm w-64 bg-gray-50">
+                        <div class="flex-1"></div>
+                        <button id="acc-export-csv"
+                            class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                            📥 Scarica CSV
+                        </button>
+                    </div>
+
                     <!-- Transactions Table -->
                     <div class="bg-white rounded-xl shadow-sm p-5">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-800">📋 Transazioni</h3>
-                            <input type="text" id="acc-search" placeholder="🔍 Cerca..."
-                                class="rounded-md border-gray-300 shadow-sm p-2 border text-sm w-64">
                         </div>
                         <!-- Bulk bar -->
                         <div id="acc-bulk-bar"

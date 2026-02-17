@@ -1140,11 +1140,36 @@ function initAccounting() {
     // Set Date Input
     if (accDateInput) accDateInput.value = now.toISOString().slice(0, 10)
 
+    // Initial load: set range to current month
+    syncRangeToPeriod()
+
     updateFormCategories()
+    updateFilterCategories()
 
     // Mode toggles
     document.getElementById('acc-mode-month')?.addEventListener('click', () => setAccMode('month'))
     document.getElementById('acc-mode-year')?.addEventListener('click', () => setAccMode('year'))
+}
+
+// Helper to sync the Action Bar dates to the selected Month/Year
+function syncRangeToPeriod() {
+    const year = parseInt(accYearSelect?.value) || new Date().getFullYear()
+    const month = parseInt(accMonthSelect?.value) || 0
+    const mode = accMode
+
+    let start, end
+    if (mode === 'month') {
+        start = new Date(year, month, 1)
+        end = new Date(year, month + 1, 0)
+    } else {
+        start = new Date(year, 0, 1)
+        end = new Date(year, 11, 31)
+    }
+
+    const df = document.getElementById('acc-date-from')
+    const dt = document.getElementById('acc-date-to')
+    if (df) df.value = start.toISOString().slice(0, 10)
+    if (dt) dt.value = end.toISOString().slice(0, 10)
 }
 initAccounting()
 
@@ -1157,15 +1182,20 @@ function setAccMode(mode) {
     if (mode === 'month') {
         btnMonth.className = 'flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-md font-medium transition'
         btnYear.className = 'flex-1 bg-gray-100 text-gray-600 text-sm py-1.5 rounded-md font-medium hover:bg-gray-200 transition'
-        selMonth.disabled = false
-        selMonth.classList.remove('opacity-50')
+        if (selMonth) {
+            selMonth.disabled = false
+            selMonth.style.opacity = '1'
+        }
     } else {
         btnMonth.className = 'flex-1 bg-gray-100 text-gray-600 text-sm py-1.5 rounded-md font-medium hover:bg-gray-200 transition'
         btnYear.className = 'flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-md font-medium transition'
-        selMonth.disabled = true
-        selMonth.classList.add('opacity-50')
+        if (selMonth) {
+            selMonth.disabled = true
+            selMonth.style.opacity = '0.5'
+        }
     }
-    loadAccounting()
+
+    filterByPeriod()
 }
 
 // --- Dynamic categories based on type ---
@@ -1179,21 +1209,34 @@ accTypeSelect?.addEventListener('change', updateFormCategories)
 
 // --- Populate filter category dropdown ---
 // --- Populate filter category dropdown ---
-function updateFilterCategories(subset) {
-    if (!accFilterCategory) return
-    const current = accFilterCategory.value
+function updateFilterCategories() {
+    if (!accFilterCategory || !accFilterType) return
+    const currentType = accFilterType.value
+    const currentCategory = accFilterCategory.value
+
     accFilterCategory.innerHTML = '<option value="all">Tutte le categorie</option>'
 
-    const source = subset || allTransactions
-    const cats = [...new Set(source.map(t => t.category))].sort()
+    let cats = []
+    if (currentType === 'income') {
+        cats = TRANSACTION_CATEGORIES.income
+    } else if (currentType === 'expense') {
+        cats = TRANSACTION_CATEGORIES.expense
+    }
+    // If currentType === 'all', cats remains empty, so only "Tutte le categorie" remains, as requested.
 
-    cats.forEach(c => {
+    cats.sort().forEach(c => {
         const opt = document.createElement('option')
         opt.value = c
         opt.textContent = c
         accFilterCategory.appendChild(opt)
     })
-    accFilterCategory.value = current || 'all'
+
+    // Try to restore selection if it's still valid, otherwise reset to 'all'
+    if (cats.includes(currentCategory)) {
+        accFilterCategory.value = currentCategory
+    } else {
+        accFilterCategory.value = 'all'
+    }
 }
 
 // --- Load Transactions ---
@@ -1215,100 +1258,88 @@ async function loadAccounting() {
 
     allTransactions = data || []
 
-    // 2. Pre-filter by Date (Month/Year)
-    filterByPeriod()
+    // 2. Sync UI and Filter
+    syncRangeToPeriod()
+    updateFilterCategories()
+    applyFilters()
 }
 
 function filterByPeriod() {
-    if (!allTransactions) return
-
-    const mode = accMode
-    const selectedYear = parseInt(accYearSelect?.value) || new Date().getFullYear()
-    const selectedMonth = parseInt(accMonthSelect?.value) || 0
-
-    // Filter only by the selected period
-    // We keep these in a separate list "periodTransactions" if we wanted, 
-    // but here we can just update "applyFilters" to start from the period-filtered list.
-    // For simplicity, let's keep "allTransactions" as the DB dump, 
-    // and create a "currentPeriodTransactions" concept.
-
-    // Let's filter in place for the view, but keep allTransactions as raw cache
-    const periodData = allTransactions.filter(t => {
-        const d = new Date(t.date)
-        const y = d.getFullYear()
-        const m = d.getMonth()
-
-        if (mode === 'month') {
-            return y === selectedYear && m === selectedMonth
-        } else {
-            return y === selectedYear
-        }
-    })
-
-    // Now apply other filters (Search, Type, Category) on top of periodData
-    applyFilters(periodData)
-    updateFilterCategories(periodData)
+    syncRangeToPeriod()
+    applyFilters()
 }
 
 // --- Apply filters ---
-// --- Apply filters ---
-function applyFilters(dataset) {
-    // If dataset is passed, use it (it's the period-filtered data).
-    // If not passed, we re-run filterByPeriod to get it.
-    // But usually this function is called by UI events (change/input), so we need to know the source.
-    // Let's make "dataset" optional, but we need a global "currentPeriodTransactions" or just helper.
+function applyFilters() {
+    if (!allTransactions) return
 
-    // BETTER APPROACH: always re-filter from allTransactions
-    const mode = accMode
-    const selectedYear = parseInt(accYearSelect?.value) || new Date().getFullYear()
-    const selectedMonth = parseInt(accMonthSelect?.value) || 0
+    let list = [...allTransactions]
 
-    let list = allTransactions.filter(t => {
-        const d = new Date(t.date)
-        if (mode === 'month') return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth
-        return d.getFullYear() === selectedYear
-    })
+    // 1. Date Range (Single source of truth)
+    const dateFrom = document.getElementById('acc-date-from')?.value
+    const dateTo = document.getElementById('acc-date-to')?.value
+    if (dateFrom && dateTo) {
+        const start = new Date(dateFrom)
+        const end = new Date(dateTo)
+        end.setHours(23, 59, 59, 999)
+        list = list.filter(t => {
+            const d = new Date(t.date)
+            return d >= start && d <= end
+        })
+    }
 
-    // Type filter
+    // 2. Type filter
     const typeFilter = accFilterType?.value || 'all'
     if (typeFilter !== 'all') {
         list = list.filter(t => t.type === typeFilter)
     }
 
-    // Category filter
+    // 3. Category filter
     const catFilter = accFilterCategory?.value || 'all'
     if (catFilter !== 'all') {
         list = list.filter(t => t.category === catFilter)
     }
 
-    // Search
+    // 4. Search
     const q = (accSearch?.value || '').trim().toLowerCase()
     if (q) {
         list = list.filter(t =>
             (t.description || '').toLowerCase().includes(q) ||
-            t.category.toLowerCase().includes(q) ||
-            String(t.amount).includes(q)
+            (t.category || '').toLowerCase().includes(q) ||
+            String(t.amount || '').includes(q)
         )
     }
 
     filteredTransactions = list
-    renderAccountingSummary()
+
+    // Update EVERYTHING in sync
+    renderAccountingSummary(list)
+    renderCharts(list)
+    renderCategoryProgress(list)
     renderTransactionList()
-    renderCharts()
-    renderCategoryProgress()
+
+    // Update category dropdown if needed? 
+    // Usually it's better to keep it showing all available categories for the base period
+    // but the user wants "sintonia", so let's keep it clean.
 }
 
 // Bind filters
 accMonthSelect?.addEventListener('change', loadAccounting)
 accYearSelect?.addEventListener('change', loadAccounting)
-accFilterType?.addEventListener('change', applyFilters)
+accFilterType?.addEventListener('change', () => {
+    updateFilterCategories()
+    applyFilters()
+})
 accFilterCategory?.addEventListener('change', applyFilters)
 accSearch?.addEventListener('input', applyFilters)
+document.getElementById('acc-date-from')?.addEventListener('change', applyFilters)
+document.getElementById('acc-date-to')?.addEventListener('change', applyFilters)
 
 // --- Render Summary Cards ---
-function renderAccountingSummary() {
-    const income = filteredTransactions.filter(t => t.type === 'income').reduce((s, t) => s + parseFloat(t.amount), 0)
-    const expenses = filteredTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + parseFloat(t.amount), 0)
+function renderAccountingSummary(data) {
+    const source = data || filteredTransactions // fallback
+    const income = source.filter(t => t.type === 'income').reduce((s, t) => s + parseFloat(t.amount), 0)
+    const expenses = source.filter(t => t.type === 'expense').reduce((s, t) => s + parseFloat(t.amount), 0)
     const balance = income - expenses
 
     const fmt = n => `€ ${n.toFixed(2).replace('.', ',')}`
@@ -1384,7 +1415,7 @@ function renderCharts() {
     if (ctxCat) {
         if (catChart) catChart.destroy()
 
-        const expenses = allTransactions.filter(t => t.type === 'expense')
+        const expenses = filteredTransactions.filter(t => t.type === 'expense')
         const catMap = {}
         expenses.forEach(t => {
             catMap[t.category] = (catMap[t.category] || 0) + t.amount
@@ -1411,7 +1442,7 @@ function renderCategoryProgress() {
     if (!container) return
     container.innerHTML = ''
 
-    const expenses = allTransactions.filter(t => t.type === 'expense')
+    const expenses = filteredTransactions.filter(t => t.type === 'expense')
     const totalExp = expenses.reduce((s, t) => s + t.amount, 0) || 1 // avoid div/0
     const catMap = {}
     expenses.forEach(t => catMap[t.category] = (catMap[t.category] || 0) + t.amount)
