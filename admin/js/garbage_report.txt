@@ -1,0 +1,57 @@
+Garbage Analysis Report:
+
+Found "In Attesa di Conferma" at char index 86298
+Byte offset: 86736
+Next 20 bytes (Hex): 20e282acc28fc3b3272c0a20202020202020206e
+Next 20 bytes (String):  €ó',
+        n
+
+-------------------
+
+Euro at offset 3438: e282ac20247b746f7461 | "€ ${tota"
+Euro at offset 3610: e282ac34203d20e282ac | "€4 = €"
+Euro at offset 3617: e282ac247b746f74616c | "€${total"
+Euro at offset 8213: e282ac20247b7469636b | "€ ${tick"
+Euro at offset 14252: e282ac20247b7469636b | "€ ${tick"
+Euro at offset 22376: e282ac310a636f6e7374 | "€1\nconst"
+Euro at offset 23391: e282ac247b4558545241 | "€${EXTRA"
+Euro at offset 23428: e282ac247b6578747261 | "€${extra"
+Euro at offset 23654: e282ac34203d20e282ac | "€4 = €"
+Euro at offset 23661: e282ac247b6261736550 | "€${baseP"
+Euro at offset 23811: e282ac247b7375676765 | "€${sugge"
+Euro at offset 24053: e282ac247b7375676765 | "€${sugge"
+Euro at offset 30241: e282ac31206f676e6920 | "€1 ogni "
+Euro at offset 30863: e282ac31207065722036 | "€1 per 6"
+Euro at offset 31616: e282ac2070726f203620 | "€ pro 6 "
+Euro at offset 32323: e282ac20706172207472 | "€ par tr"
+Euro at offset 33038: e282ac20706f72206361 | "€ por ca"
+Euro at offset 36425: e282ac20247b70617273 | "€ ${pars"
+Euro at offset 38292: e282acc29dc592204572 | "€Œ Er"
+Euro at offset 40722: e282ac206269656e74c3 | "€ bient�"
+Euro at offset 44590: e282ac20247b70617273 | "€ ${pars"
+Euro at offset 46321: e282acc29dc592204572 | "€Œ Er"
+Euro at offset 54699: e282ac20247b6e2e746f | "€ ${n.to"
+Euro at offset 59163: e282ac20247b616d742e | "€ ${amt."
+Euro at offset 61138: e282ac20247b70617273 | "€ ${pars"
+Euro at offset 67565: e282ac247b616d6f756e | "€${amoun"
+Euro at offset 67884: e282ac247b696e636f6d | "€${incom"
+Euro at offset 67962: e282ac247b657870656e | "€${expen"
+Euro at offset 68043: e282ac247b28696e636f | "€${(inco"
+Euro at offset 69595: e282acc29dc59220416e | "€Œ An"
+Euro at offset 74072: e282ac20247b72657665 | "€ ${reve"
+Euro at offset 76886: e282ac20247b746f7461 | "€ ${tota"
+Euro at offset 76986: e282ac20247b6465706f | "€ ${depo"
+Euro at offset 77061: e282ac20247b72656d61 | "€ ${rema"
+Euro at offset 86758: e282acc28fc3b3272c0a | "€ó',\n"
+Euro at offset 87505: e282acc28fc3b3272c0a | "€ó',\n"
+Euro at offset 88266: e282acc28fc3b3272c0a | "€ó',\n"
+Euro at offset 89078: e282acc28fc3b3272c0a | "€ó',\n"
+Euro at offset 89846: e282acc28fc3b3272c0a | "€ó',\n"
+Euro at offset 92061: e282ac20247b6465706f | "€ ${depo"
+Euro at offset 92386: e282ac20247b62616c61 | "€ ${bala"
+Euro at offset 92696: e282ac20247b746f7461 | "€ ${tota"
+Euro at offset 96503: e282acc29dc592204572 | "€Œ Er"
+Euro at offset 98979: e282ac20247b6e2e746f | "€ ${n.to"
+Euro at offset 100533: e282ac20247b70617273 | "€ ${pars"
+Euro at offset 100703: e282acc28fc2b120247b | "€± ${"
+Euro at offset 102987: e282acc28fc3b320247b | "€ó ${"

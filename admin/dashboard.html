@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LocalPoint Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Icone Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-md hidden md:flex flex-col">
+            <div class="p-5 border-b text-center">
+                <img src="/logo.png" alt="LocalPoint" class="h-10 mx-auto mb-1">
+                <p class="text-xs text-gray-400 font-medium">Admin Panel</p>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2">
+                <button id="nav-dashboard"
+                    class="w-full flex items-center space-x-3 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg transition-colors">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span class="font-medium">Dashboard</span>
+                </button>
+                <button id="nav-accounting"
+                    class="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                    <span class="font-medium">Contabilità</span>
+                </button>
+                <button id="nav-reservations"
+                    class="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                    <span class="font-medium">Prenotazioni</span>
+                </button>
+                <button id="nav-luggage"
+                    class="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                    <i data-lucide="luggage" class="w-5 h-5"></i>
+                    <span class="font-medium">Bagagli</span>
+                </button>
+            </nav>
+
+            <div class="p-4 border-t">
+                <button id="logout-btn"
+                    class="flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg w-full transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span class="font-medium">Esci</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Mobile Header -->
+            <header class="bg-white shadow-sm md:hidden p-4 flex justify-between items-center">
+                <span class="font-bold text-lg text-blue-600">LocalPoint</span>
+                <button class="text-gray-600">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </header>
+
+            <!-- Content Scrollable Area -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+
+                <!-- SECTION: Dashboard Home -->
+                <div id="view-dashboard" class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-semibold text-gray-800">🏠 Panoramica</h2>
+                        <p id="home-date" class="text-sm text-gray-500"></p>
+                    </div>
+
+                    <!-- KPI Cards Row 1 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
+                            <p class="text-xs text-gray-500 font-medium">🧳 Bagagli Attivi</p>
+                            <p id="home-luggage" class="text-2xl font-bold text-blue-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-green-500">
+                            <p class="text-xs text-gray-500 font-medium">💰 Incasso Oggi</p>
+                            <p id="home-today-income" class="text-2xl font-bold text-green-600 mt-1">€ 0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-emerald-500">
+                            <p class="text-xs text-gray-500 font-medium">📈 Entrate Mese</p>
+                            <p id="home-month-income" class="text-2xl font-bold text-emerald-600 mt-1">€ 0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-red-400">
+                            <p class="text-xs text-gray-500 font-medium">📉 Uscite Mese</p>
+                            <p id="home-month-expenses" class="text-2xl font-bold text-red-500 mt-1">€ 0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-indigo-500">
+                            <p class="text-xs text-gray-500 font-medium">📊 Bilancio Netto</p>
+                            <p id="home-net" class="text-2xl font-bold text-indigo-600 mt-1">€ 0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500">
+                            <p class="text-xs text-gray-500 font-medium">📅 Prenotazioni Attive</p>
+                            <p id="home-reservations" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart + Activity -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Revenue Chart -->
+                        <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📊 Andamento Mensile</h3>
+                            <div style="position: relative; height: 280px;">
+                                <canvas id="home-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="bg-white rounded-xl shadow-sm p-5">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">⚡ Azioni Rapide</h3>
+                            <div class="space-y-3">
+                                <button onclick="switchView('luggage')"
+                                    class="w-full flex items-center space-x-3 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition font-medium text-sm">
+                                    <span>🧳</span><span>Nuovo Deposito Bagagli</span>
+                                </button>
+                                <button onclick="switchView('reservations')"
+                                    class="w-full flex items-center space-x-3 px-4 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg transition font-medium text-sm">
+                                    <span>📅</span><span>Nuova Prenotazione</span>
+                                </button>
+                                <button onclick="switchView('accounting')"
+                                    class="w-full flex items-center space-x-3 px-4 py-3 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition font-medium text-sm">
+                                    <span>💰</span><span>Aggiungi Transazione</span>
+                                </button>
+                            </div>
+
+                            <!-- Today's summary -->
+                            <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-3">📅 Oggi</h3>
+                            <div id="home-today-list" class="space-y-2 max-h-[220px] overflow-y-auto">
+                                <p class="text-sm text-gray-400 text-center py-4">Nessuna attività oggi</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Details: Luggage + Reservations -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Active Luggage -->
+                        <div class="bg-white rounded-xl shadow-sm p-5">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">🧳 Bagagli Attivi Ora</h3>
+                            <div id="home-active-luggage" class="space-y-2 max-h-[300px] overflow-y-auto">
+                                <p class="text-sm text-gray-400 text-center py-4">Nessun bagaglio in deposito</p>
+                            </div>
+                        </div>
+
+                        <!-- Today's Reservations -->
+                        <div class="bg-white rounded-xl shadow-sm p-5">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📅 Prenotazioni di Oggi</h3>
+                            <div id="home-today-reservations" class="space-y-2 max-h-[300px] overflow-y-auto">
+                                <p class="text-sm text-gray-400 text-center py-4">Nessuna prenotazione oggi</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- SECTION: Luggage Management -->
+                <div id="view-luggage" class="hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-semibold text-gray-800">Gestione Bagagli</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Form Check-in -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-1">
+                            <h3 class="font-semibold text-lg mb-4">Nuovo Deposito</h3>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-sm text-blue-700">
+                                💰 Tariffa: <strong>€ 4,00 per bagaglio al giorno</strong> (minimo 1 giorno)
+                            </div>
+                            <form id="luggage-form" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Inizio Deposito</label>
+                                        <input type="datetime-local" id="luggage-datetime"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Fine Deposito</label>
+                                        <input type="datetime-local" id="luggage-datetime-end"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    </div>
+                                </div>
+                                <div id="days-info" class="text-xs text-gray-500 -mt-2">Durata: 1 giorno</div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Nome Cliente</label>
+                                    <input type="text" id="luggage-name" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Email (Opzionale)</label>
+                                        <input type="email" id="luggage-email"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                            placeholder="per invio conferma">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Telefono
+                                            (Opzionale)</label>
+                                        <input type="tel" id="luggage-phone"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                            placeholder="+39 333 1234567">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Lingua Email</label>
+                                    <select id="luggage-lang"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="it">🇮🇹 Italiano</option>
+                                        <option value="en">🇬🇧 English</option>
+                                        <option value="de">🇩🇪 Deutsch</option>
+                                        <option value="fr">🇫🇷 Français</option>
+                                        <option value="es">🇪🇸 Español</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">N. Bagagli</label>
+                                        <input type="number" id="luggage-count" required min="1" value="1"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Totale (€)</label>
+                                        <input type="text" id="luggage-price" readonly value="€ 4,00"
+                                            class="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm p-2 border text-green-700 font-bold cursor-not-allowed">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Note (Opzionale)</label>
+                                    <textarea id="luggage-notes" rows="2"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                        placeholder="es. valigia rossa, zaino nero..."></textarea>
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-medium">Deposita
+                                    & Genera Codice</button>
+                            </form>
+                        </div>
+
+                        <!-- Active List -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-lg">Bagagli in Deposito</h3>
+                            </div>
+                            <div class="mb-4">
+                                <input type="text" id="luggage-search"
+                                    placeholder="🔍 Cerca per codice (#A1B2C3D4) o nome cliente..."
+                                    class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Codice</th>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Cliente</th>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Info</th>
+                                            <th
+                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Note</th>
+                                            <th
+                                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Azioni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="luggage-list" class="bg-white divide-y divide-gray-200">
+                                        <!-- JS will populate rows here -->
+                                        <tr>
+                                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Nessun
+                                                bagaglio in deposito</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Returned Luggage History -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">📦 Storico Restituzioni</h3>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" id="returned-search" placeholder="🔍 Cerca per codice o nome cliente..."
+                                class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                        </div>
+                        <!-- Bulk delete bar -->
+                        <div id="returned-bulk-bar"
+                            class="hidden bg-red-50 border border-red-200 rounded-lg p-3 mb-3 flex items-center justify-between">
+                            <span class="text-sm text-red-700 font-medium">
+                                <span id="returned-selected-count">0</span> selezionati
+                            </span>
+                            <button id="returned-bulk-delete"
+                                class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-1.5 rounded-lg font-medium transition">
+                                🗑 Elimina selezionati
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left">
+                                            <input type="checkbox" id="returned-select-all"
+                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                        </th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Codice</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Cliente</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Bagagli / Prezzo</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Deposito</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Restituzione</th>
+                                        <th
+                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Note</th>
+                                        <th
+                                            class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="luggage-returned-list" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="8" class="px-4 py-4 text-center text-sm text-gray-500">Nessuna
+                                            restituzione registrata</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+
+                <!-- SECTION: Accounting -->
+                <div id="view-accounting" class="hidden space-y-6">
+
+                    <!-- Period & Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Controls & KPI -->
+                        <div class="space-y-4">
+                            <!-- Filters -->
+                            <div class="bg-white rounded-xl shadow-sm p-5">
+                                <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3">📅 Periodo</h3>
+                                <div class="flex items-center gap-2 mb-3">
+                                    <button id="acc-mode-month"
+                                        class="flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-md font-medium transition">Mese</button>
+                                    <button id="acc-mode-year"
+                                        class="flex-1 bg-gray-100 text-gray-600 text-sm py-1.5 rounded-md font-medium hover:bg-gray-200 transition">Anno</button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <select id="acc-month"
+                                        class="flex-1 rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                                        <option value="0">Gennaio</option>
+                                        <option value="1">Febbraio</option>
+                                        <option value="2">Marzo</option>
+                                        <option value="3">Aprile</option>
+                                        <option value="4">Maggio</option>
+                                        <option value="5">Giugno</option>
+                                        <option value="6">Luglio</option>
+                                        <option value="7">Agosto</option>
+                                        <option value="8">Settembre</option>
+                                        <option value="9">Ottobre</option>
+                                        <option value="10">Novembre</option>
+                                        <option value="11">Dicembre</option>
+                                    </select>
+                                    <select id="acc-year"
+                                        class="flex-1 rounded-md border-gray-300 shadow-sm p-2 border text-sm"></select>
+                                </div>
+                            </div>
+
+                            <!-- KPIs -->
+                            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">💰 Entrate</p>
+                                <p id="acc-income" class="text-2xl font-bold text-green-600 mt-1">€ 0,00</p>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-red-500">
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">💸 Uscite</p>
+                                <p id="acc-expenses" class="text-2xl font-bold text-red-600 mt-1">€ 0,00</p>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">📊 Bilancio Netto</p>
+                                <p id="acc-balance" class="text-2xl font-bold text-blue-600 mt-1">€ 0,00</p>
+                            </div>
+                        </div>
+
+                        <!-- Main Chart -->
+                        <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-2 flex flex-col">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">📈 Andamento</h3>
+                            <div class="flex-1 relative" style="min-height: 250px;">
+                                <canvas id="acc-main-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Categories & Detailed Filters -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Expense Breakdown Chart -->
+                        <div class="bg-white rounded-xl shadow-sm p-5">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">🍰 Spese per Categoria</h3>
+                            <div class="relative" style="height: 200px;">
+                                <canvas id="acc-cat-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Category Progress Bars -->
+                        <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-2">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">📑 Dettaglio Categorie</h3>
+                            <div id="acc-cat-progress"
+                                class="space-y-4 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="flex flex-wrap items-center gap-3 bg-white p-4 rounded-xl shadow-sm">
+                        <span class="text-sm font-semibold text-gray-600">Filtra lista:</span>
+                        <select id="acc-filter-type"
+                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
+                            <option value="all">Tutti i tipi</option>
+                            <option value="income">💰 Solo Entrate</option>
+                            <option value="expense">💸 Solo Uscite</option>
+                        </select>
+                        <select id="acc-filter-category"
+                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
+                            <option value="all">Tutte le categorie</option>
+                        </select>
+                        <div class="flex-1"></div>
+                        <button id="acc-export-csv"
+                            class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                            📥 Scarica CSV
+                        </button>
+                    </div>
+
+                    <!-- New Transaction Form -->
+                    <div class="bg-white rounded-xl shadow-sm p-5">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">➕ Nuova Transazione</h3>
+                        <form id="acc-form" class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                                <select id="acc-type" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    <option value="income">💰 Entrata</option>
+                                    <option value="expense">💸 Uscita</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Importo (€)</label>
+                                <input type="number" id="acc-amount" min="0.01" step="0.01" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                    placeholder="0,00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Categoria</label>
+                                <select id="acc-category" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Descrizione</label>
+                                <input type="text" id="acc-description"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                    placeholder="Opzionale">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Data</label>
+                                <input type="date" id="acc-date" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <button type="submit"
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg font-medium transition">
+                                    Salva
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Transactions Table -->
+                    <div class="bg-white rounded-xl shadow-sm p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">📋 Transazioni</h3>
+                            <input type="text" id="acc-search" placeholder="🔍 Cerca..."
+                                class="rounded-md border-gray-300 shadow-sm p-2 border text-sm w-64">
+                        </div>
+                        <!-- Bulk bar -->
+                        <div id="acc-bulk-bar"
+                            class="hidden bg-red-50 border border-red-200 rounded-lg p-3 mb-3 flex items-center justify-between">
+                            <span class="text-sm text-red-700 font-medium">
+                                <span id="acc-selected-count">0</span> selezionati
+                            </span>
+                            <button id="acc-bulk-delete"
+                                class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-1.5 rounded-lg font-medium transition">
+                                🗑 Elimina selezionati
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left">
+                                            <input type="checkbox" id="acc-select-all"
+                                                class="rounded border-gray-300 text-blue-600 cursor-pointer">
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Categoria</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Descrizione</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                            Importo</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                            Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="acc-list" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="7" class="px-4 py-4 text-center text-sm text-gray-500">Nessuna
+                                            transazione</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <!-- SECTION: Reservations -->
+                <div id="view-reservations" class="hidden space-y-6">
+
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+                            <p class="text-sm text-gray-500 font-medium">📅 Oggi</p>
+                            <p id="res-today" class="text-2xl font-bold text-blue-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-purple-500">
+                            <p class="text-sm text-gray-500 font-medium">📆 Questa Settimana</p>
+                            <p id="res-week" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-yellow-500">
+                            <p class="text-sm text-gray-500 font-medium">⏳ In Attesa</p>
+                            <p id="res-pending" class="text-2xl font-bold text-yellow-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
+                            <p class="text-sm text-gray-500 font-medium">💰 Incasso Previsto</p>
+                            <p id="res-revenue" class="text-2xl font-bold text-green-600 mt-1">€ 0</p>
+                        </div>
+                    </div>
+
+                    <!-- New Reservation Form -->
+                    <div class="bg-white rounded-xl shadow-sm p-5">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">➕ Nuova Prenotazione</h3>
+                        <form id="res-form" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Tipo Servizio</label>
+                                    <select id="res-service-type" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Nome Cliente</label>
+                                    <input type="text" id="res-customer-name" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Telefono</label>
+                                    <input type="tel" id="res-customer-phone"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                        placeholder="+39 333...">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" id="res-customer-email"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                        placeholder="opzionale">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-7 gap-3 items-end">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Data/Ora Inizio</label>
+                                    <input type="datetime-local" id="res-start-date" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Data/Ora Fine</label>
+                                    <input type="datetime-local" id="res-end-date"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Persone</label>
+                                    <input type="number" id="res-people" min="1" value="1"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Acconto (€)</label>
+                                    <input type="number" id="res-deposit" min="0" step="0.01" value="0"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Totale (€)</label>
+                                    <input type="number" id="res-total" min="0" step="0.01" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Fornitore</label>
+                                    <input type="text" id="res-supplier"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                        placeholder="Opzionale">
+                                </div>
+                                <div>
+                                    <button type="submit"
+                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg font-medium transition">
+                                        Salva
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Note</label>
+                                    <input type="text" id="res-notes"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                        placeholder="Es. ritiro al porto, casco extra...">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Stato</label>
+                                    <select id="res-status"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="confirmed">✅ Confermata</option>
+                                        <option value="pending">⏳ In attesa</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Lingua Email</label>
+                                    <select id="res-lang"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="it">🇮🇹 Italiano</option>
+                                        <option value="en">🇬🇧 English</option>
+                                        <option value="de">🇩🇪 Deutsch</option>
+                                        <option value="fr">🇫🇷 Français</option>
+                                        <option value="es">🇪🇸 Español</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Search & Filter Bar -->
+                    <div class="bg-white rounded-xl shadow-sm p-5">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">🔍 Cerca e Filtra</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                            <!-- Search -->
+                            <div class="lg:col-span-2">
+                                <input type="text" id="res-search"
+                                    class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border text-sm"
+                                    placeholder="🔎 Cerca per nome, telefono, email, fornitore...">
+                            </div>
+                            <!-- Date From -->
+                            <div>
+                                <input type="date" id="res-filter-from"
+                                    class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border text-sm">
+                            </div>
+                            <!-- Date To -->
+                            <div>
+                                <input type="date" id="res-filter-to"
+                                    class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border text-sm">
+                            </div>
+                            <!-- Service Type Filter -->
+                            <div>
+                                <select id="res-filter-type"
+                                    class="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border text-sm">
+                                    <option value="all">Tutti i servizi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-3">
+                            <!-- Status Filter -->
+                            <select id="res-filter-status"
+                                class="rounded-lg border-gray-300 shadow-sm p-2.5 border text-sm">
+                                <option value="all">Tutti gli stati</option>
+                                <option value="confirmed">✅ Confermata</option>
+                                <option value="pending">⏳ In attesa</option>
+                                <option value="completed">🏁 Completata</option>
+                                <option value="cancelled">❌ Annullata</option>
+                            </select>
+                            <span id="res-results-count" class="text-sm text-gray-500"></span>
+                        </div>
+                    </div>
+
+                    <!-- Reservations Table -->
+                    <div class="bg-white rounded-xl shadow-sm p-5">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">📋 Prenotazioni</h3>
+                        <!-- Bulk bar -->
+                        <div id="res-bulk-bar"
+                            class="hidden bg-red-50 border border-red-200 rounded-lg p-3 mb-3 flex items-center justify-between">
+                            <span class="text-sm text-red-700 font-medium">
+                                <span id="res-selected-count">0</span> selezionati
+                            </span>
+                            <button id="res-bulk-delete"
+                                class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-1.5 rounded-lg font-medium transition">
+                                🗑 Elimina selezionati
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-3 py-3 text-left">
+                                            <input type="checkbox" id="res-select-all"
+                                                class="rounded border-gray-300 text-blue-600 cursor-pointer">
+                                        </th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Codice</th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Servizio</th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Cliente</th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date
+                                        </th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Persone</th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Prezzo</th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Fornitore</th>
+                                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            Stato</th>
+                                        <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                            Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="res-list" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="10" class="px-4 py-4 text-center text-sm text-gray-500">Nessuna
+                                            prenotazione</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Edit Luggage Modal -->
+    <div id="edit-luggage-modal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">✏️ Modifica Deposito</h3>
+            <input type="hidden" id="edit-luggage-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nome Cliente</label>
+                    <input type="text" id="edit-luggage-name"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">N. Bagagli</label>
+                    <input type="number" id="edit-luggage-count" min="1"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Fine Deposito Prevista</label>
+                    <input type="datetime-local" id="edit-luggage-end"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Note</label>
+                    <textarea id="edit-luggage-notes" rows="2"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Prezzo Finale (€)</label>
+                    <input type="number" id="edit-luggage-price" min="0" step="0.01"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border font-semibold text-lg">
+                </div>
+                <div id="edit-price-preview"
+                    class="text-sm font-medium text-green-700 bg-green-50 rounded-lg p-2 text-center"></div>
+                <div class="flex gap-3">
+                    <button id="edit-luggage-cancel"
+                        class="flex-1 bg-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-300 font-medium">Annulla</button>
+                    <button id="edit-luggage-save"
+                        class="flex-1 bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 font-medium">Salva
+                        Modifiche</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transaction Modal -->
+    <div id="edit-acc-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">✏️ Modifica Transazione</h3>
+            <input type="hidden" id="edit-acc-id">
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                        <select id="edit-acc-type"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            <option value="income">💰 Entrata</option>
+                            <option value="expense">💸 Uscita</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Importo (€)</label>
+                        <input type="number" id="edit-acc-amount" step="0.01" min="0"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Categoria</label>
+                    <select id="edit-acc-category"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Descrizione</label>
+                    <input type="text" id="edit-acc-desc"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Data</label>
+                    <input type="date" id="edit-acc-date"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="edit-acc-cancel"
+                    class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Annulla</button>
+                <button id="edit-acc-save" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Salva
+                    Modifiche</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <script type="module" src="./js/dashboard.js?v=fixed2"></script>
+</body>
+
+</html>
