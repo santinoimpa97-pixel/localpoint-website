@@ -3,6 +3,8 @@ import { supabase } from '../../src/supabaseClient.js'
 const loginForm = document.getElementById('login-form')
 const errorMsg = document.getElementById('error-msg')
 
+
+
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault()
@@ -31,13 +33,8 @@ async function checkAuth() {
     const path = window.location.pathname
 
     // Se siamo nella pagina di login/index e l'utente è loggato -> vai alla dashboard
-    if (session && (path.endsWith('/') || path.includes('index.html') || path.includes('login.html'))) {
+    if (session) {
         window.location.href = './dashboard.html'
-    }
-
-    // Se siamo in una pagina protetta (dashboard, ecc) e l'utente NON è loggato -> vai al login
-    if (!session && !path.includes('index.html') && !path.includes('login.html') && !path.endsWith('/')) {
-        window.location.href = './index.html'
     }
 }
 
