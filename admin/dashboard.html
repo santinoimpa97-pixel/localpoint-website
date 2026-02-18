@@ -240,6 +240,14 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
                                         placeholder="es. valigia rossa, zaino nero..."></textarea>
                                 </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Pagamento</label>
+                                    <select id="luggage-payment-method"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="cash">💵 Contanti</option>
+                                        <option value="card">💳 Carta / POS</option>
+                                    </select>
+                                </div>
                                 <button type="submit"
                                     class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-medium">Deposita
                                     & Genera Codice</button>
@@ -362,35 +370,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                         <!-- Controls & KPI -->
                         <div class="space-y-4">
-                            <!-- Filters -->
-                            <div class="bg-white rounded-xl shadow-sm p-5">
-                                <h3 class="text-sm font-semibold text-gray-500 uppercase mb-3">📅 Periodo</h3>
-                                <div class="flex items-center gap-2 mb-3">
-                                    <button id="acc-mode-month"
-                                        class="flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-md font-medium transition">Mese</button>
-                                    <button id="acc-mode-year"
-                                        class="flex-1 bg-gray-100 text-gray-600 text-sm py-1.5 rounded-md font-medium hover:bg-gray-200 transition">Anno</button>
-                                </div>
-                                <div class="flex gap-2">
-                                    <select id="acc-month"
-                                        class="flex-1 rounded-md border-gray-300 shadow-sm p-2 border text-sm">
-                                        <option value="0">Gennaio</option>
-                                        <option value="1">Febbraio</option>
-                                        <option value="2">Marzo</option>
-                                        <option value="3">Aprile</option>
-                                        <option value="4">Maggio</option>
-                                        <option value="5">Giugno</option>
-                                        <option value="6">Luglio</option>
-                                        <option value="7">Agosto</option>
-                                        <option value="8">Settembre</option>
-                                        <option value="9">Ottobre</option>
-                                        <option value="10">Novembre</option>
-                                        <option value="11">Dicembre</option>
-                                    </select>
-                                    <select id="acc-year"
-                                        class="flex-1 rounded-md border-gray-300 shadow-sm p-2 border text-sm"></select>
-                                </div>
-                            </div>
+                            <!-- Period Selecor Removed (Unified Filter) -->
 
                             <!-- KPIs -->
                             <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
@@ -423,8 +403,14 @@
 
                             <!-- Real Cash -->
                             <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
-                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">💵 Cassa Reale</p>
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">💵 Cassa Reale (Contanti)
+                                </p>
                                 <p id="acc-real-cash" class="text-2xl font-bold text-green-600 mt-1">€ 0,00</p>
+                            </div>
+                            <!-- Digital Cash -->
+                            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-indigo-500">
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">💳 Conto / Digital</p>
+                                <p id="acc-digital-cash" class="text-2xl font-bold text-indigo-600 mt-1">€ 0,00</p>
                             </div>
                         </div>
 
@@ -457,6 +443,8 @@
                         </div>
                     </div>
 
+                    <!-- Filters Bar Removed (Consolidated below) -->
+
 
                     <!-- New Transaction Form -->
                     <div class="bg-white rounded-xl shadow-sm p-5">
@@ -468,6 +456,14 @@
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                                     <option value="income">💰 Entrata</option>
                                     <option value="expense">💸 Uscita</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Metodo</label>
+                                <select id="acc-payment-method" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    <option value="cash">💵 Contanti</option>
+                                    <option value="card">💳 Carta / POS</option>
                                 </select>
                             </div>
                             <div id="acc-paid-by-container" class="hidden">
@@ -514,35 +510,53 @@
                     <!-- Action Bar (Filtra lista) -->
                     <div class="flex flex-wrap items-center gap-3 bg-white p-4 rounded-xl shadow-sm">
                         <span class="text-sm font-semibold text-gray-600">Filtra lista:</span>
+
+                        <!-- Type Filter -->
                         <select id="acc-filter-type"
                             class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
                             <option value="all">Tutti i tipi</option>
                             <option value="income">💰 Solo Entrate</option>
                             <option value="expense">💸 Solo Uscite</option>
                         </select>
-                        <select id="acc-filter-category"
+
+                        <!-- Payment Method Filter -->
+                        <select id="acc-filter-payment-method"
                             class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
+                            <option value="all">Tutti i metodi</option>
+                            <option value="cash">💵 Contanti</option>
+                            <option value="card">💳 Digital / Carta</option>
+                        </select>
+
+                        <!-- Category Filter -->
+                        <select id="acc-filter-category"
+                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50 max-w-[150px]">
                             <option value="all">Tutte le categorie</option>
                         </select>
-                        <select id="acc-filter-paid-by"
-                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
-                            <option value="all">Chiunque</option>
-                            <option value="shop">🏪 Cassa Negozio</option>
-                            <option value="santino">👤 Santino</option>
-                            <option value="giovanni">👤 Giovanni</option>
-                        </select>
-                        </select>
+
+                        <!-- Date Range (Unified) -->
                         <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-md border border-gray-200">
                             <span class="text-xs font-bold text-gray-400 px-1">DAL</span>
-                            <input type="date" id="acc-date-from"
-                                class="border-none bg-transparent text-sm focus:ring-0 p-0">
+                            <input type="date" id="acc-filter-from"
+                                class="border-none bg-transparent text-sm focus:ring-0 p-0 text-gray-700">
                             <span class="text-xs font-bold text-gray-400 px-1">AL</span>
-                            <input type="date" id="acc-date-to"
-                                class="border-none bg-transparent text-sm focus:ring-0 p-0">
+                            <input type="date" id="acc-filter-to"
+                                class="border-none bg-transparent text-sm focus:ring-0 p-0 text-gray-700">
+                            <button id="acc-filter-all-time" type="button"
+                                class="ml-2 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs px-2 py-1 rounded font-bold transition"
+                                title="Mostra tutto lo storico">
+                                Tutto
+                            </button>
                         </div>
+
+
+
+                        <!-- Search -->
                         <input type="text" id="acc-search" placeholder="🔍 Cerca transazione..."
                             class="rounded-md border-gray-200 shadow-sm p-2 border text-sm w-64 bg-gray-50">
+
                         <div class="flex-1"></div>
+
+                        <!-- Export -->
                         <button id="acc-export-csv"
                             class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
                             📥 Scarica CSV
@@ -692,7 +706,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Note</label>
                                     <input type="text" id="res-notes"
@@ -716,6 +730,14 @@
                                         <option value="de">🇩🇪 Deutsch</option>
                                         <option value="fr">🇫🇷 Français</option>
                                         <option value="es">🇪🇸 Español</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Pagamento (Acconto)</label>
+                                    <select id="res-deposit-payment-method"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="cash">💵 Contanti</option>
+                                        <option value="card">💳 Carta / POS</option>
                                     </select>
                                 </div>
                             </div>
@@ -882,6 +904,14 @@
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                             <option value="income">💰 Entrata</option>
                             <option value="expense">💸 Uscita</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Metodo</label>
+                        <select id="edit-acc-payment-method"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            <option value="cash">💵 Contanti</option>
+                            <option value="card">💳 Carta / POS</option>
                         </select>
                     </div>
                     <div id="edit-acc-paid-by-container" class="hidden">

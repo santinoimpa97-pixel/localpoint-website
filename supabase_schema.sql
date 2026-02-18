@@ -11,7 +11,8 @@ create table luggage_tickets (
   bag_count int not null,
   price decimal(10,2) not null,
   status text default 'stored' check (status in ('stored', 'returned')),
-  checkout_at timestamp with time zone
+  checkout_at timestamp with time zone,
+  payment_method text default 'cash' check (payment_method in ('cash', 'card', 'transfer', 'other'))
 );
 
 -- 2. Tabella Contabilità (Transactions)
@@ -23,7 +24,9 @@ create table transactions (
   amount decimal(10,2) not null,
   description text,
   date date default CURRENT_DATE,
-  status text default 'active' -- 'active', 'deleted'
+  status text default 'active', -- 'active', 'deleted'
+  -- NEW: Metodo di pagamento per tracciare cassa vs banca
+  payment_method text default 'cash' check (payment_method in ('cash', 'card', 'transfer', 'other'))
 );
 
 -- 3. Tabella Prenotazioni (Reservations)
@@ -41,7 +44,8 @@ create table reservations (
   total_price decimal(10,2) not null,
   supplier_name text,
   notes text,
-  status text default 'confirmed' check (status in ('confirmed', 'pending', 'cancelled', 'completed'))
+  status text default 'confirmed' check (status in ('confirmed', 'pending', 'cancelled', 'completed')),
+  payment_method text default 'cash' check (payment_method in ('cash', 'card', 'transfer', 'other'))
 );
 
 -- 4. Sicurezza (Row Level Security)
@@ -60,3 +64,6 @@ create policy "Admin access transactions" on transactions
 
 create policy "Admin access reservations" on reservations
   for all using (auth.role() = 'authenticated');
+
+-- MIGRATION COMMANDS (Run manuali se le tabelle esistono già)
+-- alter table transactions add column payment_method text default 'cash' check (payment_method in ('cash', 'card', 'transfer', 'other'));

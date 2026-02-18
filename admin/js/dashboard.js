@@ -7,6 +7,8 @@ const EMAILJS_TEMPLATE_ID = 'template_ihapitu'
 const EMAILJS_PUBLIC_KEY = '0nPf665f0pWsHFx1j'
 emailjs.init(EMAILJS_PUBLIC_KEY)
 
+// --- DEBUG OVERLAY REMOVED ---
+
 // --- GOOGLE REVIEW LINK ---
 const GOOGLE_REVIEW_URL = 'https://g.page/r/CQSpCw3gaeKjEAE/review'
 
@@ -18,6 +20,7 @@ async function checkAuth() {
     }
 }
 checkAuth()
+// checkAuth() // BYPASS FOR DEBUGGING REVERTED
 
 // --- NAVIGATION ---
 const views = {
@@ -180,7 +183,10 @@ async function loadLuggage() {
 
     allLuggageTickets = data || []
     renderLuggageList(allLuggageTickets)
-    document.getElementById('stats-luggage-dash').innerText = allLuggageTickets.length
+    allLuggageTickets = data || []
+    renderLuggageList(allLuggageTickets)
+    const statsEl = document.getElementById('stats-luggage-dash')
+    if (statsEl) statsEl.innerText = allLuggageTickets.length
 }
 
 // Helper: format elapsed time
@@ -492,6 +498,7 @@ if (luggageForm) {
         const notes = document.getElementById('luggage-notes')?.value || ''
         const startDate = document.getElementById('luggage-datetime')?.value || null
         const endDate = document.getElementById('luggage-datetime-end')?.value || null
+        const paymentMethod = document.getElementById('luggage-payment-method')?.value || 'cash'
 
         const { data, error } = await supabase
             .from('luggage_tickets')
@@ -504,7 +511,8 @@ if (luggageForm) {
                     price: parseFloat(price),
                     notes: notes,
                     expected_end: endDate ? new Date(endDate).toISOString() : null,
-                    status: 'stored'
+                    status: 'stored',
+                    payment_method: paymentMethod
                 }
             ])
             .select()
@@ -541,6 +549,7 @@ if (luggageForm) {
                 amount: parseFloat(price),
                 description: `Deposito #${shortId} — ${customerName} (${bagCount} bagagli)`,
                 date: new Date().toISOString().slice(0, 10),
+                payment_method: paymentMethod,
                 status: 'active'
             }])
 
@@ -575,7 +584,7 @@ async function loadDashStats() {
         .from('reservations')
         .select('*')
         .eq('status', 'confirmed')
-        .order('date', { ascending: true })
+        .order('reservation_date', { ascending: true })
 
     const resCountEl = document.getElementById('home-reservations-count')
     const resKpiEl = document.getElementById('home-reservations-kpi')
@@ -1156,22 +1165,13 @@ const TRANSACTION_CATEGORIES = {
     ]
 }
 
-const accList = document.getElementById('acc-list')
-const accForm = document.getElementById('acc-form')
-const accTypeSelect = document.getElementById('acc-type')
-const accPaidByContainer = document.getElementById('acc-paid-by-container')
-const accPaidBySelect = document.getElementById('acc-paid-by')
-const accCategorySelect = document.getElementById('acc-category')
-const accMonthSelect = document.getElementById('acc-month')
-const accYearSelect = document.getElementById('acc-year')
-const accFilterType = document.getElementById('acc-filter-type')
-const accFilterCategory = document.getElementById('acc-filter-category')
-const accFilterPaidBy = document.getElementById('acc-filter-paid-by')
-const accSearch = document.getElementById('acc-search')
-const accDateInput = document.getElementById('acc-date')
-const accTrashList = document.getElementById('acc-trash-list')
+// DOM Elements (assigned in init)
+let accList, accForm, accPaymentMethodSelect, accTypeSelect, accPaidByContainer, accPaidBySelect, accCategorySelect
+let accFilterType, accFilterCategory, accFilterPaymentMethod, accFilterFrom, accFilterTo, accFilterAllTimeBtn, accSearch, accDateInput, accApplyFiltersBtn
+let accTrashList
+let editAccModal // Global modal ref
 
-// Mode: 'month' or 'year'
+// Mode: 'month' or 'year' (Legacy, kept for structure)
 let accMode = 'month'
 let allTransactions = []
 let filteredTransactions = []
@@ -1179,84 +1179,82 @@ let mainChart = null
 let catChart = null
 
 // --- Init ---
-// --- Init ---
-function initAccounting() {
+async function initAccounting() {
+    console.log('🚀 Initializing Accounting...')
+
+    // Select ALL Elements Safely
+    accList = document.getElementById('acc-list')
+    accForm = document.getElementById('acc-form')
+    accPaymentMethodSelect = document.getElementById('acc-payment-method')
+    accTypeSelect = document.getElementById('acc-type')
+    accPaidByContainer = document.getElementById('acc-paid-by-container')
+    accPaidBySelect = document.getElementById('acc-paid-by')
+    accCategorySelect = document.getElementById('acc-category')
+
+    accFilterType = document.getElementById('acc-filter-type')
+    accFilterCategory = document.getElementById('acc-filter-category')
+    accFilterPaymentMethod = document.getElementById('acc-filter-payment-method')
+    accFilterFrom = document.getElementById('acc-filter-from')
+    accFilterTo = document.getElementById('acc-filter-to')
+    accFilterAllTimeBtn = document.getElementById('acc-filter-all-time')
+    accSearch = document.getElementById('acc-search')
+    accDateInput = document.getElementById('acc-date')
+    accApplyFiltersBtn = document.getElementById('acc-apply-filters')
+    accTrashList = document.getElementById('acc-trash-list')
+    editAccModal = document.getElementById('edit-acc-modal')
+
+    // Initial Date Defaults
     const now = new Date()
-    // Populate Year Select (Current year - 5)
-    if (accYearSelect) {
-        accYearSelect.innerHTML = ''
-        const currentYear = now.getFullYear()
-        for (let y = currentYear; y >= currentYear - 5; y--) {
-            const opt = document.createElement('option')
-            opt.value = y
-            opt.textContent = y
-            accYearSelect.appendChild(opt)
-        }
-        accYearSelect.value = currentYear
+    const toLocalISO = (date) => {
+        const offset = date.getTimezoneOffset()
+        const local = new Date(date.getTime() - (offset * 60 * 1000))
+        return local.toISOString().slice(0, 10)
     }
 
-    // Set Month
-    if (accMonthSelect) accMonthSelect.value = now.getMonth()
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const startStr = toLocalISO(startOfMonth)
+    const todayStr = toLocalISO(now)
 
-    // Set Date Input
-    if (accDateInput) accDateInput.value = now.toISOString().slice(0, 10)
-
-    // Initial load: set range to current month
-    syncRangeToPeriod()
+    if (accFilterFrom && !accFilterFrom.value) accFilterFrom.value = startStr
+    if (accFilterTo && !accFilterTo.value) accFilterTo.value = todayStr
 
     updateFormCategories()
-    updateFilterCategories()
+    populateFilterCategories()
 
-    // Mode toggles
-    document.getElementById('acc-mode-month')?.addEventListener('click', () => setAccMode('month'))
-    document.getElementById('acc-mode-year')?.addEventListener('click', () => setAccMode('year'))
+    // Reactive Listeners
+    accFilterFrom?.addEventListener('change', () => { console.log('📅 Date From changed'); applyFilters() })
+    accFilterTo?.addEventListener('change', () => { console.log('📅 Date To changed'); applyFilters() })
+    accFilterType?.addEventListener('change', () => { console.log('🏷️ Type changed'); applyFilters() })
+    accFilterCategory?.addEventListener('change', () => { console.log('🏷️ Category changed'); applyFilters() })
+    accFilterPaymentMethod?.addEventListener('change', () => { console.log('💳 Method changed'); applyFilters() })
+    accSearch?.addEventListener('input', () => { console.log('🔍 Search changed'); applyFilters() })
+
+    // New Transaction Type Listener
+    accTypeSelect?.addEventListener('change', () => {
+        console.log('📝 New Transaction Type changed')
+        updateFormCategories()
+    })
+
+    // All Time Button
+    accFilterAllTimeBtn?.addEventListener('click', () => {
+        if (!allTransactions || allTransactions.length === 0) return
+        // Find min date
+        const dates = allTransactions.map(t => t.date).filter(Boolean).sort()
+        if (dates.length > 0) {
+            accFilterFrom.value = dates[0].slice(0, 10)
+            accFilterTo.value = new Date().toISOString().slice(0, 10) // Today
+            applyFilters()
+        }
+    })
+
+    // Load Data
+    await loadAccounting()
 }
 
 // Helper to sync the Action Bar dates to the selected Month/Year
-function syncRangeToPeriod() {
-    const year = parseInt(accYearSelect?.value) || new Date().getFullYear()
-    const month = parseInt(accMonthSelect?.value) || 0
-    const mode = accMode
-
-    let start, end
-    if (mode === 'month') {
-        start = new Date(year, month, 1)
-        end = new Date(year, month + 1, 0)
-    } else {
-        start = new Date(year, 0, 1)
-        end = new Date(year, 11, 31)
-    }
-
-    const df = document.getElementById('acc-date-from')
-    const dt = document.getElementById('acc-date-to')
-    if (df) df.value = start.toISOString().slice(0, 10)
-    if (dt) dt.value = end.toISOString().slice(0, 10)
-}
-initAccounting()
-
-function setAccMode(mode) {
-    accMode = mode
-    const btnMonth = document.getElementById('acc-mode-month')
-    const btnYear = document.getElementById('acc-mode-year')
-    const selMonth = document.getElementById('acc-month')
-
-    if (mode === 'month') {
-        btnMonth.className = 'flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-md font-medium transition'
-        btnYear.className = 'flex-1 bg-gray-100 text-gray-600 text-sm py-1.5 rounded-md font-medium hover:bg-gray-200 transition'
-        if (selMonth) {
-            selMonth.disabled = false
-            selMonth.style.opacity = '1'
-        }
-    } else {
-        btnMonth.className = 'flex-1 bg-gray-100 text-gray-600 text-sm py-1.5 rounded-md font-medium hover:bg-gray-200 transition'
-        btnYear.className = 'flex-1 bg-blue-600 text-white text-sm py-1.5 rounded-md font-medium transition'
-        if (selMonth) {
-            selMonth.disabled = true
-            selMonth.style.opacity = '0.5'
-        }
-    }
-
-    filterByPeriod()
+function filterByPeriod() {
+    // Deprecated but kept safe
+    applyFilters()
 }
 
 // --- Dynamic categories based on type ---
@@ -1273,45 +1271,19 @@ function updateFormCategories() {
         else pbContainer.classList.add('hidden')
     }
 }
-accTypeSelect?.addEventListener('change', updateFormCategories)
+
 
 // --- Populate filter category dropdown ---
-// --- Populate filter category dropdown ---
-function updateFilterCategories() {
-    if (!accFilterCategory || !accFilterType) return
-    const currentType = accFilterType.value
-    const currentCategory = accFilterCategory.value
-
-    accFilterCategory.innerHTML = '<option value="all">Tutte le categorie</option>'
-
-    let cats = []
-    if (currentType === 'income') {
-        cats = TRANSACTION_CATEGORIES.income
-    } else if (currentType === 'expense') {
-        cats = TRANSACTION_CATEGORIES.expense
-    }
-    // If currentType === 'all', cats remains empty, so only "Tutte le categorie" remains, as requested.
-
-    cats.sort().forEach(c => {
-        const opt = document.createElement('option')
-        opt.value = c
-        opt.textContent = c
-        accFilterCategory.appendChild(opt)
-    })
-
-    // Try to restore selection if it's still valid, otherwise reset to 'all'
-    if (cats.includes(currentCategory)) {
-        accFilterCategory.value = currentCategory
-    } else {
-        accFilterCategory.value = 'all'
-    }
+function populateFilterCategories() {
+    if (!accFilterCategory) return
+    const allCats = [...new Set([...TRANSACTION_CATEGORIES.income, ...TRANSACTION_CATEGORIES.expense])].sort()
+    accFilterCategory.innerHTML = '<option value="all">Tutte le categorie</option>' +
+        allCats.map(c => `<option value="${c}">${c}</option>`).join('')
 }
 
 // --- Load Transactions ---
-// --- Load Transactions ---
 async function loadAccounting() {
-    // 1. Fetch EVERYTHING that is not deleted.
-    // We filter by date in CLIENT-SIDE JS to avoid query syntax bugs or timezone missing data.
+    console.log('📥 Loading transactions...')
     const { data, error } = await supabase
         .from('transactions')
         .select('*')
@@ -1325,15 +1297,9 @@ async function loadAccounting() {
     }
 
     allTransactions = data || []
+    console.log(`✅ Loaded: ${allTransactions.length}`)
 
     // 2. Sync UI and Filter
-    syncRangeToPeriod()
-    updateFilterCategories()
-    applyFilters()
-}
-
-function filterByPeriod() {
-    syncRangeToPeriod()
     applyFilters()
 }
 
@@ -1343,16 +1309,15 @@ function applyFilters() {
 
     let list = [...allTransactions]
 
-    // 1. Date Range (Single source of truth)
-    const dateFrom = document.getElementById('acc-date-from')?.value
-    const dateTo = document.getElementById('acc-date-to')?.value
+    // 1. Date Range
+    const dateFrom = accFilterFrom?.value
+    const dateTo = accFilterTo?.value
+
     if (dateFrom && dateTo) {
-        const start = new Date(dateFrom)
-        const end = new Date(dateTo)
-        end.setHours(23, 59, 59, 999)
         list = list.filter(t => {
-            const d = new Date(t.date)
-            return d >= start && d <= end
+            if (!t.date) return false
+            const tDate = t.date.slice(0, 10) // Ensure YYYY-MM-DD
+            return tDate >= dateFrom && tDate <= dateTo
         })
     }
 
@@ -1362,19 +1327,16 @@ function applyFilters() {
         list = list.filter(t => t.type === typeFilter)
     }
 
-    // 3. Category filter
+    // 3. Payment Method filter
+    const payMethod = accFilterPaymentMethod?.value || 'all'
+    if (payMethod !== 'all') {
+        list = list.filter(t => t.payment_method === payMethod)
+    }
+
+    // 4. Category Filter
     const catFilter = accFilterCategory?.value || 'all'
     if (catFilter !== 'all') {
         list = list.filter(t => t.category === catFilter)
-    }
-
-    // 4. Paid By filter
-    const paidByFilter = accFilterPaidBy?.value || 'all'
-    if (paidByFilter !== 'all') {
-        list = list.filter(t => {
-            const payer = t.paid_by || 'shop'
-            return payer === paidByFilter
-        })
     }
 
     // 5. Search
@@ -1388,30 +1350,21 @@ function applyFilters() {
     }
 
     filteredTransactions = list
+    console.log(`🎯 Filtered Count: ${list.length}`)
 
     // Update EVERYTHING in sync
     renderAccountingSummary(list)
-    renderCharts(list)
-    renderCategoryProgress(list)
-    renderTransactionList()
+    try {
+        renderCharts(list)
+    } catch (e) { console.error('RenderCharts Error:', e) }
 
-    // Update category dropdown if needed? 
-    // Usually it's better to keep it showing all available categories for the base period
-    // but the user wants "sintonia", so let's keep it clean.
+    // renderCategoryProgress(list) - check if function exists?
+    if (typeof renderCategoryProgress === 'function') renderCategoryProgress(list)
+
+    renderTransactionList()
 }
 
-// Bind filters
-accMonthSelect?.addEventListener('change', loadAccounting)
-accYearSelect?.addEventListener('change', loadAccounting)
-accFilterType?.addEventListener('change', () => {
-    updateFilterCategories()
-    applyFilters()
-})
-accFilterCategory?.addEventListener('change', applyFilters)
-accFilterPaidBy?.addEventListener('change', applyFilters)
-accSearch?.addEventListener('input', applyFilters)
-document.getElementById('acc-date-from')?.addEventListener('change', applyFilters)
-document.getElementById('acc-date-to')?.addEventListener('change', applyFilters)
+
 
 // --- Render Summary Cards ---
 function renderAccountingSummary(data) {
@@ -1445,14 +1398,44 @@ function renderAccountingSummary(data) {
     const reimbursementsToGiovanni = source.filter(t => t.type === 'expense' && t.category === 'Rimborso Giovanni').reduce((s, t) => s + parseFloat(t.amount), 0)
     const netDebtGiovanni = expensesByGiovanni - reimbursementsToGiovanni
 
-    // Real Cash = Income (all assumed shop) - Shop Expenses
-    // Note: If we want to track income kept by partners, we'd need to enable 'paid_by' for income too.
-    // For now, assuming all income goes to shop.
-    const realCash = income - expShop
+    // Real Cash = Income (Cash) - Shop Expenses (Cash)
+    // We assume old transactions (null payment_method) are CASH for safety, unless we migrate them.
+    // Ideally user manually sets them. For now: if (payment_method == 'cash' OR null) -> Cash
+
+    // Helper to check if is cash
+    const isCash = t => t.payment_method === 'cash' || !t.payment_method
+
+    // Income Cash
+    const incomeCash = source.filter(t => t.type === 'income' && isCash(t)).reduce((s, t) => s + parseFloat(t.amount), 0)
+
+    // Expenses Cash (Paid by Shop)
+    const expensesCashShop = source.filter(t =>
+        t.type === 'expense' &&
+        isCash(t) &&
+        (t.paid_by === 'shop' || !t.paid_by)
+    ).reduce((s, t) => s + parseFloat(t.amount), 0)
+
+    const realCash = incomeCash - expensesCashShop
+
+    // Digital Cash (Conto Corrente)
+    // Income Card - Expenses Card (Paid by Shop)
+    const isCard = t => t.payment_method === 'card' || t.payment_method === 'transfer' // Treat old transfers as card/digital
+
+    const incomeDigital = source.filter(t => t.type === 'income' && isCard(t)).reduce((s, t) => s + parseFloat(t.amount), 0)
+
+    // Expenses Digital (Paid by Shop)
+    const expensesDigitalShop = source.filter(t =>
+        t.type === 'expense' &&
+        isCard(t) &&
+        (t.paid_by === 'shop' || !t.paid_by)
+    ).reduce((s, t) => s + parseFloat(t.amount), 0)
+
+    const digitalCash = incomeDigital - expensesDigitalShop
 
     const debtSanEl = document.getElementById('debt-santino')
     const debtGioEl = document.getElementById('debt-giovanni')
     const realCashEl = document.getElementById('acc-real-cash')
+    const digitalCashEl = document.getElementById('acc-digital-cash')
 
     if (debtSanEl) debtSanEl.textContent = fmt(netDebtSantino)
     if (debtGioEl) debtGioEl.textContent = fmt(netDebtGiovanni)
@@ -1460,10 +1443,15 @@ function renderAccountingSummary(data) {
         realCashEl.textContent = fmt(realCash)
         realCashEl.className = `text-2xl font-bold mt-1 ${realCash >= 0 ? 'text-green-600' : 'text-red-600'}`
     }
+    if (digitalCashEl) {
+        digitalCashEl.textContent = fmt(digitalCash)
+        digitalCashEl.className = `text-2xl font-bold mt-1 ${digitalCash >= 0 ? 'text-indigo-600' : 'text-red-600'}`
+    }
 }
 
 // --- CTS: Charts ---
-function renderCharts() {
+function renderCharts(transactions) {
+    transactions = transactions || filteredTransactions
     // 1. Main Chart (Bar: Income vs Expense per unit)
     const ctxMain = document.getElementById('acc-main-chart')?.getContext('2d')
     if (ctxMain) {
@@ -1473,35 +1461,50 @@ function renderCharts() {
         let dataInc = []
         let dataExp = []
 
-        if (accMode === 'month') {
-            // Group by day
-            const year = parseInt(accYearSelect.value)
-            const month = parseInt(accMonthSelect.value)
-            const daysInMonth = new Date(year, month + 1, 0).getDate()
+        if (accFilterFrom && accFilterTo) {
+            // Determine range duration
+            const start = new Date(accFilterFrom.value)
+            const end = new Date(accFilterTo.value)
+            const diffTime = Math.abs(end - start)
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-            labels = Array.from({ length: daysInMonth }, (_, i) => i + 1)
-            dataInc = new Array(daysInMonth).fill(0)
-            dataExp = new Array(daysInMonth).fill(0)
+            // If > 62 days (approx 2 months), group by month
+            // Else group by day
+            const groupByMonth = diffDays > 62
 
-            filteredTransactions.forEach(t => { // Use filteredTransactions!
-                const d = new Date(t.date).getDate()
-                if (d >= 1 && d <= daysInMonth) {
-                    if (t.type === 'income') dataInc[d - 1] += t.amount
-                    else dataExp[d - 1] += t.amount
+            if (!groupByMonth) {
+                // DAILY VIEW
+                // Generate labels for every day in range
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    const dayStr = d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }) // DD/MM
+                    const iso = d.toISOString().slice(0, 10)
+                    labels.push(dayStr)
+
+                    // Sum
+                    const inc = transactions.filter(t => t.type === 'income' && t.date === iso).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+                    const exp = transactions.filter(t => t.type === 'expense' && t.date === iso).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+                    dataInc.push(inc)
+                    dataExp.push(exp)
                 }
-            })
-        } else {
-            // Group by month
-            labels = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
-            dataInc = new Array(12).fill(0)
-            dataExp = new Array(12).fill(0)
-            filteredTransactions.forEach(t => { // Use filteredTransactions!
-                const m = new Date(t.date).getMonth()
-                if (m >= 0 && m < 12) {
-                    if (t.type === 'income') dataInc[m] += t.amount
-                    else dataExp[m] += t.amount
+            } else {
+                // MONTHLY VIEW
+                // Iterate months
+                let d = new Date(start)
+                d.setDate(1) // Snap to first of month
+                while (d <= end) {
+                    const mStr = d.toLocaleDateString('it-IT', { month: 'short', year: '2-digit' }) // Gen 24
+                    const mIso = d.toISOString().slice(0, 7) // YYYY-MM
+                    labels.push(mStr)
+
+                    const inc = transactions.filter(t => t.type === 'income' && t.date.startsWith(mIso)).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+                    const exp = transactions.filter(t => t.type === 'expense' && t.date.startsWith(mIso)).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+                    dataInc.push(inc)
+                    dataExp.push(exp)
+
+                    d.setMonth(d.getMonth() + 1)
                 }
-            })
+            }
+
         }
 
         mainChart = new Chart(ctxMain, {
@@ -1614,13 +1617,19 @@ function renderCategoryProgress() {
 
 
 // --- Render Transaction List ---
+// --- Render Transaction List ---
 function renderTransactionList() {
-    if (!accList) return
+    console.log('🎨 Rendering list...')
+    if (!accList) return console.warn('accList not found')
     accList.innerHTML = ''
+
+    // Reset bulk UI
     const selectAll = document.getElementById('acc-select-all')
     const bulkBar = document.getElementById('acc-bulk-bar')
     if (selectAll) selectAll.checked = false
     if (bulkBar) bulkBar.classList.add('hidden')
+    const countEl = document.getElementById('acc-selected-count')
+    if (countEl) countEl.textContent = '0'
 
     if (filteredTransactions.length === 0) {
         accList.innerHTML = '<tr><td colspan="7" class="px-4 py-4 text-center text-sm text-gray-500">Nessuna transazione trovata</td></tr>'
@@ -1635,10 +1644,13 @@ function renderTransactionList() {
       <td class="px-4 py-3">
         <input type="checkbox" class="acc-row-check rounded border-gray-300 text-blue-600 cursor-pointer" data-id="${tx.id}">
       </td>
-      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${new Date(tx.date).toLocaleDateString('it-IT')}</td>
+      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${tx.date ? new Date(tx.date).toLocaleDateString('it-IT') : '-'}</td>
       <td class="px-4 py-3 whitespace-nowrap">
         <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${isIncome ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
           ${isIncome ? '💵 Entrata' : '💸 Uscita'}
+        </span>
+        <span class="ml-1 text-xs text-gray-400" title="${tx.payment_method}">
+            ${tx.payment_method === 'card' ? '💳' : '💵'}
         </span>
       </td>
       <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
@@ -1650,31 +1662,14 @@ function renderTransactionList() {
         ${isIncome ? '+' : '-'} € ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}
       </td>
       <td class="px-4 py-3 whitespace-nowrap text-right text-sm flex gap-2 justify-end">
-        <button class="acc-btn-edit text-blue-500 hover:text-blue-800" data-id="${tx.id}">✏️</button>
-        <button class="acc-btn-delete text-red-500 hover:text-red-800" data-id="${tx.id}">🗑️</button>
+        <button type="button" class="acc-btn-edit text-blue-500 hover:text-blue-800" onclick="window.editTransaction('${tx.id}')">✏️</button>
+        <button type="button" class="acc-btn-delete text-red-500 hover:text-red-800" onclick="window.deleteTransaction('${tx.id}')">🗑️</button>
       </td>
     `
         accList.appendChild(row)
     })
 
-    // Bind actions
-    accList.querySelectorAll('.acc-btn-edit').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            console.log('✏️ Edit button clicked', btn.dataset.id)
-            e.stopPropagation() // Prevent row click if any
-            if (typeof window.editTransaction === 'function') {
-                window.editTransaction(btn.dataset.id)
-            } else {
-                console.error('❌ window.editTransaction is not a function')
-            }
-        })
-    })
-    accList.querySelectorAll('.acc-btn-delete').forEach(btn => {
-        btn.addEventListener('click', () => window.deleteTransaction(btn.dataset.id))
-    })
-
-    // Bind checkboxes
-    updateAccBulkBar()
+    // Bind checkboxes for bulk actions
     accList.querySelectorAll('.acc-row-check').forEach(cb => {
         cb.addEventListener('change', updateAccBulkBar)
     })
@@ -1745,10 +1740,11 @@ accForm?.addEventListener('submit', async (e) => {
     const category = accCategorySelect.value
     const description = document.getElementById('acc-description')?.value || ''
     const date = accDateInput.value
+    const payment_method = accPaymentMethodSelect?.value || 'cash'
     const paid_by = document.getElementById('acc-paid-by')?.value || 'shop'
 
     const { error } = await supabase.from('transactions').insert([{
-        type, amount, category, description, date, paid_by, status: 'active'
+        type, amount, category, description, date, paid_by, payment_method, status: 'active'
     }])
 
     if (error) {
@@ -1761,22 +1757,25 @@ accForm?.addEventListener('submit', async (e) => {
     }
 })
 
-// --- EDIT TRANSACTION ---
-const editAccModal = document.getElementById('edit-acc-modal')
-window.editTransaction = (id) => {
-    console.log('✏️ window.editTransaction called with ID:', id)
-    console.log('📊 allTransactions count:', allTransactions.length)
 
-    // Loose comparison for ID (string vs number)
+
+// ... (initAccounting function update below) ...
+
+// --- EDIT TRANSACTION ---
+// Assigned to window to work with inline onclick
+window.editTransaction = (id) => {
+    // Re-select modal just in case if global is not set
+    if (!editAccModal) editAccModal = document.getElementById('edit-acc-modal')
+
+    console.log('✏️ window.editTransaction called with ID:', id)
+    // ... search logic ...
     const tx = allTransactions.find(t => t.id == id)
     if (!tx) {
         console.error('❌ Transaction not found with ID:', id)
         return
     }
-    console.log('✅ Transaction found:', tx)
 
-    const modal = document.getElementById('edit-acc-modal')
-    if (!modal) {
+    if (!editAccModal) {
         console.error('❌ Modal element #edit-acc-modal not found!')
         return
     }
@@ -1796,7 +1795,11 @@ window.editTransaction = (id) => {
     }
     if (paidBySelect) paidBySelect.value = tx.paid_by || 'shop'
 
-    // Update categories based on type
+    // Payment Method
+    const pmSelect = document.getElementById('edit-acc-payment-method')
+    if (pmSelect) pmSelect.value = tx.payment_method || 'cash'
+
+    // Categories
     const cats = tx.type === 'income' ? TRANSACTION_CATEGORIES.income : TRANSACTION_CATEGORIES.expense
     const catSel = document.getElementById('edit-acc-category')
     catSel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('')
@@ -1805,14 +1808,14 @@ window.editTransaction = (id) => {
     editAccModal.classList.remove('hidden')
 }
 
-// Bind Type change in edit modal to update categories and toggle Paid By
+// Bind Type change in edit modal
 document.getElementById('edit-acc-type')?.addEventListener('change', (e) => {
+    // ... same logic ...
     const type = e.target.value
     const cats = type === 'income' ? TRANSACTION_CATEGORIES.income : TRANSACTION_CATEGORIES.expense
     const catSel = document.getElementById('edit-acc-category')
     catSel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('')
 
-    // Toggle Paid By
     const startPaidBy = document.getElementById('edit-acc-paid-by-container')
     if (startPaidBy) {
         if (type === 'expense') startPaidBy.classList.remove('hidden')
@@ -1831,7 +1834,7 @@ accTypeSelect?.addEventListener('change', (e) => {
 })
 
 document.getElementById('edit-acc-cancel')?.addEventListener('click', () => {
-    editAccModal.classList.add('hidden')
+    if (editAccModal) editAccModal.classList.add('hidden')
 })
 document.getElementById('edit-acc-save')?.addEventListener('click', async () => {
     const id = document.getElementById('edit-acc-id').value
@@ -1840,16 +1843,17 @@ document.getElementById('edit-acc-save')?.addEventListener('click', async () => 
     const category = document.getElementById('edit-acc-category').value
     const description = document.getElementById('edit-acc-desc').value
     const date = document.getElementById('edit-acc-date').value
+    const payment_method = document.getElementById('edit-acc-payment-method').value
     const paid_by = document.getElementById('edit-acc-paid-by').value
 
     const { error } = await supabase.from('transactions').update({
-        type, amount, category, description, date, paid_by
+        type, amount, category, description, date, paid_by, payment_method
     }).eq('id', id)
 
     if (error) {
         alert('Errore aggiornamento: ' + error.message)
     } else {
-        editAccModal.classList.add('hidden')
+        if (editAccModal) editAccModal.classList.add('hidden')
         loadAccounting()
     }
 })
@@ -2198,6 +2202,7 @@ window.completeReservation = async (id) => {
             amount: parseFloat(balance),
             description: `SALDO: ${sLabel} — ${res.customer_name}`,
             date: new Date().toISOString().slice(0, 10),
+            payment_method: res.payment_method || 'cash',
             status: 'active'
         }])
     }
@@ -2222,8 +2227,11 @@ resForm?.addEventListener('submit', async (e) => {
         total_price: parseFloat(document.getElementById('res-total').value),
         supplier_name: document.getElementById('res-supplier')?.value || null,
         notes: document.getElementById('res-notes')?.value || null,
-        status: document.getElementById('res-status')?.value || 'confirmed'
+        status: document.getElementById('res-status')?.value || 'confirmed',
+        status: document.getElementById('res-status')?.value || 'confirmed',
+        payment_method: document.getElementById('res-deposit-payment-method')?.value || document.getElementById('res-payment-method')?.value || 'cash'
     }
+    console.log('📦 SUBMIT RESERVATION DATA:', data)
 
     const { data: newRes, error } = await supabase.from('reservations').insert([data]).select()
     if (error) {
@@ -2269,6 +2277,7 @@ resForm?.addEventListener('submit', async (e) => {
                 amount: parseFloat(data.deposit),
                 description: `ACCONTO: ${sLabel} — ${data.customer_name}`,
                 date: new Date().toISOString().slice(0, 10),
+                payment_method: data.payment_method,
                 status: 'active'
             }])
         }
@@ -2695,3 +2704,7 @@ function renderHomeChart(allTransactions) {
 
 // Auto-load dashboard on init
 loadDashboardHome()
+initAccounting().catch(err => {
+    console.error('Init Accounting Failed:', err)
+    alert('Errore inizializzazione contabilità: ' + err.message)
+})
