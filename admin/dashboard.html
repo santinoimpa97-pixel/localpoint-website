@@ -80,6 +80,10 @@
                             <p class="text-xs text-gray-500 font-medium">🧳 Bagagli Attivi</p>
                             <p id="home-luggage" class="text-2xl font-bold text-blue-600 mt-1">0</p>
                         </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500">
+                            <p class="text-xs text-gray-500 font-medium">📅 Prenotazioni Attive</p>
+                            <p id="home-reservations-kpi" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+                        </div>
                         <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-green-500">
                             <p class="text-xs text-gray-500 font-medium">💰 Incasso Oggi</p>
                             <p id="home-today-income" class="text-2xl font-bold text-green-600 mt-1">€ 0</p>
@@ -96,10 +100,7 @@
                             <p class="text-xs text-gray-500 font-medium">📊 Bilancio Netto</p>
                             <p id="home-net" class="text-2xl font-bold text-indigo-600 mt-1">€ 0</p>
                         </div>
-                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500">
-                            <p class="text-xs text-gray-500 font-medium">📅 Prenotazioni Attive</p>
-                            <p id="home-reservations" class="text-2xl font-bold text-purple-600 mt-1">0</p>
-                        </div>
+
                     </div>
 
                     <!-- Chart + Activity -->
@@ -148,11 +149,15 @@
                             </div>
                         </div>
 
-                        <!-- Today's Reservations -->
+                        <!-- Active Reservations -->
                         <div class="bg-white rounded-xl shadow-sm p-5">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📅 Prenotazioni di Oggi</h3>
-                            <div id="home-today-reservations" class="space-y-2 max-h-[300px] overflow-y-auto">
-                                <p class="text-sm text-gray-400 text-center py-4">Nessuna prenotazione oggi</p>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">📅 Prenotazioni Attive</h3>
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-sm text-gray-500">Prenotazioni confermate</p>
+                                <span id="home-reservations-count" class="text-2xl font-bold text-purple-600">0</span>
+                            </div>
+                            <div id="home-active-reservations-list" class="space-y-2 max-h-[250px] overflow-y-auto">
+                                <p class="text-sm text-gray-400 text-center py-4">Nessuna prenotazione attiva</p>
                             </div>
                         </div>
                     </div>
@@ -397,8 +402,29 @@
                                 <p id="acc-expenses" class="text-2xl font-bold text-red-600 mt-1">€ 0,00</p>
                             </div>
                             <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
-                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">📊 Bilancio Netto</p>
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">📊 Bilancio Utile</p>
                                 <p id="acc-balance" class="text-2xl font-bold text-blue-600 mt-1">€ 0,00</p>
+                            </div>
+
+                            <!-- Partner Debts -->
+                            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-orange-500">
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">🤝 Da Rimborsare</p>
+                                <div class="mt-1 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>Santino:</span>
+                                        <span id="debt-santino" class="font-bold text-red-500">€ 0,00</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Giovanni:</span>
+                                        <span id="debt-giovanni" class="font-bold text-red-500">€ 0,00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Real Cash -->
+                            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
+                                <p class="text-sm text-gray-500 font-medium whitespace-nowrap">💵 Cassa Reale</p>
+                                <p id="acc-real-cash" class="text-2xl font-bold text-green-600 mt-1">€ 0,00</p>
                             </div>
                         </div>
 
@@ -442,6 +468,15 @@
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                                     <option value="income">💰 Entrata</option>
                                     <option value="expense">💸 Uscita</option>
+                                </select>
+                            </div>
+                            <div id="acc-paid-by-container" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700">Pagato da</label>
+                                <select id="acc-paid-by"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-yellow-50">
+                                    <option value="shop">🏪 Cassa Negozio</option>
+                                    <option value="santino">👤 Santino</option>
+                                    <option value="giovanni">👤 Giovanni</option>
                                 </select>
                             </div>
                             <div>
@@ -488,6 +523,14 @@
                         <select id="acc-filter-category"
                             class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
                             <option value="all">Tutte le categorie</option>
+                        </select>
+                        <select id="acc-filter-paid-by"
+                            class="rounded-md border-gray-300 shadow-sm p-2 border text-sm bg-gray-50">
+                            <option value="all">Chiunque</option>
+                            <option value="shop">🏪 Cassa Negozio</option>
+                            <option value="santino">👤 Santino</option>
+                            <option value="giovanni">👤 Giovanni</option>
+                        </select>
                         </select>
                         <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-md border border-gray-200">
                             <span class="text-xs font-bold text-gray-400 px-1">DAL</span>
@@ -839,6 +882,15 @@
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                             <option value="income">💰 Entrata</option>
                             <option value="expense">💸 Uscita</option>
+                        </select>
+                    </div>
+                    <div id="edit-acc-paid-by-container" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700">Pagato da</label>
+                        <select id="edit-acc-paid-by"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border bg-yellow-50">
+                            <option value="shop">🏪 Cassa Negozio</option>
+                            <option value="santino">👤 Santino</option>
+                            <option value="giovanni">👤 Giovanni</option>
                         </select>
                     </div>
                     <div>

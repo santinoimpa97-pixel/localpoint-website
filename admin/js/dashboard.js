@@ -557,13 +557,48 @@ if (luggageForm) {
 
 // Initial Load
 async function loadDashStats() {
+    // 1. Active Luggage
     const { count: luggageCount } = await supabase
         .from('luggage_tickets')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'stored')
 
-    const statsEl = document.getElementById('stats-luggage')
-    if (statsEl) statsEl.innerText = luggageCount || 0
+    const statsEl = document.getElementById('stats-luggage') // This logic seems to be for another view?
+    // Note: 'stats-luggage' doesn't seem to exist in dashboard.html home view, maybe in luggage view title?
+    // Let's ensure we update home counters if they exist
+    const homeLuggage = document.getElementById('home-luggage')
+    if (homeLuggage) homeLuggage.innerText = luggageCount || 0
+
+
+    // 2. Active Reservations
+    const { data: activeRes, error } = await supabase
+        .from('reservations')
+        .select('*')
+        .eq('status', 'confirmed')
+        .order('date', { ascending: true })
+
+    const resCountEl = document.getElementById('home-reservations-count')
+    const resKpiEl = document.getElementById('home-reservations-kpi')
+    const resListEl = document.getElementById('home-active-reservations-list')
+
+    if (resCountEl) resCountEl.innerText = activeRes?.length || 0
+    if (resKpiEl) resKpiEl.innerText = activeRes?.length || 0
+
+    if (resListEl && activeRes) {
+        if (activeRes.length === 0) {
+            resListEl.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Nessuna prenotazione attiva</p>'
+        } else {
+            resListEl.innerHTML = activeRes.map(r => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div>
+                        <p class="font-medium text-gray-800 text-sm">${r.customer_name}</p>
+                        <p class="text-xs text-gray-500">${new Date(r.date).toLocaleDateString()} - ${r.service_type}</p>
+                    </div>
+                     <span class="text-xs font-bold text-purple-600 px-2 py-1 bg-purple-100 rounded-full">#${r.id.slice(0, 4)}</span>
+                </div>
+            `).join('')
+        }
+    }
 }
 loadDashStats()
 
@@ -1116,18 +1151,22 @@ const TRANSACTION_CATEGORIES = {
         'Servizi Digitali', 'Ricariche', 'Noleggio', 'Pagamenti/Bollettini', 'Altro'
     ],
     expense: [
-        'Affitto', 'Stipendi', 'Utenze', 'Forniture', 'Tasse', 'Marketing', 'Manutenzione', 'Altro'
+        'Affitto', 'Stipendi', 'Utenze', 'Forniture', 'Tasse', 'Marketing', 'Manutenzione',
+        'Rimborso Santino', 'Rimborso Giovanni', 'Altro'
     ]
 }
 
 const accList = document.getElementById('acc-list')
 const accForm = document.getElementById('acc-form')
 const accTypeSelect = document.getElementById('acc-type')
+const accPaidByContainer = document.getElementById('acc-paid-by-container')
+const accPaidBySelect = document.getElementById('acc-paid-by')
 const accCategorySelect = document.getElementById('acc-category')
 const accMonthSelect = document.getElementById('acc-month')
 const accYearSelect = document.getElementById('acc-year')
 const accFilterType = document.getElementById('acc-filter-type')
 const accFilterCategory = document.getElementById('acc-filter-category')
+const accFilterPaidBy = document.getElementById('acc-filter-paid-by')
 const accSearch = document.getElementById('acc-search')
 const accDateInput = document.getElementById('acc-date')
 const accTrashList = document.getElementById('acc-trash-list')
@@ -1226,6 +1265,13 @@ function updateFormCategories() {
     const type = accTypeSelect.value
     const cats = type === 'income' ? TRANSACTION_CATEGORIES.income : TRANSACTION_CATEGORIES.expense
     accCategorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('')
+
+    // Toggle Paid By visibility
+    const pbContainer = document.getElementById('acc-paid-by-container')
+    if (pbContainer) {
+        if (type === 'expense') pbContainer.classList.remove('hidden')
+        else pbContainer.classList.add('hidden')
+    }
 }
 accTypeSelect?.addEventListener('change', updateFormCategories)
 
@@ -1322,7 +1368,16 @@ function applyFilters() {
         list = list.filter(t => t.category === catFilter)
     }
 
-    // 4. Search
+    // 4. Paid By filter
+    const paidByFilter = accFilterPaidBy?.value || 'all'
+    if (paidByFilter !== 'all') {
+        list = list.filter(t => {
+            const payer = t.paid_by || 'shop'
+            return payer === paidByFilter
+        })
+    }
+
+    // 5. Search
     const q = (accSearch?.value || '').trim().toLowerCase()
     if (q) {
         list = list.filter(t =>
@@ -1353,6 +1408,7 @@ accFilterType?.addEventListener('change', () => {
     applyFilters()
 })
 accFilterCategory?.addEventListener('change', applyFilters)
+accFilterPaidBy?.addEventListener('change', applyFilters)
 accSearch?.addEventListener('input', applyFilters)
 document.getElementById('acc-date-from')?.addEventListener('change', applyFilters)
 document.getElementById('acc-date-to')?.addEventListener('change', applyFilters)
@@ -1374,6 +1430,35 @@ function renderAccountingSummary(data) {
     if (balEl) {
         balEl.textContent = fmt(balance)
         balEl.className = `text-2xl font-bold mt-1 ${balance >= 0 ? 'text-blue-600' : 'text-red-600'}`
+    }
+
+    // Partner Stats
+    const expShop = source.filter(t => t.type === 'expense' && (t.paid_by === 'shop' || !t.paid_by)).reduce((s, t) => s + parseFloat(t.amount), 0)
+
+    // Expenses paid by Santino MINUS Reimbursements to Santino
+    const expensesBySantino = source.filter(t => t.type === 'expense' && t.paid_by === 'santino').reduce((s, t) => s + parseFloat(t.amount), 0)
+    const reimbursementsToSantino = source.filter(t => t.type === 'expense' && t.category === 'Rimborso Santino').reduce((s, t) => s + parseFloat(t.amount), 0)
+    const netDebtSantino = expensesBySantino - reimbursementsToSantino
+
+    // Expenses paid by Giovanni MINUS Reimbursements to Giovanni
+    const expensesByGiovanni = source.filter(t => t.type === 'expense' && t.paid_by === 'giovanni').reduce((s, t) => s + parseFloat(t.amount), 0)
+    const reimbursementsToGiovanni = source.filter(t => t.type === 'expense' && t.category === 'Rimborso Giovanni').reduce((s, t) => s + parseFloat(t.amount), 0)
+    const netDebtGiovanni = expensesByGiovanni - reimbursementsToGiovanni
+
+    // Real Cash = Income (all assumed shop) - Shop Expenses
+    // Note: If we want to track income kept by partners, we'd need to enable 'paid_by' for income too.
+    // For now, assuming all income goes to shop.
+    const realCash = income - expShop
+
+    const debtSanEl = document.getElementById('debt-santino')
+    const debtGioEl = document.getElementById('debt-giovanni')
+    const realCashEl = document.getElementById('acc-real-cash')
+
+    if (debtSanEl) debtSanEl.textContent = fmt(netDebtSantino)
+    if (debtGioEl) debtGioEl.textContent = fmt(netDebtGiovanni)
+    if (realCashEl) {
+        realCashEl.textContent = fmt(realCash)
+        realCashEl.className = `text-2xl font-bold mt-1 ${realCash >= 0 ? 'text-green-600' : 'text-red-600'}`
     }
 }
 
@@ -1556,7 +1641,10 @@ function renderTransactionList() {
           ${isIncome ? '💵 Entrata' : '💸 Uscita'}
         </span>
       </td>
-      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${tx.category}</td>
+      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+        <div>${tx.category}</div>
+        ${tx.paid_by && tx.paid_by !== 'shop' ? `<div class="text-xs font-bold text-orange-600">👤 ${tx.paid_by.charAt(0).toUpperCase() + tx.paid_by.slice(1)}</div>` : ''}
+      </td>
       <td class="px-4 py-3 text-sm text-gray-600 max-w-xs truncate" title="${tx.description || ''}">${tx.description || '—'}</td>
       <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold ${isIncome ? 'text-green-600' : 'text-red-600'}">
         ${isIncome ? '+' : '-'} € ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}
@@ -1657,9 +1745,10 @@ accForm?.addEventListener('submit', async (e) => {
     const category = accCategorySelect.value
     const description = document.getElementById('acc-description')?.value || ''
     const date = accDateInput.value
+    const paid_by = document.getElementById('acc-paid-by')?.value || 'shop'
 
     const { error } = await supabase.from('transactions').insert([{
-        type, amount, category, description, date, status: 'active'
+        type, amount, category, description, date, paid_by, status: 'active'
     }])
 
     if (error) {
@@ -1698,6 +1787,15 @@ window.editTransaction = (id) => {
     document.getElementById('edit-acc-desc').value = tx.description || ''
     document.getElementById('edit-acc-date').value = tx.date
 
+    // Paid By
+    const paidByContainer = document.getElementById('edit-acc-paid-by-container')
+    const paidBySelect = document.getElementById('edit-acc-paid-by')
+    if (paidByContainer) {
+        if (tx.type === 'expense') paidByContainer.classList.remove('hidden')
+        else paidByContainer.classList.add('hidden')
+    }
+    if (paidBySelect) paidBySelect.value = tx.paid_by || 'shop'
+
     // Update categories based on type
     const cats = tx.type === 'income' ? TRANSACTION_CATEGORIES.income : TRANSACTION_CATEGORIES.expense
     const catSel = document.getElementById('edit-acc-category')
@@ -1707,11 +1805,29 @@ window.editTransaction = (id) => {
     editAccModal.classList.remove('hidden')
 }
 
-// Bind Type change in edit modal to update categories
+// Bind Type change in edit modal to update categories and toggle Paid By
 document.getElementById('edit-acc-type')?.addEventListener('change', (e) => {
-    const cats = e.target.value === 'income' ? TRANSACTION_CATEGORIES.income : TRANSACTION_CATEGORIES.expense
+    const type = e.target.value
+    const cats = type === 'income' ? TRANSACTION_CATEGORIES.income : TRANSACTION_CATEGORIES.expense
     const catSel = document.getElementById('edit-acc-category')
     catSel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('')
+
+    // Toggle Paid By
+    const startPaidBy = document.getElementById('edit-acc-paid-by-container')
+    if (startPaidBy) {
+        if (type === 'expense') startPaidBy.classList.remove('hidden')
+        else startPaidBy.classList.add('hidden')
+    }
+})
+
+// Bind Type change in New Form
+accTypeSelect?.addEventListener('change', (e) => {
+    updateFormCategories()
+    const type = e.target.value
+    if (accPaidByContainer) {
+        if (type === 'expense') accPaidByContainer.classList.remove('hidden')
+        else accPaidByContainer.classList.add('hidden')
+    }
 })
 
 document.getElementById('edit-acc-cancel')?.addEventListener('click', () => {
@@ -1724,9 +1840,10 @@ document.getElementById('edit-acc-save')?.addEventListener('click', async () => 
     const category = document.getElementById('edit-acc-category').value
     const description = document.getElementById('edit-acc-desc').value
     const date = document.getElementById('edit-acc-date').value
+    const paid_by = document.getElementById('edit-acc-paid-by').value
 
     const { error } = await supabase.from('transactions').update({
-        type, amount, category, description, date
+        type, amount, category, description, date, paid_by
     }).eq('id', id)
 
     if (error) {
