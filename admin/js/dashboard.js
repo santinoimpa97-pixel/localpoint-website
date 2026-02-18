@@ -562,7 +562,8 @@ async function loadDashStats() {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'stored')
 
-    document.getElementById('stats-luggage').innerText = luggageCount || 0
+    const statsEl = document.getElementById('stats-luggage')
+    if (statsEl) statsEl.innerText = luggageCount || 0
 }
 loadDashStats()
 
@@ -1431,28 +1432,69 @@ function renderCharts() {
         })
     }
 
-    // 2. Category Pie Chart (Expenses)
-    const ctxCat = document.getElementById('acc-cat-chart')?.getContext('2d')
-    if (ctxCat) {
+    // 2. Best Sellers Doughnut Chart (Income)
+    const ctxBest = document.getElementById('acc-best-seller-chart')?.getContext('2d')
+    if (ctxBest) {
         if (catChart) catChart.destroy()
 
-        const expenses = filteredTransactions.filter(t => t.type === 'expense')
+        const incomeTx = filteredTransactions.filter(t => t.type === 'income')
         const catMap = {}
-        expenses.forEach(t => {
-            catMap[t.category] = (catMap[t.category] || 0) + t.amount
+        incomeTx.forEach(t => {
+            const cat = t.category || 'Altro'
+            catMap[cat] = (catMap[cat] || 0) + t.amount
         })
 
-        const labels = Object.keys(catMap)
-        const data = Object.values(catMap)
-        const colors = ['#EF4444', '#F59E0B', '#3B82F6', '#10B981', '#6366F1', '#8B5CF6', '#EC4899']
+        // Sort by value desc
+        const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1])
 
-        catChart = new Chart(ctxCat, {
+        const labels = sorted.map(s => s[0])
+        const data = sorted.map(s => s[1])
+
+        const colors = [
+            '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+            '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6'
+        ]
+
+        catChart = new Chart(ctxBest, {
             type: 'doughnut',
             data: {
                 labels: labels,
-                datasets: [{ data: data, backgroundColor: colors, borderWidth: 0 }]
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors.slice(0, labels.length),
+                    borderWidth: 0
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { boxWidth: 12, font: { size: 11 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                const value = context.parsed;
+                                const total = context.chart._metasets[context.datasetIndex].total;
+                                const percentage = ((value / total) * 100).toFixed(1) + '%';
+
+                                if (value !== null) {
+                                    label += new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value);
+                                    label += ` (${percentage})`;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
         })
     }
 }
@@ -1520,11 +1562,27 @@ function renderTransactionList() {
         ${isIncome ? '+' : '-'} € ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}
       </td>
       <td class="px-4 py-3 whitespace-nowrap text-right text-sm flex gap-2 justify-end">
-        <button class="text-blue-500 hover:text-blue-800" onclick="window.editTransaction('${tx.id}')">✏️</button>
-        <button class="text-red-500 hover:text-red-800" onclick="window.deleteTransaction('${tx.id}')">🗑️</button>
+        <button class="acc-btn-edit text-blue-500 hover:text-blue-800" data-id="${tx.id}">✏️</button>
+        <button class="acc-btn-delete text-red-500 hover:text-red-800" data-id="${tx.id}">🗑️</button>
       </td>
     `
         accList.appendChild(row)
+    })
+
+    // Bind actions
+    accList.querySelectorAll('.acc-btn-edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            console.log('✏️ Edit button clicked', btn.dataset.id)
+            e.stopPropagation() // Prevent row click if any
+            if (typeof window.editTransaction === 'function') {
+                window.editTransaction(btn.dataset.id)
+            } else {
+                console.error('❌ window.editTransaction is not a function')
+            }
+        })
+    })
+    accList.querySelectorAll('.acc-btn-delete').forEach(btn => {
+        btn.addEventListener('click', () => window.deleteTransaction(btn.dataset.id))
     })
 
     // Bind checkboxes
@@ -1617,8 +1675,22 @@ accForm?.addEventListener('submit', async (e) => {
 // --- EDIT TRANSACTION ---
 const editAccModal = document.getElementById('edit-acc-modal')
 window.editTransaction = (id) => {
-    const tx = allTransactions.find(t => t.id === id)
-    if (!tx) return
+    console.log('✏️ window.editTransaction called with ID:', id)
+    console.log('📊 allTransactions count:', allTransactions.length)
+
+    // Loose comparison for ID (string vs number)
+    const tx = allTransactions.find(t => t.id == id)
+    if (!tx) {
+        console.error('❌ Transaction not found with ID:', id)
+        return
+    }
+    console.log('✅ Transaction found:', tx)
+
+    const modal = document.getElementById('edit-acc-modal')
+    if (!modal) {
+        console.error('❌ Modal element #edit-acc-modal not found!')
+        return
+    }
 
     document.getElementById('edit-acc-id').value = tx.id
     document.getElementById('edit-acc-type').value = tx.type
@@ -1627,7 +1699,7 @@ window.editTransaction = (id) => {
     document.getElementById('edit-acc-date').value = tx.date
 
     // Update categories based on type
-    const cats = tx.type === 'income' ? incomeCategories : expenseCategories
+    const cats = tx.type === 'income' ? TRANSACTION_CATEGORIES.income : TRANSACTION_CATEGORIES.expense
     const catSel = document.getElementById('edit-acc-category')
     catSel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('')
     catSel.value = tx.category
