@@ -79,6 +79,27 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
 })
 
 
+// --- MOBILE MENU ---
+const mobileMenuBtn = document.getElementById('mobile-menu-btn')
+const sidebar = document.getElementById('sidebar')
+
+if (mobileMenuBtn && sidebar) {
+    mobileMenuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden')
+        sidebar.classList.toggle('flex') // Ensure it shows as flex
+    })
+}
+
+// Close sidebar when clicking a nav item on mobile
+document.querySelectorAll('aside nav button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (window.innerWidth < 768) { // Only on mobile
+            sidebar.classList.add('hidden')
+            sidebar.classList.remove('flex')
+        }
+    })
+})
+
 // --- LUGGAGE FEATURE ---
 const PRICE_PER_BAG_PER_DAY = 4.00
 const luggageList = document.getElementById('luggage-list')

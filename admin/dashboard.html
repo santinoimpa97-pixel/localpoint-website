@@ -15,7 +15,8 @@
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md hidden md:flex flex-col">
+        <aside id="sidebar"
+            class="w-64 bg-white shadow-md hidden md:flex flex-col z-50 md:z-auto fixed md:relative h-full transition-transform">
             <div class="p-5 border-b text-center">
                 <img src="/logo.png" alt="LocalPoint" class="h-10 mx-auto mb-1">
                 <p class="text-xs text-gray-400 font-medium">Admin Panel</p>
@@ -58,7 +59,7 @@
             <!-- Mobile Header -->
             <header class="bg-white shadow-sm md:hidden p-4 flex justify-between items-center">
                 <span class="font-bold text-lg text-blue-600">LocalPoint</span>
-                <button class="text-gray-600">
+                <button id="mobile-menu-btn" class="text-gray-600 focus:outline-none">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
             </header>
