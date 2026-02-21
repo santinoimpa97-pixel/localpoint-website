@@ -65,5 +65,26 @@ create policy "Admin access transactions" on transactions
 create policy "Admin access reservations" on reservations
   for all using (auth.role() = 'authenticated');
 
+-- 5. Tabella Spedizioni (Shipments)
+create table shipments (
+  id uuid default uuid_generate_v4() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  customer_name text not null,
+  customer_email text,
+  customer_phone text,
+  tracking_number text not null,
+  courier text not null check (courier in ('POSTE', 'SDA/POSTE', 'UPS', 'BRT')),
+  amount decimal(10,2) default 0,
+  payment_method text default 'cash',
+  status text default 'pending' check (status in ('pending', 'shipped', 'delivered')),
+  notes text
+);
+
+alter table shipments enable row level security;
+
+create policy "Admin access shipments" on shipments
+  for all using (auth.role() = 'authenticated');
+
+
 -- MIGRATION COMMANDS (Run manuali se le tabelle esistono già)
 -- alter table transactions add column payment_method text default 'cash' check (payment_method in ('cash', 'card', 'transfer', 'other'));

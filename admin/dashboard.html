@@ -43,6 +43,11 @@
                     <i data-lucide="luggage" class="w-5 h-5"></i>
                     <span class="font-medium">Bagagli</span>
                 </button>
+                <button id="nav-shipping"
+                    class="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                    <i data-lucide="truck" class="w-5 h-5"></i>
+                    <span class="font-medium">Spedizioni</span>
+                </button>
             </nav>
 
             <div class="p-4 border-t">
@@ -841,6 +846,154 @@
 
 
                 </div>
+
+                <!-- SECTION: Shipments -->
+                <div id="view-shipping" class="hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-semibold text-gray-800">📦 Gestione Spedizioni</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- New Shipment Form -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-1">
+                            <h3 class="font-semibold text-lg mb-4">Nuova Spedizione</h3>
+                            <form id="shipping-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Nome Cliente</label>
+                                    <input type="text" id="ship-name" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                                        <input type="email" id="ship-email" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Telefono</label>
+                                        <input type="tel" id="ship-phone"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Corriere</label>
+                                    <select id="ship-courier" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="POSTE">POSTE</option>
+                                        <option value="UPS">UPS</option>
+                                        <option value="BRT">BRT</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-2">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Prezzo (€)</label>
+                                        <input type="number" id="ship-amount" step="0.01" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                            placeholder="0.00">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Pagamento</label>
+                                        <select id="ship-payment-method" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                            <option value="cash">Contanti</option>
+                                            <option value="card">Carta</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Numero di
+                                        Tracciamento</label>
+                                    <input type="text" id="ship-tracking" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                        placeholder="es. ABC123456789">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Note (Opzionale)</label>
+                                    <textarea id="ship-notes" rows="2"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></textarea>
+                                </div>
+                                <div
+                                    class="p-3 bg-yellow-50 rounded-lg text-xs text-yellow-800 border border-yellow-200">
+                                    ℹ️ Una mail automatica sarà inviata al cliente informandolo che il tracciamento si
+                                    aggiornerà dopo il ritiro presso il nostro punto.
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-medium">Invia
+                                    Notifica & Salva</button>
+                            </form>
+                        </div>
+
+                        <!-- Shipments List -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+                            <div
+                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                                <h3 class="font-semibold text-lg">Lista Spedizioni</h3>
+                                <div class="flex w-full sm:w-auto gap-2">
+                                    <div class="relative flex-1 sm:w-64">
+                                        <i data-lucide="search"
+                                            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                        <input type="text" id="ship-search" placeholder="Cerca spedizione..."
+                                            class="pl-9 pr-4 py-2 w-full border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                    </div>
+                                    <button onclick="deleteSelectedShipments()" id="btn-bulk-delete"
+                                        class="hidden bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition-colors"
+                                        title="Elimina selezionati">
+                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left">
+                                                <input type="checkbox" id="select-all-shipments"
+                                                    class="rounded text-blue-600">
+                                            </th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Data</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Cliente</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Email</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Telefono</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Corriere</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Tracking</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Note</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Prezzo</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Pagamento</th>
+                                            <th
+                                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase text-nowrap">
+                                                Azioni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="shipping-list" class="bg-white divide-y divide-gray-200 text-nowrap">
+                                        <tr>
+                                            <td colspan="8" class="px-4 py-4 text-center text-sm text-gray-500">Nessuna
+                                                spedizione registrata</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
 
             </main>
         </div>

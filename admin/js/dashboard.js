@@ -27,15 +27,20 @@ const views = {
     dashboard: document.getElementById('view-dashboard'),
     luggage: document.getElementById('view-luggage'),
     accounting: document.getElementById('view-accounting'),
-    reservations: document.getElementById('view-reservations')
+    reservations: document.getElementById('view-reservations'),
+    shipping: document.getElementById('view-shipping')
 }
 
 const navBtns = {
     dashboard: document.getElementById('nav-dashboard'),
     luggage: document.getElementById('nav-luggage'),
     accounting: document.getElementById('nav-accounting'),
-    reservations: document.getElementById('nav-reservations')
+    reservations: document.getElementById('nav-reservations'),
+    shipping: document.getElementById('nav-shipping')
 }
+
+// Global Shipping Refs
+let shippingList, shippingForm
 
 function switchView(viewName) {
     // Hide all views
@@ -65,7 +70,9 @@ function switchView(viewName) {
     }
     if (viewName === 'reservations') {
         loadReservations()
-
+    }
+    if (viewName === 'shipping') {
+        loadShipping()
     }
 }
 
@@ -2634,6 +2641,10 @@ async function loadDashboardHome() {
         const pendingRes = activeRes.filter(r => r.status === 'pending')
         if (pendingRes.length > 0) items.push(`⏳ ${pendingRes.length} prenotazioni in attesa`)
 
+        // Shipping items (optional, could add if desired)
+        // const todayShips = (allShipments || []).filter(s => s.created_at.startsWith(new Date().toISOString().slice(0,10)))
+        // if (todayShips.length > 0) items.push(`📦 ${todayShips.length} spedizioni oggi`)
+
         if (items.length === 0) {
             todayContainer.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Nessuna attività oggi</p>'
         } else {
@@ -2700,9 +2711,261 @@ function renderHomeChart(allTransactions) {
     })
 }
 
-// Auto-load dashboard on init
-loadDashboardHome()
 initAccounting().catch(err => {
     console.error('Init Accounting Failed:', err)
     alert('Errore inizializzazione contabilità: ' + err.message)
 })
+
+// ========================
+// --- SHIPPING MODULE ---
+// ========================
+
+async function initShipping() {
+    console.log('📦 Initializing Shipping...')
+    shippingList = document.getElementById('shipping-list')
+    shippingForm = document.getElementById('shipping-form')
+
+    // Search input listener
+    document.getElementById('ship-search')?.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase()
+        filterShipments(query)
+    })
+
+    // Select All listener
+    document.getElementById('select-all-shipments')?.addEventListener('change', (e) => {
+        const checkboxes = shippingList.querySelectorAll('input[type="checkbox"]')
+        checkboxes.forEach(cb => cb.checked = e.target.checked)
+        updateBulkDeleteButton()
+    })
+
+    shippingForm?.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const customer_name = document.getElementById('ship-name').value
+        const customer_email = document.getElementById('ship-email').value
+        const customer_phone = document.getElementById('ship-phone').value
+        const courier = document.getElementById('ship-courier').value
+        const tracking_number = document.getElementById('ship-tracking').value
+        const notes = document.getElementById('ship-notes').value
+        const amount = parseFloat(document.getElementById('ship-amount').value || 0)
+        const payment_method = document.getElementById('ship-payment-method').value
+
+        const { error } = await supabase.from('shipments').insert([{
+            customer_name, customer_email, customer_phone, courier, tracking_number, notes,
+            amount, payment_method, status: 'pending'
+        }])
+
+        if (error) {
+            alert('Errore salvataggio: ' + error.message)
+        } else {
+            // Register accounting transaction
+            await supabase.from('transactions').insert([{
+                type: 'income',
+                amount: amount,
+                category: 'Spedizioni',
+                description: tracking_number,
+                date: new Date().toISOString().slice(0, 10),
+                payment_method: payment_method,
+                paid_by: 'shop',
+                status: 'active'
+            }])
+
+            alert('Spedizione salvata e transazione registrata correttamente!')
+            shippingForm.reset()
+            loadShipping()
+            if (typeof loadAccounting === 'function') loadAccounting()
+
+            // Send Email
+            sendShippingEmail({
+                customer_name,
+                customer_email,
+                courier,
+                tracking_number,
+                notes
+            })
+        }
+    })
+}
+
+// Global scope functions for UI events
+window.updateBulkDeleteButton = function () {
+    const shippingList = document.getElementById('shipping-list')
+    if (!shippingList) return
+    const selected = shippingList.querySelectorAll('input[type="checkbox"]:checked')
+    const btn = document.getElementById('btn-bulk-delete')
+    if (btn) {
+        if (selected.length > 0) btn.classList.remove('hidden')
+        else btn.classList.add('hidden')
+    }
+}
+
+window.deleteSelectedShipments = async () => {
+    const shippingList = document.getElementById('shipping-list')
+    const selected = Array.from(shippingList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+    if (selected.length === 0) return
+    if (!confirm(`Eliminare ${selected.length} spedizioni selezionate?`)) return
+
+    const { error } = await supabase.from('shipments').delete().in('id', selected)
+    if (!error) {
+        loadShipping()
+        const selectAll = document.getElementById('select-all-shipments')
+        if (selectAll) selectAll.checked = false
+        window.updateBulkDeleteButton()
+        showNotification('Spedizioni eliminate con successo')
+    } else {
+        alert('Errore eliminazione: ' + error.message)
+    }
+}
+
+let allShipments = []
+
+async function loadShipping() {
+    const { data, error } = await supabase.from('shipments').select('*').order('created_at', { ascending: false })
+    if (!error) {
+        allShipments = data
+        renderShippingList(data)
+    }
+}
+
+function filterShipments(query) {
+    const filtered = allShipments.filter(s =>
+        s.customer_name?.toLowerCase().includes(query) ||
+        s.customer_email?.toLowerCase().includes(query) ||
+        s.tracking_number?.toLowerCase().includes(query) ||
+        s.courier?.toLowerCase().includes(query) ||
+        s.notes?.toLowerCase().includes(query)
+    )
+    renderShippingList(filtered)
+}
+
+// Functions moved to global scope above
+
+function showNotification(msg) {
+    const toast = document.createElement('div')
+    toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl z-50 transform transition-all duration-300 translate-y-20'
+    toast.innerHTML = `<div class="flex items-center gap-2"><div class="w-2 h-2 bg-green-500 rounded-full"></div><span>${msg}</span></div>`
+    document.body.appendChild(toast)
+
+    setTimeout(() => toast.classList.remove('translate-y-20'), 100)
+    setTimeout(() => {
+        toast.classList.add('translate-y-20')
+        setTimeout(() => toast.remove(), 300)
+    }, 3000)
+}
+
+function renderShippingList(list) {
+    if (!shippingList) return
+    if (!list || list.length === 0) {
+        shippingList.innerHTML = '<tr><td colspan="11" class="px-4 py-4 text-center text-sm text-gray-500">Nessuna spedizione registrata</td></tr>'
+        return
+    }
+
+    shippingList.innerHTML = list.map(s => {
+        const date = new Date(s.created_at).toLocaleDateString('it-IT')
+        return `<tr>
+            <td class="px-4 py-3">
+                <input type="checkbox" value="${s.id}" class="rounded text-blue-600" onchange="window.updateBulkDeleteButton()">
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-600 font-medium">${date}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-800">${s.customer_name}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${s.customer_email || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${s.customer_phone || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${s.courier === 'SDA/POSTE' ? 'POSTE' : s.courier}</td>
+            <td class="px-4 py-3 text-sm font-mono text-blue-600 font-bold">${s.tracking_number}</td>
+            <td class="px-4 py-3 text-sm text-gray-500 italic max-w-xs truncate" title="${s.notes || ''}">${s.notes || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-800 font-medium">€${(s.amount || 0).toFixed(2)}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 capitalize">${s.payment_method === 'cash' ? 'Contanti' : (s.payment_method === 'card' ? 'Carta' : s.payment_method || '-')}</td>
+            <td class="px-4 py-3 text-right">
+                <button onclick="deleteShipment('${s.id}')" class="text-red-500 hover:text-red-700"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </td>
+        </tr>`
+    }).join('')
+    lucide.createIcons()
+}
+
+window.deleteShipment = async (id) => {
+    if (!confirm('Eliminare questa spedizione?')) return
+    const { error } = await supabase.from('shipments').delete().eq('id', id)
+    if (!error) loadShipping()
+}
+
+async function sendShippingEmail({ customer_name, customer_email, courier, tracking_number, notes }) {
+    let trackingUrl = '#'
+
+    if (courier === 'POSTE' || courier === 'SDA/POSTE') {
+        trackingUrl = `https://www.poste.it/cerca/#/risultati-spedizioni/${tracking_number}`
+    } else if (courier === 'UPS') {
+        trackingUrl = `https://www.ups.com/track?loc=en_US&tracknum=${tracking_number}&requester=WT/trackdetails`
+    } else if (courier === 'BRT') {
+        trackingUrl = `https://as777.brt.it/vas/sped_det_show.hsm?referer=sped_numspe_par.htm&Nspediz=${tracking_number}&RicercaNumeroSpedizione=Ricerca`
+    }
+
+    const htmlBody = `
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f0f4f3; padding: 20px;">
+        <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(27,58,92,0.12); width: 100%;">
+            <!-- Header with logo -->
+            <div style="background: linear-gradient(135deg, #1B3A5C 0%, #2A9D8F 100%); padding: 32px 24px; text-align: center;">
+                <div style="margin-bottom: 16px; display: block;">
+                    <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto; margin: 0 auto; display: block;">
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block; padding: 8px 24px;">
+                    <span style="color: white; font-size: 15px; font-weight: 700;">📦 Conferma Spedizione</span>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div style="padding: 28px 24px;">
+                <p style="color: #1B3A5C; font-size: 16px; margin: 0 0 10px;">Gentile <strong>${customer_name}</strong>,</p>
+                <p style="color: #4a5568; font-size: 14px; line-height: 1.5; margin: 0 0 20px;">Ti informiamo che la tua spedizione tramite <strong>${courier === 'SDA/POSTE' || courier === 'POSTE' ? 'POSTE' : courier}</strong> è stata presa in carico presso il nostro punto LocalPoint.</p>
+                
+                <!-- Notes if present -->
+                ${notes ? `
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 10px; margin-bottom: 24px;">
+                    <p style="color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; margin: 0 0 8px;">Note sulla spedizione:</p>
+                    <p style="color: #1B3A5C; font-size: 14px; margin: 0; line-height: 1.4;">${notes}</p>
+                </div>
+                ` : ''}
+
+                <!-- Tracking Box -->
+                <div style="background: linear-gradient(135deg, #e6f7f4 0%, #edf6ff 100%); border: 2px solid #2A9D8F; border-radius: 14px; padding: 24px; text-align: center; margin: 0 0 24px;">
+                    <p style="color: #2A9D8F; font-size: 11px; margin: 0 0 8px; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Numero di Tracking</p>
+                    <p style="color: #1B3A5C; font-size: 28px; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px; margin: 0 0 20px;">${tracking_number}</p>
+                    <a href="${trackingUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #2A9D8F, #7BC142); color: white; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-size: 15px; font-weight: 700; box-shadow: 0 4px 10px rgba(42,157,143,0.3);">Traccia Spedizione</a>
+                </div>
+
+                <!-- Pickup Notice -->
+                <div style="background: #fff5f5; border-left: 4px solid #f56565; padding: 12px 16px; margin: 0 0 20px;">
+                    <p style="color: #c53030; font-size: 13px; margin: 0; font-weight: 600;">⚠️ Nota Importante:</p>
+                    <p style="color: #4a5568; font-size: 13px; margin: 4px 0 0;">Il tracciamento si attiverà solo dopo che il corriere avrà effettuato il ritiro fisico presso la nostra sede.</p>
+                </div>
+
+                <!-- Review Section -->
+                <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 24px;">
+                    <p style="color: #4a5568; font-size: 14px; margin-bottom: 12px;">La tua opinione è importante!</p>
+                    <a href="${GOOGLE_REVIEW_URL}" target="_blank" style="display: inline-block; background: #ffffff; color: #1B3A5C; border: 2px solid #2A9D8F; text-decoration: none; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;">⭐ Lascia una recensione</a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="border-top: 3px solid #7BC142; background: #f7faf8; padding: 24px; text-align: center;">
+                <p style="color: #1B3A5C; font-size: 14px; margin: 0 0 4px; font-weight: 700;">Grazie per aver scelto LocalPoint!</p>
+                <p style="color: #2A9D8F; font-size: 12px; margin: 0 0 8px;">Il Team Local Point — Milazzo</p>
+                <p style="color: #a0aec0; font-size: 11px; margin: 0;">www.local-point.it</p>
+            </div>
+        </div>
+    </div>`
+
+    try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_email: customer_email,
+            subject: `Informazioni Tracking Spedizione - ${courier === 'SDA/POSTE' || courier === 'POSTE' ? 'POSTE' : courier}`,
+            message: htmlBody
+        })
+        console.log('✅ Email spedizione inviata!')
+        showNotification('Email inviata con successo')
+    } catch (err) {
+        console.error('❌ Errore invio email:', err)
+        alert('Errore invio email')
+    }
+}
+
+initShipping()
