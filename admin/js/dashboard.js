@@ -1180,7 +1180,7 @@ let catChart = null
 
 // --- Init ---
 async function initAccounting() {
-    console.log('🚀 Initializing Accounting...')
+    console.log('🚀 initAccounting started')
 
     // Select ALL Elements Safely
     accList = document.getElementById('acc-list')
@@ -1233,6 +1233,11 @@ async function initAccounting() {
     accTypeSelect?.addEventListener('change', () => {
         console.log('📝 New Transaction Type changed')
         updateFormCategories()
+        const type = accTypeSelect.value
+        if (accPaidByContainer) {
+            if (type === 'expense') accPaidByContainer.classList.remove('hidden')
+            else accPaidByContainer.classList.add('hidden')
+        }
     })
 
     // All Time Button
@@ -1248,7 +1253,72 @@ async function initAccounting() {
     })
 
     // Load Data
+    console.log('🔄 Calling loadAccounting...')
     await loadAccounting()
+    console.log('✅ loadAccounting finished')
+
+    // --- Form Submit (Create) ---
+    console.log('🔗 Attaching accForm submit listener')
+    accForm?.addEventListener('submit', async (e) => {
+        console.log('📤 Form submit detected!')
+        e.preventDefault()
+        const type = accTypeSelect.value
+        const amount = parseFloat(document.getElementById('acc-amount').value)
+        const category = accCategorySelect.value
+        const description = document.getElementById('acc-description')?.value || ''
+        const date = accDateInput.value
+        const payment_method = accPaymentMethodSelect?.value || 'cash'
+        const paid_by = document.getElementById('acc-paid-by')?.value || 'shop'
+
+        const { error } = await supabase.from('transactions').insert([{
+            type, amount, category, description, date, paid_by, payment_method, status: 'active'
+        }])
+
+        if (error) {
+            console.error('❌ Supabase Insert Error:', error)
+            alert('Errore salvataggio: ' + error.message)
+        } else {
+            console.log('🎉 Transaction saved successfully!')
+            accForm.reset()
+            accDateInput.value = new Date().toISOString().slice(0, 10)
+            updateFormCategories()
+            loadAccounting()
+        }
+    })
+    console.log('🚀 initAccounting fully completed')
+
+
+    // CSV Export
+    document.getElementById('acc-export-csv')?.addEventListener('click', () => {
+        if (filteredTransactions.length === 0) {
+            alert('Nessuna transazione da esportare')
+            return
+        }
+
+        let csv = 'Data,Tipo,Categoria,Descrizione,Importo\n'
+        filteredTransactions.forEach(tx => {
+            const date = new Date(tx.date).toLocaleDateString('it-IT')
+            const type = tx.type === 'income' ? 'Entrata' : 'Uscita'
+            const desc = (tx.description || '').replace(/"/g, '""')
+            const amount = parseFloat(tx.amount).toFixed(2).replace('.', ',')
+            csv += `${date},"${type}","${tx.category}","${desc}","${tx.type === 'income' ? '+' : '-'}€${amount}"\n`
+        })
+
+        // Add totals
+        const income = filteredTransactions.filter(t => t.type === 'income').reduce((s, t) => s + parseFloat(t.amount), 0)
+        const expenses = filteredTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + parseFloat(t.amount), 0)
+        csv += `\n,,,"Totale Entrate","€${income.toFixed(2).replace('.', ',')}"\n`
+        csv += `,,,"Totale Uscite","€${expenses.toFixed(2).replace('.', ',')}"\n`
+        csv += `,,,"Bilancio Netto","€${(income - expenses).toFixed(2).replace('.', ',')}"\n`
+
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `LocalPoint_Contabilita_${new Date().toISOString().slice(0, 10)}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+    })
 }
 
 // Helper to sync the Action Bar dates to the selected Month/Year
@@ -1496,8 +1566,8 @@ function renderCharts(transactions) {
                     const mIso = d.toISOString().slice(0, 7) // YYYY-MM
                     labels.push(mStr)
 
-                    const inc = transactions.filter(t => t.type === 'income' && t.date.startsWith(mIso)).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
-                    const exp = transactions.filter(t => t.type === 'expense' && t.date.startsWith(mIso)).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+                    const inc = transactions.filter(t => t.type === 'income' && t.date && t.date.startsWith(mIso)).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
+                    const exp = transactions.filter(t => t.type === 'expense' && t.date && t.date.startsWith(mIso)).reduce((s, t) => s + parseFloat(t.amount || 0), 0)
                     dataInc.push(inc)
                     dataExp.push(exp)
 
@@ -1732,35 +1802,6 @@ window.deleteTransaction = async (id) => {
 
 
 
-// --- Form Submit (Create) ---
-accForm?.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const type = accTypeSelect.value
-    const amount = parseFloat(document.getElementById('acc-amount').value)
-    const category = accCategorySelect.value
-    const description = document.getElementById('acc-description')?.value || ''
-    const date = accDateInput.value
-    const payment_method = accPaymentMethodSelect?.value || 'cash'
-    const paid_by = document.getElementById('acc-paid-by')?.value || 'shop'
-
-    const { error } = await supabase.from('transactions').insert([{
-        type, amount, category, description, date, paid_by, payment_method, status: 'active'
-    }])
-
-    if (error) {
-        alert('Errore salvataggio: ' + error.message)
-    } else {
-        accForm.reset()
-        accDateInput.value = new Date().toISOString().slice(0, 10)
-        updateFormCategories()
-        loadAccounting()
-    }
-})
-
-
-
-// ... (initAccounting function update below) ...
-
 // --- EDIT TRANSACTION ---
 // Assigned to window to work with inline onclick
 window.editTransaction = (id) => {
@@ -1858,50 +1899,6 @@ document.getElementById('edit-acc-save')?.addEventListener('click', async () => 
     }
 })
 
-
-// --- CSV Export ---
-document.getElementById('acc-export-csv')?.addEventListener('click', () => {
-    if (filteredTransactions.length === 0) {
-        alert('Nessuna transazione da esportare')
-        return
-    }
-
-    const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
-    const month = monthNames[parseInt(accMonthSelect?.value ?? 0)]
-    const year = accYearSelect?.value ?? new Date().getFullYear()
-
-    let csv = 'Data,Tipo,Categoria,Descrizione,Importo\n'
-    filteredTransactions.forEach(tx => {
-        const date = new Date(tx.date).toLocaleDateString('it-IT')
-        const type = tx.type === 'income' ? 'Entrata' : 'Uscita'
-        const desc = (tx.description || '').replace(/"/g, '""')
-        const amount = parseFloat(tx.amount).toFixed(2).replace('.', ',')
-        csv += `${date},"${type}","${tx.category}","${desc}","${tx.type === 'income' ? '+' : '-'}€${amount}"\n`
-    })
-
-    // Add totals
-    const income = filteredTransactions.filter(t => t.type === 'income').reduce((s, t) => s + parseFloat(t.amount), 0)
-    const expenses = filteredTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + parseFloat(t.amount), 0)
-    csv += `\n,,,"Totale Entrate","€${income.toFixed(2).replace('.', ',')}"\n`
-    csv += `,,,"Totale Uscite","€${expenses.toFixed(2).replace('.', ',')}"\n`
-    csv += `,,,"Bilancio Netto","€${(income - expenses).toFixed(2).replace('.', ',')}"\n`
-
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-
-    let filename = `LocalPoint_Contabilita_`
-    if (accMode === 'month') {
-        filename += `${parseInt(accMonthSelect.value) + 1}_${accYearSelect.value}`
-    } else {
-        filename += `ANNO_${accYearSelect.value}`
-    }
-    a.download = filename + '.csv'
-
-    a.click()
-    URL.revokeObjectURL(url)
-})
 
 // ============================
 // --- RESERVATIONS MODULE ---
