@@ -1359,6 +1359,7 @@ async function loadAccounting() {
         .select('*')
         .neq('status', 'deleted')
         .order('date', { ascending: false })
+        .order('created_at', { ascending: false })
 
     if (error) {
         console.error('Error loading transactions:', error)
