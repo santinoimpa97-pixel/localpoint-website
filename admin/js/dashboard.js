@@ -1480,14 +1480,17 @@ function renderAccountingSummary(data) {
     // We assume old transactions (null payment_method) are CASH for safety, unless we migrate them.
     // Ideally user manually sets them. For now: if (payment_method == 'cash' OR null) -> Cash
 
+    // Use allTransactions to get the absolute running balance regardless of the date filter
+    const absoluteSource = allTransactions || source
+
     // Helper to check if is cash
     const isCash = t => t.payment_method === 'cash' || !t.payment_method
 
-    // Income Cash
-    const incomeCash = source.filter(t => t.type === 'income' && isCash(t)).reduce((s, t) => s + parseFloat(t.amount), 0)
+    // Income Cash (Based on ALL transactions)
+    const incomeCash = absoluteSource.filter(t => t.type === 'income' && isCash(t)).reduce((s, t) => s + parseFloat(t.amount), 0)
 
-    // Expenses Cash (Paid by Shop)
-    const expensesCashShop = source.filter(t =>
+    // Expenses Cash (Paid by Shop) (Based on ALL transactions)
+    const expensesCashShop = absoluteSource.filter(t =>
         t.type === 'expense' &&
         isCash(t) &&
         (t.paid_by === 'shop' || !t.paid_by)
@@ -1499,10 +1502,11 @@ function renderAccountingSummary(data) {
     // Income Card - Expenses Card (Paid by Shop)
     const isCard = t => t.payment_method === 'card' || t.payment_method === 'transfer' // Treat old transfers as card/digital
 
-    const incomeDigital = source.filter(t => t.type === 'income' && isCard(t)).reduce((s, t) => s + parseFloat(t.amount), 0)
+    // Income Digital (Based on ALL transactions)
+    const incomeDigital = absoluteSource.filter(t => t.type === 'income' && isCard(t)).reduce((s, t) => s + parseFloat(t.amount), 0)
 
-    // Expenses Digital (Paid by Shop)
-    const expensesDigitalShop = source.filter(t =>
+    // Expenses Digital (Paid by Shop) (Based on ALL transactions)
+    const expensesDigitalShop = absoluteSource.filter(t =>
         t.type === 'expense' &&
         isCard(t) &&
         (t.paid_by === 'shop' || !t.paid_by)
