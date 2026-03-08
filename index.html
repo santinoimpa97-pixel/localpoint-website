@@ -132,6 +132,45 @@
 
   <main>
     <section id="hero">
+
+      <!-- 3D Decorative Elements (behind text) -->
+      <div class="hero-3d-bg" aria-hidden="true">
+        <!-- Rotating orbit rings -->
+        <div class="orbit-ring ring-outer"></div>
+        <div class="orbit-ring ring-inner"></div>
+
+        <!-- Location Pin 1 (left, teal) -->
+        <div class="loc-pin pin-a">
+          <div class="pin-needle">
+            <div class="pin-head">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+          </div>
+          <div class="pin-glow"></div>
+        </div>
+
+        <!-- Location Pin 2 (right, green - largest) -->
+        <div class="loc-pin pin-b">
+          <div class="pin-needle">
+            <div class="pin-head">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+          </div>
+          <div class="pin-glow"></div>
+        </div>
+
+        <!-- Location Pin 3 (bottom-left, blue) -->
+        <div class="loc-pin pin-c">
+          <div class="pin-needle">
+            <div class="pin-head">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+          </div>
+          <div class="pin-glow"></div>
+        </div>
+      </div>
+
+      <!-- Main Hero Content -->
       <div class="container hero-content">
         <h1 data-i18n="hero.title">Tutti i servizi di cui hai bisogno, <br>in un solo posto</h1>
         <p data-i18n="hero.subtitle">Spedizioni, pagamenti, deposito bagagli e molto altro. Il tuo punto di riferimento
@@ -143,53 +182,102 @@
       </div>
     </section>
 
+    <!-- Hero Parallax: moves pins slightly on mouse move, desktop only -->
+    <script>
+      (function () {
+        var hero = document.getElementById('hero');
+        if (!hero) return;
+        // Skip parallax on touch devices
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+
+        var pins = document.querySelectorAll('.loc-pin');
+        var rings = document.querySelectorAll('.orbit-ring');
+        var rafId = null;
+        var mouseX = 0, mouseY = 0;
+
+        hero.addEventListener('mousemove', function (e) {
+          var rect = hero.getBoundingClientRect();
+          mouseX = (e.clientX - rect.left - rect.width / 2) / rect.width;
+          mouseY = (e.clientY - rect.top - rect.height / 2) / rect.height;
+          if (!rafId) rafId = requestAnimationFrame(update);
+        });
+
+        hero.addEventListener('mouseleave', function () {
+          mouseX = mouseY = 0;
+          if (!rafId) rafId = requestAnimationFrame(update);
+        });
+
+        function update() {
+          rafId = null;
+          var depths = [18, -12, 24];
+          pins.forEach(function (pin, i) {
+            var d = depths[i] || 15;
+            pin.style.transform = 'translate(' + (mouseX * d) + 'px, ' + (mouseY * d) + 'px)';
+          });
+          rings.forEach(function (ring, i) {
+            var d = i === 0 ? -5 : 8;
+            ring.style.marginLeft = 'calc(' + (i === 0 ? 'min(800px, 160vw)' : 'min(500px, 100vw)') + ' / -2 + ' + (mouseX * d) + 'px)';
+          });
+        }
+      })();
+    </script>
+
     <section id="services">
       <div class="container">
         <h2 class="section-title" data-i18n="services.title">I Nostri Servizi</h2>
         <p class="section-subtitle" data-i18n="services.subtitle">Comodo, rapido e sicuro per residenti e turisti.</p>
 
         <div class="services-grid">
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-box-open"></i></div>
             <h3 data-i18n="services.shipping.title">Spedizioni</h3>
             <p data-i18n="services.shipping.desc">Nazionali e internazionali. Tariffe semplici e convenienti.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-map-pin"></i></div>
             <h3 data-i18n="services.pickup.title">Punto Ritiro</h3>
             <p data-i18n="services.pickup.desc">Ritira qui i tuoi pacchi. Fermopoint Amazon, Vinted, e altri.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-suitcase"></i></div>
             <h3 data-i18n="services.luggage.title">Deposito Bagagli</h3>
             <p data-i18n="services.luggage.desc">Custodia sicura vicino al porto. Solo 4€ al giorno.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
             <h3 data-i18n="services.payments.title">Pagamenti</h3>
             <p data-i18n="services.payments.desc">Bollettini, bollo auto, PagoPA, F24.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-mobile-screen"></i></div>
             <h3 data-i18n="services.topup.title">Ricariche</h3>
             <p data-i18n="services.topup.desc">Telefoniche, carte prepagate, conti gioco.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-plane-departure"></i></div>
             <h3 data-i18n="services.transfer.title">Transfer & Escursioni</h3>
             <p data-i18n="services.transfer.desc">Transfer aeroporti e escursioni alle Isole Eolie.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-id-card"></i></div>
             <h3 data-i18n="services.digital.title">Servizi Digitali</h3>
             <p data-i18n="services.digital.desc">SPID, PEC, firma digitale, visure.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-car"></i></div>
             <h3 data-i18n="services.rental.title">Noleggio</h3>
             <p data-i18n="services.rental.desc">Auto e scooter per muoverti in libertà.</p>
           </div>
-          <div class="service-card">
+          <div class="service-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare="true"
+            data-tilt-max-glare="0.5">
             <div class="icon"><i class="fa-solid fa-bolt"></i></div>
             <h3 data-i18n="services.utilities.title">Contratti Utenze</h3>
             <p data-i18n="services.utilities.desc">WiFi, luce e gas. Attivazione e volture.</p>
@@ -701,6 +789,10 @@
       if (e.key === 'ArrowRight') changeLightboxImage(1);
     });
   </script>
+
+  <!-- Vanilla Tilt JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
 </body>
 
 </html>
