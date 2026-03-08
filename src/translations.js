@@ -472,6 +472,13 @@ export const translations = {
     es: "Abrimos a las 09:00",
     fr: "Nous ouvrons à 09:00"
   },
+  "contact.openMaps": {
+    it: "Apri in Maps",
+    en: "Open in Maps",
+    de: "In Maps öffnen",
+    es: "Abrir en Maps",
+    fr: "Ouvrir dans Maps"
+  },
 
   // Footer
   "footer.copyright": {
@@ -554,13 +561,13 @@ export function getCurrentLanguage() {
   if (stored && languages[stored]) {
     return stored;
   }
-  
+
   // Detect browser language
   const browserLang = navigator.language.slice(0, 2).toLowerCase();
   if (languages[browserLang]) {
     return browserLang;
   }
-  
+
   return 'it'; // Default to Italian
 }
 
@@ -570,15 +577,15 @@ export function setLanguage(lang) {
     console.warn(`Language ${lang} not supported`);
     return;
   }
-  
+
   localStorage.setItem('localpoint-lang', lang);
   document.documentElement.lang = lang;
-  
+
   // Update all elements with data-i18n attribute
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     const translation = t(key, lang);
-    
+
     // Check if it's innerHTML (contains HTML tags) or textContent
     if (translation.includes('<')) {
       el.innerHTML = translation;
@@ -586,13 +593,13 @@ export function setLanguage(lang) {
       el.textContent = translation;
     }
   });
-  
+
   // Update language selector display
   const langDisplay = document.getElementById('current-lang');
   if (langDisplay) {
     langDisplay.textContent = languages[lang].flag;
   }
-  
+
   // Dispatch event for other scripts
   window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
 }

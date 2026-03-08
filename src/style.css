@@ -1167,6 +1167,28 @@ nav a:hover {
   margin-top: 50px;
 }
 
+.open-maps-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 14px 20px;
+  background: var(--gradient-main);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(0, 78, 146, 0.25);
+}
+
+.open-maps-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 78, 146, 0.35);
+}
+
 /* Reviews */
 #reviews {
   padding: 120px 0;
