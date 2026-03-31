@@ -3,25 +3,374 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login - LocalPoint</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <title>Admin Login — LocalPoint</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html { background: #0d1b2e; }
+    @view-transition { navigation: auto; }
+    * { font-family: 'Inter', sans-serif; }
+
+    body { margin: 0; min-height: 100vh; display: flex; background: #eef2f7; }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      width: 45%;
+      background: linear-gradient(160deg, #0d1b2e 0%, #112240 60%, #0a1628 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 50px;
+      position: relative;
+      overflow: hidden;
+    }
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,160,160,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .left-content { position: relative; z-index: 1; text-align: center; max-width: 340px; }
+    .left-logo { height: 52px; margin: 0 auto 20px; filter: brightness(0) invert(1); }
+    .left-logo-fallback {
+      font-size: 2rem; font-weight: 900; color: #fff;
+      letter-spacing: -0.04em; margin-bottom: 20px;
+    }
+    .left-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.3);
+      color: #93c5fd; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 50px; margin-bottom: 28px;
+    }
+    .left-title {
+      color: #fff; font-size: 1.75rem; font-weight: 800;
+      line-height: 1.2; letter-spacing: -0.03em; margin-bottom: 16px;
+    }
+    .left-sub {
+      color: rgba(255,255,255,0.45); font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .left-divider {
+      width: 40px; height: 3px;
+      background: linear-gradient(90deg, #3b82f6, #00a0a0);
+      border-radius: 2px; margin: 28px auto;
+    }
+    .left-features { list-style: none; padding: 0; margin: 0; text-align: left; }
+    .left-features li {
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(255,255,255,0.5); font-size: 0.82rem;
+      padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .left-features li:last-child { border-bottom: none; }
+    .left-features li span.dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #3b82f6; flex-shrink: 0;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 40px;
+    }
+    .login-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 20px 48px rgba(0,0,0,0.09);
+      padding: 44px 40px;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .login-card h2 {
+      font-size: 1.45rem; font-weight: 800;
+      color: #0f172a; letter-spacing: -0.03em;
+      margin: 0 0 6px;
+    }
+    .login-card p.sub {
+      color: #64748b; font-size: 0.875rem; margin: 0 0 32px;
+    }
+
+    /* Input group */
+    .input-group { position: relative; }
+    .input-group .input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: #94a3b8; font-size: 0.95rem; pointer-events: none;
+    }
+    .input-group input {
+      width: 100%; box-sizing: border-box;
+      padding: 11px 40px 11px 40px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 0.9rem; color: #0f172a;
+      background: #f8fafc;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+      outline: none;
+    }
+    .input-group input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+      background: #fff;
+    }
+    .input-group input::placeholder { color: #94a3b8; }
+    .toggle-pw {
+      position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: #94a3b8; padding: 2px; font-size: 0.9rem;
+      transition: color 0.15s;
+    }
+    .toggle-pw:hover { color: #475569; }
+
+    /* Submit button */
+    #submit-btn {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff; font-size: 0.95rem; font-weight: 700;
+      border: none; border-radius: 11px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    #submit-btn:hover:not(:disabled) {
+      box-shadow: 0 6px 20px rgba(37,99,235,0.48);
+      transform: translateY(-1px);
+    }
+    #submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+    /* Error */
+    #error-msg {
+      display: none; align-items: center; gap: 8px;
+      background: #fef2f2; border: 1px solid #fecaca;
+      color: #dc2626; font-size: 0.82rem; font-weight: 500;
+      padding: 10px 14px; border-radius: 9px;
+    }
+    #error-msg.visible { display: flex; }
+
+    /* Shake animation */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      15%      { transform: translateX(-8px); }
+      30%      { transform: translateX(8px); }
+      45%      { transform: translateX(-6px); }
+      60%      { transform: translateX(6px); }
+      75%      { transform: translateX(-3px); }
+      90%      { transform: translateX(3px); }
+    }
+    .shake { animation: shake 0.5s ease; }
+
+    /* Remember me checkbox */
+    .remember-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .remember-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.82rem; color: #64748b; cursor: pointer; user-select: none;
+    }
+    .remember-label input[type=checkbox] {
+      width: 16px; height: 16px; border-radius: 4px !important;
+      accent-color: #3b82f6; cursor: pointer; padding: 0 !important;
+      border: 1.5px solid #cbd5e1 !important;
+    }
+    .forgot-link {
+      font-size: 0.82rem; color: #3b82f6; font-weight: 600;
+      background: none; border: none; cursor: pointer; padding: 0;
+      text-decoration: none; transition: color 0.15s;
+    }
+    .forgot-link:hover { color: #1d4ed8; text-decoration: underline; }
+
+    /* Forgot password panel */
+    #forgot-panel { display: none; flex-direction: column; gap: 14px; }
+    #forgot-panel.visible { display: flex; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; color: #64748b; font-weight: 600;
+      background: none; border: none; cursor: pointer; padding: 0;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: #0f172a; }
+    #reset-success {
+      display: none; align-items: center; gap: 8px;
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      color: #16a34a; font-size: 0.82rem; font-weight: 500;
+      padding: 10px 14px; border-radius: 9px;
+    }
+    #reset-success.visible { display: flex; }
+
+    /* Security badge */
+    .security-badge {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      color: #94a3b8; font-size: 0.73rem; margin-top: 24px;
+    }
+    .security-badge i { font-size: 0.75rem; color: #10b981; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .left-panel { display: none; }
+      .right-panel { padding: 30px 20px; }
+      .login-card { padding: 32px 24px; }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 h-screen flex items-center justify-center">
-  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
-    <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">LocalPoint Admin</h1>
-    <form id="login-form" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" id="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+<body>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-content">
+      <img src="/logo.png" alt="LocalPoint" class="left-logo"
+           onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
+      <div id="logo-fallback" class="left-logo-fallback" style="display:none;">LocalPoint</div>
+
+      <div class="left-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        Area Riservata
       </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" id="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-      </div>
-      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Accedi</button>
-    </form>
-    <p id="error-msg" class="text-red-500 text-sm mt-4 hidden"></p>
+
+      <h2 class="left-title">Gestisci la tua attività da un unico posto</h2>
+      <p class="left-sub">Pannello amministrativo LocalPoint Milazzo</p>
+
+      <div class="left-divider"></div>
+
+      <ul class="left-features">
+        <li><span class="dot"></span> Contabilità entrate e uscite</li>
+        <li><span class="dot"></span> Gestione prenotazioni e bagagli</li>
+        <li><span class="dot"></span> Catalogo esperienze dinamico</li>
+        <li><span class="dot"></span> Sistema partner e referral</li>
+        <li><span class="dot"></span> Statistiche in tempo reale</li>
+      </ul>
+    </div>
   </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="login-card" id="login-card">
+      <!-- Titoli dinamici -->
+      <h2 id="card-title">Bentornato</h2>
+      <p class="sub" id="card-sub">Accedi al pannello di amministrazione</p>
+
+      <!-- ── LOGIN FORM ── -->
+      <form id="login-form" style="display:flex; flex-direction:column; gap:16px;">
+
+        <!-- Email -->
+        <div>
+          <label style="display:block; font-size:0.78rem; font-weight:600; color:#475569; margin-bottom:6px;">
+            Indirizzo Email
+          </label>
+          <div class="input-group">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" id="email" placeholder="admin@localpoint.it" required autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:0.78rem; font-weight:600; color:#475569;">Password</label>
+            <button type="button" class="forgot-link" id="show-forgot">Password dimenticata?</button>
+          </div>
+          <div class="input-group">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" class="toggle-pw" id="toggle-pw" tabindex="-1">
+              <i class="fa-regular fa-eye" id="pw-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ricordami -->
+        <div class="remember-row">
+          <label class="remember-label">
+            <input type="checkbox" id="remember-me" checked>
+            Ricordami su questo dispositivo
+          </label>
+        </div>
+
+        <!-- Error -->
+        <div id="error-msg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="error-text">Email o password non corretti. Riprova.</span>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submit-btn">
+          <i class="fa-solid fa-arrow-right-to-bracket" id="btn-icon"></i>
+          <span id="btn-text">Accedi</span>
+        </button>
+
+      </form>
+
+      <!-- ── FORGOT PASSWORD PANEL ── -->
+      <div id="forgot-panel">
+        <button type="button" class="back-link" id="back-to-login">
+          <i class="fa-solid fa-arrow-left"></i> Torna al login
+        </button>
+
+        <div>
+          <label style="display:block; font-size:0.78rem; font-weight:600; color:#475569; margin-bottom:6px;">
+            Indirizzo Email
+          </label>
+          <div class="input-group">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" id="reset-email" placeholder="admin@localpoint.it" autocomplete="email">
+          </div>
+        </div>
+        <p style="font-size:0.78rem; color:#94a3b8; margin:0;">
+          Riceverai un link per impostare una nuova password.
+        </p>
+
+        <!-- Reset success -->
+        <div id="reset-success">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Email inviata! Controlla la tua casella di posta.</span>
+        </div>
+
+        <button type="button" id="reset-btn"
+          style="width:100%;padding:13px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:0.95rem;font-weight:700;border:none;border-radius:11px;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,0.35);display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;">
+          <i class="fa-solid fa-paper-plane" id="reset-icon"></i>
+          <span id="reset-text">Invia link di reset</span>
+        </button>
+      </div>
+
+      <!-- Security badge -->
+      <div class="security-badge">
+        <i class="fa-solid fa-lock"></i>
+        <span>Accesso riservato al personale LocalPoint</span>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="./js/auth.js"></script>
+  <script>
+    // Toggle password visibility
+    document.getElementById('toggle-pw').addEventListener('click', () => {
+      const input = document.getElementById('password');
+      const icon = document.getElementById('pw-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    });
+  </script>
 </body>
 </html>

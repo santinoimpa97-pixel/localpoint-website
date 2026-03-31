@@ -1,0 +1,163 @@
+============================================================
+  LOCALPOINT MILAZZO — PANORAMICA DEL PROGETTO
+============================================================
+
+COS'È LOCALPOINT
+----------------
+LocalPoint è un centro servizi fisico situato in Via Tenente
+Brigiano 6, Milazzo (ME), vicino al porto. Offre due anime:
+
+1. SERVIZI ALLA PERSONA (negozio fisico)
+   Rivolti sia ai residenti che ai turisti di passaggio:
+
+   - Spedizioni nazionali e internazionali
+     (BRT, corrieri vari, packaging incluso)
+   - Punto ritiro pacchi
+     (Amazon, Vinted, Subito, e-commerce in genere)
+   - Deposito bagagli — €4/bagaglio/giorno
+     (custodia sicura in ufficio, ideale per chi prende il traghetto)
+   - Pagamento bollettini, MAV, RAV, F24
+   - Attivazione SPID (identità digitale)
+   - Attivazione PEC (posta elettronica certificata)
+   - Firma digitale e altri servizi digitali
+
+2. SERVIZI TURISTICI (prenotazioni esperienze)
+   Escursioni, noleggi, transfer e parcheggio
+   per turisti diretti alle Isole Eolie e dintorni.
+
+Il sito web è allo stesso tempo un vetrina pubblica per i turisti
+e un pannello admin privato per il team LocalPoint.
+
+TECNOLOGIA
+----------
+- Frontend: Vite + Vanilla JS + Tailwind CSS
+- Database: Supabase (PostgreSQL con RLS)
+- Storage: Supabase Storage (foto esperienze)
+- Email: EmailJS
+- Deploy: localpoint.it
+
+
+============================================================
+  LATO PUBBLICO (turisti)
+============================================================
+
+1. HOME PAGE (index.html)
+   Pagina principale con hero animato, pin 3D, sezione contatti
+   e bottone WhatsApp flottante.
+
+2. SERVIZI TURISTICI (tourist-services.html)
+   Catalogo delle esperienze suddiviso in 5 categorie:
+   - Escursioni & Tour (Eolie, Etna, diving, trekking...)
+   - Noleggi (motorini, auto, barche)
+   - Transfer & NCC (aeroporto Catania/Palermo, limousine)
+   - Parcheggio Porto (scoperto, coperto, settimanale)
+   - Deposito Bagagli (custodia in ufficio)
+
+   Funzionalità:
+   - Navigazione per categoria con animazione
+   - Ricerca e filtro esperienze
+   - Banner partner attivo (tariffe agevolate via codice referral)
+   - Prenotazione deposito bagagli tramite form integrato
+   - Tasto Back del browser funzionante per categoria
+
+3. DETTAGLIO ESPERIENZA (service-details.html)
+   Pagina dedicata a ogni singola esperienza con:
+   - Galleria foto dinamica (griglia desktop + Swiper mobile)
+   - Lightbox per visualizzazione foto a schermo intero
+   - Descrizione, prezzo e informazioni sul servizio
+   - Bottone "Scrivi su WhatsApp" con messaggio pre-compilato
+     (include codice referral se presente)
+   - Sezione "Non trovi il servizio?" con contatto diretto
+   - Breadcrumb con link di ritorno alla categoria
+
+4. DIVENTA PARTNER (become-partner.html)
+   Form di iscrizione per hotel, bar e attività commerciali
+   che vogliono diventare affiliati LocalPoint.
+
+
+============================================================
+  SISTEMA REFERRAL (partner)
+============================================================
+
+Ogni partner ha un codice univoco (es. HOTEL-MELA).
+Il partner condivide il link:
+  tourist-services.html?ref=HOTEL-MELA
+
+Il sistema:
+- Mostra un banner "Tariffe agevolate attive"
+- Salva il codice in localStorage (persiste tra le pagine)
+- Quando il turista prenota via WhatsApp, il messaggio
+  include automaticamente "Tariffe agevolate (codice: HOTEL-MELA)"
+- Le prenotazioni vengono collegate all'affiliato nel DB
+- Le commissioni vengono calcolate e tracciate
+
+
+============================================================
+  PANNELLO ADMIN (admin/dashboard.html)
+============================================================
+
+Accesso protetto da autenticazione Supabase.
+Sezioni principali:
+
+1. PANORAMICA
+   KPI in tempo reale: bagagli attivi, prenotazioni, incasso
+   oggi, entrate/uscite mese, bilancio netto. Grafico mensile.
+
+2. CONTABILITÀ
+   Registro entrate/uscite con categorie, filtri per periodo,
+   grafici, esportazione CSV. Transazioni create automaticamente
+   al check-in bagagli, spedizioni e completamento prenotazioni.
+
+3. PRENOTAZIONI
+   Gestione prenotazioni con stato (pending/confirmed/completed).
+   Completamento genera transazione contabile automatica.
+   Calcolo commissione partner se presente referral.
+
+4. BAGAGLI
+   Check-in/check-out deposito bagagli. Calcolo automatico
+   prezzo (€4/bagaglio/giorno). Lista attivi e restituiti.
+
+5. SPEDIZIONI
+   Gestione spedizioni con invio email automatico al cliente
+   e registrazione transazione in contabilità.
+
+6. ESPERIENZE
+   CRUD completo del catalogo esperienze collegato a Supabase.
+   Upload foto diretto su Supabase Storage, drag-and-drop per
+   riordinare le foto, link anteprima diretta alla pagina pubblica.
+
+7. PARTNER
+   Lista affiliati con codice referral, tasso commissione,
+   storico prenotazioni per partner, gestione stato attivo/inattivo.
+
+
+============================================================
+  SEO & PERFORMANCE
+============================================================
+
+- Sitemap XML generata automaticamente da Supabase
+  (npm run sitemap — eseguito anche durante il build)
+- robots.txt che dichiara la sitemap a Google
+- Lazy loading sulle immagini (tranne la prima above the fold)
+- Breadcrumb strutturati per ogni esperienza
+
+
+============================================================
+  FILE PRINCIPALI
+============================================================
+
+index.html                  → Home page pubblica
+tourist-services.html       → Catalogo esperienze
+service-details.html        → Dettaglio singola esperienza
+become-partner.html         → Registrazione partner
+admin/dashboard.html        → Pannello admin
+admin/js/dashboard.js       → Tutta la logica admin
+src/supabaseClient.js       → Connessione Supabase
+src/translations.js         → Sistema multilingua
+generate-sitemap.js         → Script generazione sitemap
+public/sitemap.xml          → Sitemap generata
+public/robots.txt           → Direttive per i crawler
+create_experiences.sql      → Schema + dati iniziali DB
+referral_system_migration.sql → Schema sistema referral
+
+============================================================

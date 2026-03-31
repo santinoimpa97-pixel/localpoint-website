@@ -17,6 +17,13 @@ export const translations = {
     es: "Servicios",
     fr: "Services"
   },
+  "nav.tourist": {
+    it: "Servizi Turistici",
+    en: "Tourist Services",
+    de: "Touristendienstleistungen",
+    es: "Servicios Turísticos",
+    fr: "Services Touristiques"
+  },
   "nav.shipping": {
     it: "Spedizioni",
     en: "Shipping",
@@ -227,11 +234,160 @@ export const translations = {
     fr: "Expédiez avec Nous"
   },
   "shipping.subtitle": {
-    it: "Tariffe nazionali semplici e convenienti. Imballaggio escluso. Tracking incluso.",
-    en: "Simple and competitive national rates. Packaging excluded. Tracking included.",
-    de: "Einfache und günstige nationale Tarife. Verpackung nicht inbegriffen. Tracking inklusive.",
-    es: "Tarifas nacionales sencillas y convenientes. Embalaje no incluido. Seguimiento incluido.",
-    fr: "Tarifs nationaux simples et avantageux. Emballage non inclus. Suivi inclus."
+    it: "Tariffe nazionali semplici e convenienti.",
+    en: "Simple and competitive national rates.",
+    de: "Einfache und günstige nationale Tarife.",
+    es: "Tarifas nacionales sencillas y convenientes.",
+    fr: "Tarifs nationaux simples et avantageux."
+  },
+  "shipping.badge": {
+    it: "Spedizioni veloci in 24/48h",
+    en: "Fast shipping in 24/48h",
+    de: "Schneller Versand in 24/48h",
+    es: "Envíos rápidos en 24/48h",
+    fr: "Expéditions rapides en 24/48h"
+  },
+  "shipping.feat.speed.title": {
+    it: "24 / 48h",
+    en: "24 / 48h",
+    de: "24 / 48h",
+    es: "24 / 48h",
+    fr: "24 / 48h"
+  },
+  "shipping.feat.speed.desc": {
+    it: "Consegna nazionale",
+    en: "National delivery",
+    de: "Nationale Lieferung",
+    es: "Entrega nacional",
+    fr: "Livraison nationale"
+  },
+  "shipping.feat.tracking.title": {
+    it: "Tracking Live",
+    en: "Live Tracking",
+    de: "Live-Tracking",
+    es: "Seguimiento en vivo",
+    fr: "Suivi en direct"
+  },
+  "shipping.feat.tracking.desc": {
+    it: "Incluso su ogni spedizione",
+    en: "Included on every shipment",
+    de: "Bei jeder Sendung inklusive",
+    es: "Incluido en cada envío",
+    fr: "Inclus sur chaque expédition"
+  },
+  "shipping.feat.intl.title": {
+    it: "Spedizioni Internazionali",
+    en: "International Shipping",
+    de: "Internationaler Versand",
+    es: "Envíos Internacionales",
+    fr: "Expéditions Internationales"
+  },
+  "shipping.feat.intl.desc": {
+    it: "a partire da € 19,90",
+    en: "starting from € 19.90",
+    de: "ab € 19,90",
+    es: "desde € 19,90",
+    fr: "à partir de € 19,90"
+  },
+  "shipping.feat.packaging.title": {
+    it: "Imballaggio",
+    en: "Packaging",
+    de: "Verpackung",
+    es: "Embalaje",
+    fr: "Emballage"
+  },
+  "shipping.feat.packaging.desc": {
+    it: "Disponibile in sede",
+    en: "Available in store",
+    de: "Im Geschäft erhältlich",
+    es: "Disponible en tienda",
+    fr: "Disponible en magasin"
+  },
+  "partners.label": {
+    it: "I nostri corrieri partner",
+    en: "Our courier partners",
+    de: "Unsere Kurier-Partner",
+    es: "Nuestros socios mensajeros",
+    fr: "Nos transporteurs partenaires"
+  },
+
+  // Tourist Services Preview Section
+  "tourist.badge": {
+    it: "🏝️ Turismo a Milazzo",
+    en: "🏝️ Tourism in Milazzo",
+    de: "🏝️ Tourismus in Milazzo",
+    es: "🏝️ Turismo en Milazzo",
+    fr: "🏝️ Tourisme à Milazzo"
+  },
+  "tourist.title": {
+    it: "Parti senza pensieri",
+    en: "Travel without worries",
+    de: "Reisen ohne Sorgen",
+    es: "Viaja sin preocupaciones",
+    fr: "Partez sans soucis"
+  },
+  "tourist.subtitle": {
+    it: "Escursioni, noleggi, transfer e molto altro. Tutto prenotabile online in 2 minuti.",
+    en: "Excursions, rentals, transfers and much more. All bookable online in 2 minutes.",
+    de: "Ausflüge, Mietwagen, Transfers und vieles mehr. Alles online in 2 Minuten buchbar.",
+    es: "Excursiones, alquileres, traslados y mucho más. Todo reservable online en 2 minutos.",
+    fr: "Excursions, locations, transferts et bien plus. Tout réservable en ligne en 2 minutes."
+  },
+  "tourist.card.excursions.chip": {
+    it: "🏝️ Natura & Avventura",
+    en: "🏝️ Nature & Adventure",
+    de: "🏝️ Natur & Abenteuer",
+    es: "🏝️ Naturaleza & Aventura",
+    fr: "🏝️ Nature & Aventure"
+  },
+  "tourist.card.excursions.title": {
+    it: "Escursioni & Tour",
+    en: "Excursions & Tours",
+    de: "Ausflüge & Touren",
+    es: "Excursiones & Tours",
+    fr: "Excursions & Tours"
+  },
+  "tourist.card.rentals.chip": {
+    it: "🚗 Mobilità",
+    en: "🚗 Mobility",
+    de: "🚗 Mobilität",
+    es: "🚗 Movilidad",
+    fr: "🚗 Mobilité"
+  },
+  "tourist.card.rentals.title": {
+    it: "Noleggi",
+    en: "Rentals",
+    de: "Mietwagen",
+    es: "Alquileres",
+    fr: "Locations"
+  },
+  "tourist.card.transfer.chip": {
+    it: "✈️ Aeroporti",
+    en: "✈️ Airports",
+    de: "✈️ Flughäfen",
+    es: "✈️ Aeropuertos",
+    fr: "✈️ Aéroports"
+  },
+  "tourist.card.transfer.title": {
+    it: "Transfer & NCC",
+    en: "Transfer & NCC",
+    de: "Transfer & NCC",
+    es: "Transfer & NCC",
+    fr: "Transfer & NCC"
+  },
+  "tourist.cta": {
+    it: "Esplora tutti i Servizi Turistici",
+    en: "Explore all Tourist Services",
+    de: "Alle Touristendienstleistungen entdecken",
+    es: "Explorar todos los Servicios Turísticos",
+    fr: "Explorer tous les Services Touristiques"
+  },
+  "tourist.cta.sub": {
+    it: "5 categorie · 20+ esperienze · Prenota in 2 minuti",
+    en: "5 categories · 20+ experiences · Book in 2 minutes",
+    de: "5 Kategorien · 20+ Erlebnisse · In 2 Minuten buchen",
+    es: "5 categorías · 20+ experiencias · Reserva en 2 minutos",
+    fr: "5 catégories · 20+ expériences · Réservez en 2 minutes"
   },
 
   // Luggage Section
@@ -482,11 +638,11 @@ export const translations = {
 
   // Footer
   "footer.copyright": {
-    it: "© 2025 LocalPoint Milazzo. Tutti i diritti riservati.",
-    en: "© 2025 LocalPoint Milazzo. All rights reserved.",
-    de: "© 2025 LocalPoint Milazzo. Alle Rechte vorbehalten.",
-    es: "© 2025 LocalPoint Milazzo. Todos los derechos reservados.",
-    fr: "© 2025 LocalPoint Milazzo. Tous droits réservés."
+    it: "© 2026 LocalPoint Milazzo. Tutti i diritti riservati. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Diventa Partner</a>",
+    en: "© 2026 LocalPoint Milazzo. All rights reserved. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Become a Partner</a>",
+    de: "© 2026 LocalPoint Milazzo. Alle Rechte vorbehalten. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Partner werden</a>",
+    es: "© 2026 LocalPoint Milazzo. Todos los derechos reservados. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Hazte socio</a>",
+    fr: "© 2026 LocalPoint Milazzo. Tous droits réservés. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Devenir Partenaire</a>"
   },
 
   // Cookie Banner

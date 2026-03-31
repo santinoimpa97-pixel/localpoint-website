@@ -16,27 +16,40 @@ document.querySelectorAll('nav a').forEach(link => {
   });
 });
 
-// Smooth Scroll for anchor links (optional, as CSS scroll-behavior: smooth works too, but this is robust)
+// Smooth Scroll logic
+function scrollToTarget(targetId, behavior = "smooth") {
+  const targetElement = document.querySelector(targetId);
+  if (targetElement) {
+    const headerOffset = 100; // Updated to match real header height
+    const elementPosition = targetElement.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: behavior
+    });
+  }
+}
+
+// Smooth Scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function (e) {
     e.preventDefault();
     const targetId = this.getAttribute('href');
     if (targetId === '#') return;
-
-    const targetElement = document.querySelector(targetId);
-    if (targetElement) {
-      // Adjust for sticky header
-      const headerOffset = 80;
-      const elementPosition = targetElement.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
+    scrollToTarget(targetId);
   });
 });
+
+// Handle Hash on Load (Fix for external links like /#contact)
+function handleHashOnLoad() {
+  if (window.location.hash) {
+    // Small delay to ensure dynamic content (i18n, images) is settled
+    setTimeout(() => {
+      scrollToTarget(window.location.hash, "auto");
+    }, 100);
+  }
+}
 
 // Language Selector
 const langSelector = document.getElementById('language-selector');
@@ -70,7 +83,7 @@ langOptions.forEach(option => {
   });
 });
 
-// Initialize language on page load
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
   const currentLang = getCurrentLanguage();
   setLanguage(currentLang);
@@ -82,4 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// Final check for hash on full load
+window.addEventListener('load', handleHashOnLoad);
 

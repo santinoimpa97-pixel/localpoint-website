@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Locandina Partner - LocalPoint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f0f0f0;
+            padding: 40px 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        @media print {
+            body { padding: 0; background: none; }
+            .page { box-shadow: none; margin: 0; width: 100%; height: 100vh; }
+            .no-print { display: none; }
+        }
+        .gradient-top {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2A9D8F 100%);
+            height: 100mm;
+            clip-path: ellipse(110% 80% at 50% 0%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 40px;
+        }
+        .qr-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        .qr-frame {
+            border: 15px solid #2A9D8F;
+            border-radius: 40px;
+            padding: 30px;
+            display: inline-block;
+            margin: 20px auto;
+            background: white;
+        }
+        .footer-brand {
+            background: #f7fbf8;
+            border-top: 5px solid #7BC142;
+            padding: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print fixed top-5 right-5 z-50">
+        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-xl hover:scale-105 transition transform flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> Stampa Locandina
+        </button>
+    </div>
+
+    <div class="page">
+        <!-- TOP SECTION -->
+        <div class="gradient-top">
+            <img src="https://local-point.it/logo.png" alt="LocalPoint" class="w-64 mb-10">
+            <h1 class="text-6xl font-black text-center leading-tight">PRENOTA QUI I TUOI SERVIZI</h1>
+            <p class="text-2xl mt-4 opacity-90 font-bold uppercase tracking-widest">Escursioni • Noleggi • Transfer</p>
+        </div>
+
+        <!-- MAIN SECTION -->
+        <div class="qr-container">
+            <h2 id="display-name" class="text-3xl font-bold text-slate-800 mb-2"></h2>
+            <p class="text-slate-500 text-xl font-medium">Inquadra il QR Code per scoprire le offerte riservate</p>
+            
+            <div class="qr-frame">
+                <div id="qrcode" class="w-80 h-80 flex items-center justify-center">
+                    <img id="qr-img" src="" class="w-full h-full">
+                </div>
+            </div>
+            
+            <p class="text-2xl font-black text-[#2A9D8F] uppercase">Scansiona e Prenota</p>
+            <p class="text-slate-400 mt-2">Nessuna app richiesta</p>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer-brand">
+            <div class="flex justify-center items-center gap-10">
+                <div class="text-left">
+                    <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Partner Ufficiale</p>
+                    <p id="footer-partner-name" class="text-xl font-bold text-slate-800"></p>
+                </div>
+                <div class="h-12 w-px bg-slate-200"></div>
+                <div class="text-left">
+                    <p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Servizio Gestito da</p>
+                    <p class="text-xl font-bold text-slate-800">LocalPoint Milazzo</p>
+                </div>
+            </div>
+            <p class="mt-8 text-slate-300 font-bold tracking-widest text-sm">WWW.LOCAL-POINT.IT</p>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref') || 'LP10';
+        const name = urlParams.get('name') || 'Struttura Partner';
+
+        document.getElementById('display-name').textContent = name;
+        document.getElementById('footer-partner-name').textContent = name;
+
+        // Generate QR Code URL
+        const siteUrl = window.location.origin + '/tourist-services.html?ref=' + ref;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(siteUrl)}`;
+        document.getElementById('qr-img').src = qrUrl;
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>

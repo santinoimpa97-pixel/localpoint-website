@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node generate-sitemap.js)",
+      "Bash(node --check admin/js/dashboard.js)"
+    ]
+  }
+}
