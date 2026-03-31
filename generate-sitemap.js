@@ -1,16 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
-import { readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 
-// Read .env manually (no dotenv needed)
-const env = Object.fromEntries(
-    readFileSync('.env', 'utf8')
-        .split('\n')
-        .filter(line => line.includes('='))
-        .map(line => line.split('=').map(s => s.trim()))
-)
+// Load environment variables (supports .env and process.env)
+let env = { ...process.env }
+if (existsSync('.env')) {
+    const dotenv = Object.fromEntries(
+        readFileSync('.env', 'utf8')
+            .split('\n')
+            .filter(line => line.includes('='))
+            .map(line => line.split('=').map(s => s.trim()))
+    )
+    env = { ...env, ...dotenv }
+}
 
 const SITE = 'https://localpoint.it'
-const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY)
+const supabase = createClient(env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY)
 
 const { data: experiences, error } = await supabase
     .from('experiences')
