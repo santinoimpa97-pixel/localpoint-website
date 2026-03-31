@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Diventa Partner – LocalPoint Milazzo</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Main Style -->
+    <link rel="stylesheet" href="/src/style.css">
+    <script type="module" src="/src/cookie-manager.js"></script>
+    
+    <style>
+        html { background: #fff; }
+        @view-transition { navigation: auto; }
+        :root {
+            --partner-blue: #004e92;
+            --partner-teal: #00a0a0;
+            --partner-green: #8cc63f;
+        }
+
+        body {
+            background-color: #f8fafc;
+        }
+
+        /* Hero Section */
+        .partner-hero {
+            position: relative;
+            padding: 150px 20px 120px;
+            background: linear-gradient(-45deg, var(--partner-blue), var(--partner-teal), var(--partner-green));
+            background-size: 400% 400%;
+            animation: gradientHero 15s ease infinite;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientHero {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .partner-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255,255,255,0.05)" d="M42.7,-73.4C55.9,-67.2,67.6,-57,76.5,-44.6C85.4,-32.1,91.5,-17.4,92.5,-2.2C93.6,13,89.5,28.6,80.6,42.1C71.6,55.5,57.7,66.8,42.5,74.2C27.2,81.5,10.6,84.9,-5.3,82.8C-21.2,80.6,-36.5,72.9,-49.2,62.2C-61.9,51.5,-72,37.8,-78.5,22.4C-84.9,7,-87.7,-10.1,-82.5,-25.1C-77.3,-40.1,-64.1,-53,-50,-62.4C-35.9,-71.8,-20.9,-77.7,-4.8,-79.8C11.3,-81.9,29.5,-79.7,42.7,-73.4Z" transform="translate(100 100)" /></svg>') no-repeat center center;
+            background-size: cover;
+            opacity: 0.6;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 50px;
+            border-radius: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        .partner-hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .partner-hero p {
+            font-size: 1.25rem;
+            margin: 0 auto 40px;
+            opacity: 0.95;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: white !important;
+            color: var(--partner-blue) !important;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        /* Features Box Styling */
+        .partner-features { padding: 100px 0; background: #fff; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .feature-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(100, 116, 139, 0.08);
+            border: 1px solid #f1f5f9;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--partner-blue), var(--partner-teal));
+            transform: scaleX(0); transition: transform 0.4s ease; transform-origin: left;
+        }
+        .feature-card:hover::before { transform: scaleX(1); }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(100, 116, 139, 0.12);
+        }
+        .feature-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, rgba(0, 78, 146, 0.1), rgba(0, 160, 160, 0.1));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 25px; font-size: 2rem; color: var(--partner-blue);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover .feature-icon {
+            background: var(--partner-blue); color: white; transform: rotate(10deg) scale(1.1);
+        }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--partner-blue); font-weight:800; }
+        .feature-card p { color: #64748b; line-height: 1.6; font-size: 1.05rem; }
+
+        /* Success Message Styling */
+        .success-message {
+            display: none;
+            background: linear-gradient(135deg, rgba(140, 198, 63, 0.1) 0%, rgba(0, 160, 160, 0.1) 100%);
+            border: 2px solid var(--partner-green);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        .success-message i { font-size: 3rem; color: var(--partner-green); margin-bottom: 20px; }
+        .success-message h3 { font-size: 1.8rem; color: var(--partner-blue); margin-bottom: 10px; font-weight: 800; }
+        .success-message p { color: #64748b; font-size: 1.1rem; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Steps */
+        .partner-steps { background: #f8fafc; padding: 100px 0 80px; border-top: 1px solid #e2e8f0; }
+        .step-item { display: flex; align-items: flex-start; gap: 30px; margin-bottom: 50px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; transition: transform 0.3s; }
+        .step-item:hover { transform: translateX(10px); border-color: var(--partner-teal); }
+        .step-number {
+            width: 60px; height: 60px; background: linear-gradient(135deg, var(--partner-blue), var(--partner-teal));
+            color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.5rem; flex-shrink: 0; box-shadow: 0 10px 20px rgba(0,160,160,0.3);
+        }
+        .step-content h4 { font-size: 1.5rem; margin-bottom: 10px; color: var(--partner-blue); font-weight:800; }
+        .step-content p { color: #64748b; font-size: 1.1rem; }
+
+        /* Contact Line */
+        .partner-contact {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        .contact-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            padding: 60px;
+            border-radius: 40px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ffffff;
+            position: relative;
+        }
+        .contact-container::after {
+            content:''; position:absolute; inset:-3px; border-radius:43px; z-index:-1;
+            background: linear-gradient(135deg, var(--partner-blue), var(--partner-green));
+            opacity:0.2; filter:blur(10px);
+        }
+        .partner-form { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; position:relative; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label {
+            font-weight: 700; color: var(--partner-blue); font-size: 0.95rem; margin-left: 5px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            background-color: #f8fafc;
+            border-radius: 16px; font-family: inherit; font-size: 1.05rem;
+            transition: all 0.3s; color: #1e293b;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--partner-teal); background-color: white;
+            box-shadow: 0 0 0 4px rgba(0, 160, 160, 0.1);
+        }
+        .submit-btn {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--partner-blue), var(--partner-teal));
+            color: white; padding: 20px; border: none; border-radius: 16px;
+            font-size: 1.2rem; font-weight: 800; text-transform:uppercase; letter-spacing:1px;
+            cursor: pointer; transition: all 0.3s; margin-top: 15px; box-shadow: 0 10px 30px rgba(0, 78, 146, 0.3);
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 78, 146, 0.4);
+            background: linear-gradient(135deg, var(--partner-teal), var(--partner-blue));
+        }
+        .submit-btn:disabled {
+            background: #94a3b8; cursor: not-allowed; box-shadow: none; transform:none;
+        }
+
+        @media (max-width: 768px) {
+            .partner-form { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+            .submit-btn { grid-column: span 1; }
+            .partner-hero { padding: 120px 20px 80px; }
+            .hero-content { padding: 30px 20px; }
+            .contact-container { padding: 40px 25px; margin: 0 15px; border-radius: 30px; }
+            .step-item { flex-direction: column; text-align: center; align-items: center; gap:15px; }
+            .partner-features, .partner-contact, .partner-steps { padding: 60px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="/">
+                    <img src="/logo.png" alt="LocalPoint Milazzo Logo" class="logo-img">
+                </a>
+            </div>
+            
+            <nav id="nav">
+                <ul>
+                    <li><a href="/index.html"><span aria-hidden="true">🏠</span> Home</a></li>
+                    <li><a href="/tourist-services.html"><span aria-hidden="true">🌴</span> Servizi Turistici</a></li>
+                    <li><a href="/#contact"><span aria-hidden="true">📍</span> Contatti</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <button id="mobile-menu-btn" class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="partner-hero">
+            <div class="container hero-content">
+                <h1>Collabora con LocalPoint</h1>
+                <p>Aumenta il valore aggiunto per i tuoi ospiti e ricevi una provvigione fissa per ogni servizio prenotato. Una partnership semplice, trasparente e senza costi.</p>
+                <a href="#partner-form-section" class="btn-primary">Inizia ora</a>
+            </div>
+        </section>
+
+        <!-- VALUE PROP -->
+        <section class="partner-features">
+            <div class="container">
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <h3>Guadagno Extra</h3>
+                        <p>Ricevi una provvigione su ogni escursione, transfer o noleggio prenotato tramite il tuo codice dedicato.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-face-smile-wink"></i>
+                        </div>
+                        <h3>Più Ospiti Felici</h3>
+                        <p>Fornisci ai tuoi clienti esperienze verificate e di alta qualità a Milazzo e nelle Eolie, senza dover gestire nulla.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </div>
+                        <h3>Zero Gestione</h3>
+                        <p>Ti diamo noi le locandine e il QR Code. Il cliente prenota, paga e noi gestiamo il servizio e i ticket.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="partner-steps">
+            <div class="container" style="max-width: 900px;">
+                <h2 style="text-align:center; color:var(--partner-blue); font-size:2.5rem; font-weight:900; margin-bottom:60px;">Inizia in 3 minuti</h2>
+                
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Iscrizione Gratuita</h4>
+                        <p>Compila il modulo qui sotto. In pochi minuti creeremo il tuo account partner e verrai contattato per i dettagli.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Attivazione QR Code</h4>
+                        <p>Riceverai una locandina personalizzata con il tuo logo e il tuo QR code unico da esporre nella tua struttura.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Monitoraggio & Pagamenti</h4>
+                        <p>Avrai accesso a una dashboard dedicata per vedere le tue commissioni in tempo reale e richiederne il saldo.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT FORM -->
+        <section id="partner-form-section" class="partner-contact">
+            <div class="container">
+                <div class="contact-container">
+                    <div style="text-align:center; margin-bottom:40px;">
+                        <h2 style="color:var(--partner-blue); font-size:2rem; font-weight:900;">Candidati come Partner</h2>
+                        <p style="color:#64748b;">Inviaci i dettagli della tua attività e ti ricontatteremo entro 24 ore.</p>
+                    </div>
+
+                    <form id="partner-application-form" class="partner-form" data-track="partner_application_submit">
+                        <div class="form-group">
+                            <label for="p-name">Nome e Cognome <span style="color:red">*</span></label>
+                            <input type="text" id="p-name" placeholder="Mario Rossi" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="p-activity">Nome Attività <span style="color:red">*</span></label>
+                            <input type="text" id="p-activity" placeholder="B&B Il Porto" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="p-email">Email Business <span style="color:red">*</span></label>
+                            <input type="email" id="p-email" placeholder="info@tuaattivita.it" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="p-phone">Telefono / WhatsApp <span style="color:red">*</span></label>
+                            <input type="tel" id="p-phone" placeholder="+39 3XX XXXXXXX" required>
+                        </div>
+                        <div class="form-group full">
+                            <label for="p-type">Tipo di Attività <span style="color:red">*</span></label>
+                            <select id="p-type" required>
+                                <option value="">Seleziona...</option>
+                                <option value="B&B / Casa Vacanze">B&B / Casa Vacanze</option>
+                                <option value="Hotel">Hotel</option>
+                                <option value="Bar / Ristorante">Bar / Ristorante</option>
+                                <option value="Noleggio">Noleggio</option>
+                                <option value="Altro">Altro</option>
+                            </select>
+                        </div>
+                        <div class="form-group full">
+                            <label for="p-notes">Note Aggiuntive</label>
+                            <textarea id="p-notes" rows="4" placeholder="Parlaci brevemente della tua attività..."></textarea>
+                        </div>
+                        <button type="submit" id="p-submit" class="submit-btn">
+                            Invia Candidatura <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div id="partner-success-message" class="success-message">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <h3>Candidatura Inviata!</h3>
+                        <p>Grazie per averci contattato. Abbiamo ricevuto la tua richiesta e ti ricontatteremo entro 24 ore per completare l'attivazione.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
+                <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+                <div class="socials">
+                    <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://wa.me/393793283803" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Link Utili</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/tourist-services.html">Servizi Turistici</a></li>
+                    <li><a href="/#shipping">Spedizioni</a></li>
+                    <li><a href="/#luggage">Deposito Bagagli</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+                <ul class="footer-contact-list">
+                    <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+                    <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
+                    <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
+                    <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/src/main.js" type="module"></script>
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            emailjs.init("0nPf665f0pWsHFx1j"); // Inizializza EmailJS
+            
+            const form = document.getElementById('partner-application-form');
+            const submitBtn = document.getElementById('p-submit');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso...';
+                
+                const payload = {
+                    nome: document.getElementById('p-name').value,
+                    attivita: document.getElementById('p-activity').value,
+                    email: document.getElementById('p-email').value,
+                    telefono: document.getElementById('p-phone').value,
+                    tipo: document.getElementById('p-type').value,
+                    note: document.getElementById('p-notes').value || "Nessuna nota"
+                };
+
+                const messageBody = `
+🤝 NUOVA CANDIDATURA PARTNER TRASMESSA DA LOCALPOINT.IT
+
+📋 Dettagli del contatto:
+- Nome e Cognome: ${payload.nome}
+- Nome Attività: ${payload.attivita}
+- Email: ${payload.email}
+- Telefono/WhatsApp: ${payload.telefono}
+- Tipo di Attività: ${payload.tipo}
+
+📝 Note aggiuntive fornite:
+${payload.note}
+
+--
+Sistema Automatico LocalPoint Milazzo
+                `;
+
+                try {
+                    // Invia a localpointmilazzo@gmail.com
+                    await emailjs.send('service_dmf1g2a', 'template_ihapitu', {
+                        to_name: 'Amministratore LocalPoint',
+                        to_email: 'localpointmilazzo@gmail.com',
+                        subject: `Nuova Candidatura Partner da: ${payload.attivita}`,
+                        message: messageBody
+                    });
+                    
+                    form.style.display = 'none';
+                    document.getElementById('partner-success-message').style.display = 'block';
+                    window.scrollTo({ top: document.getElementById('partner-form-section').offsetTop - 50, behavior: 'smooth' });
+                } catch (error) {
+                    console.error('EmailJS Error:', error);
+                    alert("❌ Spiacenti, si è verificato un errore durante l'invio. Per favore, scrivici direttamente o riprova più tardi.");
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Invia Candidatura <i class="fa-solid fa-paper-plane"></i>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

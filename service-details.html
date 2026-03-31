@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Esperienza – LocalPoint</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+    
+    <script type="module" src="/src/cookie-manager.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <style>
+        html { background: #f2f7fc; }
+        @view-transition { navigation: auto; }
+        :root {
+            /* LocalPoint Palette & Design System */
+            --primary-blue:  #004e92;
+            --primary-teal:  #00a0a0;
+            --accent-green:  #8cc63f;
+            --gradient-main: linear-gradient(135deg, rgba(0,78,146,1) 0%, rgba(0,160,160,1) 50%, rgba(140,198,63,1) 100%);
+            --bg:            #f2f7fc;
+            --surface:       #ffffff;
+            --text-dark:     #001a33;
+            --text-gray:     #5b728b;
+            --border:        #d4e4f5;
+            --r-lg:          22px;
+            --shadow:        0 15px 45px rgba(0,78,146,0.07);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+        body { font-family:'Roboto', sans-serif; background:var(--bg); color:var(--text-dark); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+        
+        /* HEADER LOCALPOINT */
+        .ts-nav { background: linear-gradient(135deg, rgba(0,78,146,0.98) 0%, rgba(0,160,160,0.96) 60%, rgba(140,198,63,0.93) 100%); position: sticky; top:0; z-index:100; padding:12px 0; border-bottom:2px solid rgba(255,255,255,0.15); box-shadow:0 4px 30px rgba(0,78,146,0.3); backdrop-filter:blur(20px); }
+        .ts-nav-inner { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; justify-content:space-between; align-items:center; }
+        .ts-nav-inner .img-wrapper { display:flex; align-items:center; height:54px; background:rgba(255,255,255,0.95); padding:6px 14px; border-radius:14px; box-shadow:0 4px 15px rgba(0,78,146,0.2); border:1px solid rgba(255,255,255,0.5);}
+        .ts-nav-inner img { height: 100%; width:auto; object-fit:contain; }
+        .ts-links { display:flex; gap: 30px; }
+        .ts-links a { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.05rem; color: #fff; text-decoration: none; transition: opacity 0.3s; text-shadow:0 2px 10px rgba(0,0,0,0.3); }
+        .ts-links a:hover { opacity: 0.85; }
+        @media(max-width: 768px) { .ts-links { display: none; } }
+
+        /* BREADCRUMB */
+        .breadcrumb { max-width:1200px; margin: 30px auto 20px; padding:0 20px; font-size: 0.9rem; color: var(--text-gray); font-weight: 500;}
+        .breadcrumb a { color: var(--text-gray); text-decoration: none; transition: color 0.2s;}
+        .breadcrumb a:hover { color: var(--primary-blue); }
+        .breadcrumb i { font-size: 0.55rem; margin: 0 10px; vertical-align: middle; color: #a4b7cc;}
+
+        /* CONTENT WRAPPER */
+        .main-container { max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; }
+
+        /* TITLE SECTION */
+        .title-sec { margin-bottom: 30px; }
+        .badge { background: var(--gradient-main); color: white; box-shadow: 0 4px 16px rgba(0,160,160,0.25); font-size: 0.75rem; font-weight: 800; padding: 6px 14px; border-radius: 8px; display: inline-block; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.08em;}
+        #gyg-title { font-family: 'Outfit', sans-serif; font-size: clamp(2.2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.1; margin-bottom: 15px; color: var(--primary-blue); letter-spacing: -0.02em;}
+        .title-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; font-size: 1rem; font-weight: 500;}
+        .reviews { font-weight: 800; display: flex; align-items: center; gap: 6px; color: var(--primary-teal);}
+        .reviews i { color: #f59e0b; font-size: 1.1rem;}
+        .location { color: var(--text-gray); }
+
+        /* GALLERY DESKTOP */
+        .gallery-grid {
+            display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 250px 250px;
+            gap: 14px; border-radius: var(--r-lg); overflow: hidden; margin-bottom: 50px; box-shadow: var(--shadow);
+            border: 2px solid #fff; /* Premium bezel */
+        }
+        .g-img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.4s ease; cursor: pointer; }
+        .g-img:hover { filter: brightness(0.8); }
+        .g-item-1 { grid-column: 1 / 2; grid-row: 1 / 3; }
+        .g-item-2 { grid-column: 2 / 3; grid-row: 1 / 2; }
+        .g-item-3 { grid-column: 3 / 4; grid-row: 1 / 2; }
+        .g-item-4 { grid-column: 2 / 3; grid-row: 2 / 3; }
+        .g-item-5 { grid-column: 3 / 4; grid-row: 2 / 3; position: relative; }
+        
+        .show-all-btn {
+            position: absolute; bottom: 18px; right: 18px;
+            background: rgba(255,255,255,0.95); padding: 10px 20px; border-radius: 12px; backdrop-filter: blur(10px);
+            font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--primary-blue);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); cursor: pointer; border: 1px solid rgba(255,255,255,0.5); transition: all 0.3s;
+        }
+        .show-all-btn:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,78,146,0.25);}
+
+        /* LIGHTBOX */
+        #lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:9999; align-items:center; justify-content:center; }
+        #lightbox.open { display:flex; }
+        #lightbox img { max-width:90vw; max-height:90vh; object-fit:contain; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.6); user-select:none; }
+        .lb-close { position:fixed; top:20px; right:24px; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:1.8rem; width:48px; height:48px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(10px); transition:background 0.2s; }
+        .lb-close:hover { background:rgba(255,255,255,0.3); }
+        .lb-arrow { position:fixed; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:1.6rem; width:52px; height:52px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(10px); transition:background 0.2s; }
+        .lb-arrow:hover { background:rgba(255,255,255,0.3); }
+        .lb-prev { left:16px; }
+        .lb-next { right:16px; }
+        .lb-counter { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.7); font-size:0.95rem; font-weight:600; letter-spacing:0.05em; }
+
+        /* GALLERY MOBILE */
+        .swiper-mobile { display: none; margin-bottom: 30px; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); border: 2px solid #fff;}
+        .swiper-mobile .swiper { width: 100%; height: 350px; }
+        .swiper-mobile .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .swiper-mobile .swiper-pagination-bullet { background: #fff !important; opacity: 0.7; }
+        .swiper-mobile .swiper-pagination-bullet-active { background: var(--primary-teal) !important; opacity: 1; transform: scale(1.3); }
+
+        @media(max-width: 900px) {
+            .gallery-grid { display: none; }
+            .swiper-mobile { display: block; width: 100vw; margin-left: -20px; border-radius: 0; border: none; }
+            .main-container { padding-top: 10px; }
+        }
+
+        /* 2 COLUMN LAYOUT */
+        .content-split { display: grid; grid-template-columns: 63% 1fr; gap: 5%; align-items: start; }
+        @media(max-width: 1024px) { .content-split { grid-template-columns: 1fr; gap: 40px; } }
+
+        /* LEFT COLUMN */
+        .left-col { background: var(--surface); padding: 45px 50px; border-radius: var(--r-lg); box-shadow: var(--shadow); border: 1px solid #fff; }
+        @media(max-width: 768px) { .left-col { padding: 35px 25px; } }
+
+        .left-col h2 { font-family: 'Outfit', sans-serif; font-size: 1.7rem; font-weight: 900; margin-bottom: 35px; color: var(--primary-blue); letter-spacing: -0.01em;}
+
+        .about-list { list-style: none; margin-bottom: 45px; }
+        .about-item { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px; padding-bottom: 15px;}
+        .about-icon { font-size: 1.6rem; color: var(--primary-teal); flex-shrink: 0; margin-top: 2px; width: 35px; text-align: center; }
+        .about-text h4 { font-size: 1.15rem; font-family: 'Outfit', sans-serif; font-weight: 800; margin-bottom: 6px; color: var(--text-dark); }
+        .about-text p { font-size: 1rem; color: var(--text-gray); line-height: 1.6; }
+
+        hr { border: 0; border-top: 1px dashed var(--border); margin: 45px 0; }
+
+        .highlights { background: rgba(0,160,160,0.05); padding: 35px; border-radius: 16px; margin-bottom: 45px; border: 1px dashed rgba(0,160,160,0.3); }
+        .highlights h3 { font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 900; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; color: var(--primary-blue);}
+        .highlights h3 i { color: #f59e0b; font-size: 1.2rem;}
+        .highlights ul { list-style: none; }
+        .highlights li { position: relative; padding-left: 35px; margin-bottom: 18px; font-size: 1.05rem; line-height: 1.6; font-weight: 500;}
+        .highlights li::before { content: '✔'; position: absolute; left: 0; top: 0; font-weight: 900; color: var(--accent-green); font-size: 1.15rem;}
+
+        .full-desc { font-size: 1.05rem; line-height: 1.7; color: var(--text-gray); margin-bottom: 20px; font-weight: 400; }
+        .full-desc b, .full-desc strong { font-weight: 700; color: var(--primary-blue); }
+        .full-desc i, .full-desc em { font-style: italic; }
+        .full-desc h3 { font-size: 1.1rem; font-weight: 700; color: var(--primary-blue); margin: 1em 0 0.4em; }
+        .full-desc ul { list-style: disc; padding-left: 1.5em; margin: 0.5em 0; }
+        .full-desc ol { list-style: decimal; padding-left: 1.5em; margin: 0.5em 0; }
+        .full-desc li { margin-bottom: 0.25em; }
+        .full-desc p, .full-desc div { margin: 0.3em 0; }
+
+        /* RIGHT COLUMN (BOOKING WIDGET) */
+        .right-col { position: sticky; top: 120px; }
+        .booking-card { border: 1px solid #fff; border-radius: var(--r-lg); padding: 40px 30px; box-shadow: var(--shadow); background: var(--surface); }
+        
+        .price-head { display: flex; flex-direction: column; margin-bottom: 30px; padding-bottom: 25px; border-bottom: 2px dashed var(--border); }
+        .price-head span.from { font-size: 0.95rem; color: var(--text-gray); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .price-head span.val { font-size: 3rem; font-weight: 900; color: var(--primary-blue); margin-bottom: 5px; line-height: 1; letter-spacing: -0.04em; }
+        .price-head span.unit { font-size: 1.05rem; color: var(--primary-teal); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .form-area { text-align: center; background: #f8fafc; padding: 30px 20px; border-radius: 16px; border: 1px solid #eaebf2; }
+        .form-area img { width: 54px; height: 54px; margin-bottom: 18px; filter: drop-shadow(0 4px 10px rgba(37,211,102,0.2)); }
+        .form-area h4 { margin-bottom: 10px; font-size: 1.25rem; font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--text-dark);}
+        .form-area p { font-size: 1rem; color: var(--text-gray); margin-bottom: 28px; line-height: 1.5; }
+        
+        .btn-book { 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 18px; border: none; border-radius: 14px; 
+            background: #25d366; color: #fff; text-decoration: none;
+            font-size: 1.15rem; font-weight: 900; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.2,0.8,0.2,1); box-shadow: 0 8px 24px rgba(37,211,102,0.35);
+        }
+        .btn-book:hover { background: #20bc5b; transform: translateY(-3px); box-shadow: 0 12px 35px rgba(37,211,102,0.45); }
+
+        .no-charge-msg { text-align: center; font-size: 0.95rem; color: var(--primary-teal); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 25px; }
+
+        .err-state { display:none; padding: 100px 20px; text-align: center; }
+        .err-state h2 { font-size: 2.5rem; margin-bottom: 20px; color: var(--primary-blue); font-family: 'Outfit'; }
+
+        /* FOOTER LOCALPOINT */
+        footer { background: linear-gradient(135deg, #003870 0%, #001a33 100%); color: white; padding: 60px 0 0; position: relative; margin-top: 0; }
+        footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-main); }
+        .footer-grid { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 1.4fr 1fr 1.4fr; gap: 48px; padding-bottom: 48px; }
+        .footer-brand .footer-logo { display: block; height: 52px; margin-bottom: 16px; margin-left: -8px; filter: brightness(0) invert(1); }
+        .footer-brand .footer-tagline { font-size: 0.92rem; opacity: 0.75; line-height: 1.65; margin-bottom: 20px; }
+        .socials { display: flex; gap: 16px; }
+        .socials a { color: white; font-size: 1.3rem; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.1); text-decoration: none; }
+        .socials a:hover { color: var(--accent-green); background: rgba(255,255,255,0.18); transform: translateY(-3px); }
+        .footer-col-title { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 18px; }
+        .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        .footer-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.93rem; transition: color 0.2s; }
+        .footer-links a:hover { color: white; }
+        .footer-contact-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+        .footer-contact-list li, .footer-contact-list a { color: rgba(255,255,255,0.75); font-size: 0.9rem; line-height: 1.5; text-decoration: none; display: flex; align-items: flex-start; gap: 10px; transition: color 0.2s; }
+        .footer-contact-list a:hover { color: white; }
+        .footer-contact-list i { color: var(--accent-green); font-size: 0.95rem; margin-top: 2px; flex-shrink: 0; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 0; }
+        .footer-bottom p { font-size: 0.82rem; opacity: 0.55; text-align: center; margin: 0; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        @media(max-width: 768px) { .footer-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; } .footer-brand .footer-logo { margin-left: auto; margin-right: auto; } .socials { justify-content: center; } .footer-contact-list li, .footer-contact-list a { justify-content: center; } }
+
+        /* MOBILE NAV */
+        #sd-mobile-nav.open { display:flex !important; }
+        @media (max-width: 768px) {
+            .ts-links { display:none !important; }
+            #sd-menu-btn { display:inline-flex !important; }
+        }
+
+        /* SHARE BUTTON */
+        .share-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 18px; border-radius: 50px;
+            background: rgba(0,78,146,0.07); border: 1.5px solid rgba(0,78,146,0.15);
+            color: var(--primary-blue); font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
+        }
+        .share-btn:hover { background: rgba(0,78,146,0.13); transform: translateY(-1px); }
+        .share-btn.copied { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+
+        /* WHATSAPP FLOAT */
+        .wa-float {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 65px; height: 65px;
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 6px 30px rgba(37,211,102,0.5);
+            z-index: 9999; text-decoration: none;
+            animation: waPulse 2s infinite;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .wa-float:hover { transform: scale(1.15); box-shadow: 0 10px 40px rgba(37,211,102,0.7); }
+        @keyframes waPulse {
+            0%,100% { box-shadow: 0 6px 30px rgba(37,211,102,0.5); }
+            50%      { box-shadow: 0 6px 30px rgba(37,211,102,0.5), 0 0 0 10px rgba(37,211,102,0.12); }
+        }
+        @media (max-width: 768px) {
+            .wa-float { width: 55px; height: 55px; font-size: 1.8rem; bottom: 20px; right: 20px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="ts-nav">
+        <div class="ts-nav-inner">
+            <a href="/" class="img-wrapper">
+                <img src="/logo.png" alt="LocalPoint" onerror="this.parentElement.innerHTML='<span style=\'font-size:1.4rem;font-family:Outfit;font-weight:900;color:var(--primary-blue);\'>LocalPoint</span>'">
+            </a>
+            <div class="ts-links">
+                <a href="/">🏠 Home</a>
+                <a href="/tourist-services.html">🌴 Servizi Turistici</a>
+                <a href="/#contact">📍 Contatti</a>
+            </div>
+            <!-- Hamburger mobile -->
+            <button id="sd-menu-btn" onclick="document.getElementById('sd-mobile-nav').classList.toggle('open')" aria-label="Menu"
+                style="display:none;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);color:#fff;width:44px;height:44px;border-radius:10px;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;">
+                <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
+                <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
+                <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
+            </button>
+        </div>
+        <!-- Mobile nav overlay -->
+        <div id="sd-mobile-nav" style="display:none;flex-direction:column;background:linear-gradient(135deg,rgba(0,78,146,0.99) 0%,rgba(0,160,160,0.97) 100%);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.1);">
+            <a href="/" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🏠 Home</a>
+            <a href="/tourist-services.html" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🌴 Servizi Turistici</a>
+            <a href="/#contact" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;">📍 Contatti</a>
+        </div>
+    </nav>
+
+    <div class="err-state" id="error-screen">
+        <h2>Esperienza non trovata</h2>
+        <a href="/tourist-services.html" style="color:var(--primary-blue); text-decoration:none; font-weight:800; font-size: 1.2rem;"><i class="fa-solid fa-arrow-left"></i> Torna alla ricerca</a>
+    </div>
+
+    <main class="main-container" id="main-content" style="display:none;">
+
+        <!-- BREADCRUMB -->
+        <div class="breadcrumb">
+            <a href="/tourist-services.html" id="gyg-bc-cat-link">Categoria</a> <i class="fa-solid fa-chevron-right"></i>
+            <span style="color:var(--primary-blue); font-weight:700;" id="gyg-bc-title">Esperienza</span>
+        </div>
+
+        <!-- TITLE AND META -->
+        <div class="title-sec">
+            <div class="badge">LocalPoint Certified – Milazzo</div>
+            <h1 id="gyg-title">Titolo Esperienza</h1>
+            <div class="title-meta">
+                <div class="location"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i> Sicilia, Italia</div>
+                <span style="color:var(--border);">•</span>
+                <div class="location" id="gyg-cat-tag">Categoria</div>
+                <button class="share-btn" id="share-btn" onclick="shareExperience()">
+                    <i class="fa-solid fa-share-nodes"></i> Condividi
+                </button>
+            </div>
+        </div>
+
+        <!-- DESKTOP GALLERY GRID -->
+        <div class="gallery-desktop">
+            <div class="gallery-grid" id="desktop-grid">
+                <!-- Javascript injects images -->
+            </div>
+        </div>
+
+        <!-- MOBILE SWIPER -->
+        <div class="swiper-mobile">
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper" id="mobile-swiper-wrap"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+
+        <!-- CONTENT SPLIT -->
+        <div class="content-split">
+            <!-- LEFT COLUMN -->
+            <div class="left-col">
+                <h3 style="font-family: 'Outfit'; font-size: 1.4rem; color: var(--primary-blue); font-weight: 800; margin-bottom: 15px;">Descrizione completa dell'attività</h3>
+                <div class="full-desc" id="gyg-desc" style="margin-bottom: 40px;"></div>
+
+                <hr style="margin-top: 0;">
+
+                <h2>Informazioni su questa attività</h2>
+                <ul class="about-list">
+                    <li class="about-item">
+                        <div class="about-icon"><i class="fa-regular fa-calendar-check"></i></div>
+                        <div class="about-text">
+                            <h4>Cancellazione flessibile</h4>
+                            <p>Cancella fino a 24 ore prima per ricevere un rimborso completo o riprogrammare l'esperienza nella massima facilità.</p>
+                        </div>
+                    </li>
+                    <li class="about-item">
+                        <div class="about-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="about-text">
+                            <h4>Prenota ora e paga sul posto</h4>
+                            <p>Mantieni i tuoi piani di viaggio flessibili: blocca la disponibilità online e paga direttamente il giorno dell'erogazione del servizio.</p>
+                        </div>
+                    </li>
+                    <li class="about-item">
+                        <div class="about-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                        <div class="about-text">
+                            <h4>Orari Personalizzati</h4>
+                            <p>Contattaci per valutare gli orari di partenza e adattare l'esperienza alle tue esigenze di viaggio.</p>
+                        </div>
+                    </li>
+                    <li class="about-item">
+                        <div class="about-icon"><i class="fa-brands fa-whatsapp" style="color: #25d366;"></i></div>
+                        <div class="about-text">
+                            <h4>Assistenza Locale Multilingua VIP</h4>
+                            <p>Supporto garantito e costante via WhatsApp in Italiano e Inglese direttamente dal nostro ufficio di Via Tenente Brigiano.</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <hr>
+
+                <h2>L'esperienza LocalPoint</h2>
+                
+                <div class="highlights">
+                    <h3><i class="fa-solid fa-star"></i> Perché sceglierla</h3>
+                    <ul>
+                        <li>Goditi un'esperienza premium senza stress organizzativo alcuno</li>
+                        <li>Affidati ai migliori partner locali, selezionati dal nostro team di Concierge</li>
+                        <li>Scegli l'affidabilità di LocalPoint, il modo più sicuro di vivere Milazzo</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN WIDGET -->
+            <div class="right-col">
+                <div class="booking-card">
+                    <div class="price-head">
+                        <span class="from">Prezzo a partire da</span>
+                        <span class="val" id="gyg-price-val">€0</span>
+                        <span class="unit" id="gyg-price-note">A persona</span>
+                    </div>
+
+                    <div class="form-area">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/WhatsApp_icon.png" alt="WhatsApp">
+                        <h4>Prenota in modo semplice</h4>
+                        <p>Inviaci un rapido messaggio su WhatsApp spiegandoci i tuoi piani. Ti confermeremo all'istante l'effettiva disponibilità!</p>
+                        
+                        <a href="https://wa.me/393793283803" id="wa-book-btn" target="_blank" class="btn-book">
+                            <i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> Scrivici su WhatsApp
+                        </a>
+                    </div>
+                    <div class="no-charge-msg"><i class="fa-solid fa-bolt" style="color:#eab308;"></i> Risposta rapida da team locale</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- NON TROVI IL SERVIZIO -->
+    <div style="background:linear-gradient(135deg,#004e92 0%,#00a0a0 60%,#8cc63f 100%);padding:3.5rem 1.5rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+        <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
+            <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);">💬 Assistenza Personale</div>
+            <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;">Non trovi il servizio che cerchi?</h2>
+            <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
+                <a href="/#contact"
+                   style="display:inline-flex;align-items:center;gap:0.7rem;background:#fff;color:#004e92;padding:1rem 2.5rem;border-radius:50px;font-size:1rem;font-weight:800;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,0.2);transition:transform 0.3s,box-shadow 0.3s;"
+                   onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.2)'">
+                    <i class="fa-solid fa-paper-plane"></i> Contattaci
+                </a>
+            </div>
+            <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
+                <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+                <div class="socials">
+                    <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://wa.me/393793283803" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Link Utili</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/tourist-services.html">Servizi Turistici</a></li>
+                    <li><a href="/#shipping">Spedizioni</a></li>
+                    <li><a href="/#luggage">Deposito Bagagli</a></li>
+                    <li><a href="/become-partner.html">Diventa Partner</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+                <ul class="footer-contact-list">
+                    <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+                    <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
+                    <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
+                    <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <script type="module">
+        import { supabase } from '/src/supabaseClient.js';
+        
+        // Premium Unsplash Fallbacks perfectly mimicking luxury travels
+        const FALLBACKS = [
+            "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1563720311-667950c0dd23?auto=format&fit=crop&w=1200&q=80", 
+            "https://images.unsplash.com/photo-1574882199049-cfdb8eab111d?auto=format&fit=crop&w=1200&q=80", 
+            "https://images.unsplash.com/photo-1502444330042-d1a1ddf9bb5b?auto=format&fit=crop&w=1200&q=80", 
+            "https://images.unsplash.com/photo-1556811231-1e967a57a419?auto=format&fit=crop&w=1200&q=80"
+        ];
+        
+        // LIGHTBOX
+        let lbImgs = [], lbIdx = 0;
+
+        function lbOpen(images, index) {
+            lbImgs = images; lbIdx = index;
+            lbRender();
+            document.getElementById('lightbox').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function lbClose() {
+            document.getElementById('lightbox').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        function lbMove(dir) {
+            lbIdx = (lbIdx + dir + lbImgs.length) % lbImgs.length;
+            lbRender();
+        }
+        function lbRender() {
+            document.getElementById('lb-img').src = lbImgs[lbIdx];
+            document.getElementById('lb-counter').textContent = lbImgs.length > 1 ? `${lbIdx + 1} / ${lbImgs.length}` : '';
+        }
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('lightbox') || e.target === document.getElementById('lb-img')) lbClose();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('lightbox').classList.contains('open')) return;
+            if (e.key === 'Escape') lbClose();
+            if (e.key === 'ArrowLeft') lbMove(-1);
+            if (e.key === 'ArrowRight') lbMove(1);
+        });
+        window.lbOpen = lbOpen;
+        window.lbClose = lbClose;
+        window.lbMove = lbMove;
+
+        function gImg(i) {
+            return `<img src="" class="g-img" data-lb-idx="${i}"${i > 0 ? ' loading="lazy"' : ''}>`;
+        }
+
+        function buildGrid(imgs) {
+            const grid = document.getElementById('desktop-grid');
+            const n = imgs.length;
+            let html = '';
+            if (n === 1) {
+                html = `<div style="grid-column:1/4;grid-row:1/3">${gImg(0)}</div>`;
+            } else if (n === 2) {
+                html = `
+                    <div class="g-item-1">${gImg(0)}</div>
+                    <div style="grid-column:2/4;grid-row:1/3">${gImg(1)}</div>`;
+            } else if (n === 3) {
+                html = `
+                    <div class="g-item-1">${gImg(0)}</div>
+                    <div style="grid-column:2/4;grid-row:1/2">${gImg(1)}</div>
+                    <div style="grid-column:2/4;grid-row:2/3">${gImg(2)}</div>`;
+            } else if (n === 4) {
+                html = `
+                    <div class="g-item-1">${gImg(0)}</div>
+                    <div class="g-item-2">${gImg(1)}</div>
+                    <div class="g-item-3">${gImg(2)}</div>
+                    <div style="grid-column:2/4;grid-row:2/3">${gImg(3)}</div>`;
+            } else {
+                html = `
+                    <div class="g-item-1">${gImg(0)}</div>
+                    <div class="g-item-2">${gImg(1)}</div>
+                    <div class="g-item-3">${gImg(2)}</div>
+                    <div class="g-item-4">${gImg(3)}</div>
+                    <div class="g-item-5">
+                        ${gImg(4)}
+                        <div class="show-all-btn" data-lb-idx="0"><i class="fa-solid fa-images"></i> Guarda Galleria</div>
+                    </div>`;
+            }
+            grid.innerHTML = html;
+            // Set src and click listeners after injection
+            grid.querySelectorAll('[data-lb-idx]').forEach(el => {
+                const idx = parseInt(el.dataset.lbIdx)
+                if (el.tagName === 'IMG') el.src = imgs[idx]
+                el.addEventListener('click', () => lbOpen(imgs, idx))
+            })
+        }
+
+        function buildSwiper(imgs) {
+            const wrap = document.getElementById('mobile-swiper-wrap')
+            wrap.innerHTML = imgs.map((img, i) =>
+                `<div class="swiper-slide"><img src="${img}" class="lb-swipe-img" data-idx="${i}"${i > 0 ? ' loading="lazy"' : ''} style="cursor:pointer;width:100%;height:100%;object-fit:cover;"></div>`
+            ).join('');
+            wrap.querySelectorAll('.lb-swipe-img').forEach(img => {
+                img.addEventListener('click', () => lbOpen(imgs, parseInt(img.dataset.idx)))
+            })
+            new Swiper(".mySwiper", {
+                pagination: { el: ".swiper-pagination", clickable: true },
+                loop: imgs.length > 1,
+                autoplay: { delay: 4000, disableOnInteraction: false }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const catId = params.get('cat');
+            const itemId = params.get('id');
+            
+            if(!catId || !itemId) {
+                document.getElementById('error-screen').style.display = 'block';
+                return;
+            }
+            
+            const { data: item, error } = await supabase.from('experiences').select('*').eq('slug_id', itemId).single();
+            if(error || !item) {
+                document.getElementById('error-screen').style.display = 'block';
+                return;
+            }
+            
+            // Use only real images, single fallback if none
+            const imgs = (item.images && item.images.length > 0) ? item.images : [FALLBACKS[0]];
+
+            document.getElementById('main-content').style.display = 'block';
+            document.title = item.title + ' | LocalPoint';
+
+            // Text population
+            const CAT_LABELS = { escursioni:'Escursioni & Tour', noleggi:'Noleggi', transfer:'Transfer & NCC', parcheggio:'Parcheggio Porto', bagagli:'Deposito Bagagli' };
+            const catLabel = CAT_LABELS[catId] || catId.charAt(0).toUpperCase() + catId.slice(1);
+            document.getElementById('gyg-bc-cat-link').textContent = catLabel;
+            document.getElementById('gyg-bc-cat-link').href = `/tourist-services.html?cat=${catId}`;
+            document.getElementById('gyg-bc-title').textContent = item.title;
+            document.getElementById('gyg-cat-tag').textContent = catId.charAt(0).toUpperCase() + catId.slice(1);
+            document.getElementById('gyg-title').textContent = item.title;
+            const rawDesc = item.description || 'Nessuna descrizione specificata. Contattaci su WhatsApp per maggiori dettagli.'
+            const safeDesc = (typeof DOMPurify !== 'undefined')
+                ? DOMPurify.sanitize(rawDesc, { ALLOWED_TAGS: ['b','strong','i','em','u','h3','ul','ol','li','p','br','a','span'], ALLOWED_ATTR: ['href','target','rel'] })
+                : rawDesc
+            document.getElementById('gyg-desc').innerHTML = safeDesc
+            document.getElementById('gyg-price-val').textContent = item.price;
+            document.getElementById('gyg-price-note').textContent = item.price_note || 'A persona / unità';
+
+            // WhatsApp Link Logic
+            const waLink = document.getElementById('wa-book-btn');
+            if (waLink) {
+                const refCode = localStorage.getItem('localpoint_referral');
+                const refLine = refCode ? `\nTariffe agevolate (codice: ${refCode})\n` : '';
+                const msg = `Ciao LocalPoint!\n\nVorrei avere informazioni e disponibilita' per l'esperienza:\n*${item.title}*\n${refLine}\nResto in attesa, grazie!`;
+                waLink.href = `https://wa.me/393793283803?text=${encodeURIComponent(msg)}`;
+            }
+
+            // Update float button with same contextual message
+            const waFloatBtn = document.getElementById('wa-float-btn');
+            if (waFloatBtn) waFloatBtn.href = waLink.href;
+
+            buildGrid(imgs);
+            buildSwiper(imgs);
+        });
+
+    function shareExperience() {
+        const url = window.location.href;
+        const title = document.getElementById('gyg-title')?.textContent || 'Esperienza LocalPoint';
+        const btn = document.getElementById('share-btn');
+        if (navigator.share) {
+            navigator.share({ title, text: `Dai un'occhiata a questa esperienza su LocalPoint: ${title}`, url });
+        } else {
+            navigator.clipboard.writeText(url).then(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Link copiato!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-share-nodes"></i> Condividi';
+                    btn.classList.remove('copied');
+                }, 2500);
+            });
+        }
+    }
+    </script>
+
+    <!-- WHATSAPP FLOAT -->
+    <a id="wa-float-btn" href="https://wa.me/393793283803" target="_blank" rel="noopener" class="whatsapp-float" aria-label="Chatta su WhatsApp" data-track="whatsapp_float">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox">
+        <button class="lb-close" onclick="lbClose()">✕</button>
+        <button class="lb-arrow lb-prev" onclick="lbMove(-1)">&#8249;</button>
+        <img id="lb-img" src="" alt="">
+        <button class="lb-arrow lb-next" onclick="lbMove(1)">&#8250;</button>
+        <div class="lb-counter" id="lb-counter"></div>
+    </div>
+</body>
+</html>

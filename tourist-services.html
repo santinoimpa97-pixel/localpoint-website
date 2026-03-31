@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Servizi Turistici – LocalPoint</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script type="module" src="/src/cookie-manager.js"></script>
+    <style>
+        html { background: #f0f9ff; }
+        @view-transition { navigation: auto; }
+        :root {
+            /* ===== LocalPoint — Home Page Palette ===== */
+            --primary-blue:  #004e92;
+            --primary-teal:  #00a0a0;
+            --accent-green:  #8cc63f;
+            --light-teal:    #4dd0e1;
+            --gradient-main: linear-gradient(135deg, #004e92 0%, #00a0a0 50%, #8cc63f 100%);
+            --shadow:        0 10px 40px rgba(0,78,146,0.15), inset 0 1px 0 rgba(255,255,255,0.5);
+            --shadow-hover:  0 20px 60px rgba(0,78,146,0.3), inset 0 1px 0 rgba(255,255,255,0.8);
+
+            --bg:       #f0f9ff;
+            --surface:  #ffffff;
+            --text-main:#2d3748;
+            --text-mut: #4a5568;
+            --border:   #cce7f5;
+
+            /* Aliases used through the file */
+            --navy:        var(--primary-blue);
+            --navy-dark:   #003870;
+            --teal:        var(--primary-teal);
+            --teal-dark:   #007a7a;
+            --teal-light:  #e0f7f7;
+            --green:       var(--accent-green);
+            --green-dark:  #6ea32e;
+            --accent:      var(--primary-blue);
+            --accent-light:#e8f4ff;
+
+            --r-xl:20px;
+            --r-lg:12px;
+            --nav-h:70px;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+        html { scroll-behavior: smooth; }
+        body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--text-main); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+        button { border:none; background:none; font-family:inherit; cursor:pointer; }
+
+        /* ========================= NAV ========================= */
+        .ts-nav {
+            position: fixed; top:0; left:0; right:0; z-index:200; height:var(--nav-h);
+            display:flex; align-items:center; justify-content:space-between; padding:0 2.5rem;
+            background:linear-gradient(135deg, rgba(0,78,146,0.97) 0%, rgba(0,160,160,0.95) 60%, rgba(140,198,63,0.9) 100%);
+            backdrop-filter:blur(18px) saturate(180%);
+            border-bottom:2px solid rgba(255,255,255,0.15);
+            box-shadow:0 4px 30px rgba(0,78,146,0.3);
+        }
+        .ts-nav .logo img { height:38px; background:#fff; border-radius:10px; padding:4px 8px; }
+        .nav-back { display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; font-weight:700; color:rgba(255,255,255,0.9); transition:color 0.25s; text-decoration:none; }
+        .nav-back:hover { color:#fff; text-shadow:0 0 10px rgba(255,255,255,0.6); }
+        .nav-contact { font-size:0.85rem; font-weight:700; color:rgba(255,255,255,0.9); display:flex; align-items:center; gap:0.4rem; text-decoration:none; }
+        .nav-contact:hover { color:#fff; }
+
+        /* REFERRAL BANNER */
+        .ref-banner { display:none; background:linear-gradient(90deg,var(--navy),var(--teal)); color:#fff; text-align:center; padding:0.7rem; font-size:0.85rem; font-weight:700; }
+        .ref-banner.active { display:block; }
+
+        /* ========================= HERO ========================= */
+        .hero-wrap { position:relative; height:calc(100svh - 82px); min-height:500px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+        
+        .hero-bg { position:absolute; inset:0; }
+        .hero-bg img { width:100%; height:100%; object-fit:cover; }
+        .hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(170deg, rgba(0,78,146,0.6) 0%, rgba(0,160,160,0.2) 50%, rgba(0,78,146,0.65) 100%); }
+
+        .hero-content { position:relative; z-index:5; text-align:center; max-width:800px; padding:0 2rem; }
+        
+        .hero-eyebrow { display:inline-flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); backdrop-filter:blur(12px); color:#fff; padding:0.5rem 1.2rem; border-radius:50px; font-size:0.75rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1.8rem; animation:fadeDown 0.8s ease both; }
+        
+        .hero-content h1 { font-size:clamp(3rem,6vw,5.5rem); font-weight:900; color:#fff; line-height:1.05; letter-spacing:-0.03em; margin-bottom:1.5rem; text-shadow:0 4px 30px rgba(0,0,0,0.4); animation:fadeUp 0.8s 0.15s ease both; }
+        .hero-content h1 em { font-style:normal; color:var(--teal); }
+        
+        .hero-content p { font-size:1.15rem; font-weight:300; color:rgba(255,255,255,0.85); line-height:1.6; max-width:550px; margin:0 auto 2.5rem; animation:fadeUp 0.8s 0.3s ease both; }
+        
+        .hero-scroll-btn { display:inline-flex; align-items:center; gap:0.6rem; background:#fff; color:var(--primary-blue); padding:0.9rem 2rem; font-size:1rem; font-weight:700; border-radius:50px; box-shadow:0 8px 24px rgba(0,78,146,0.35); transition:transform 0.3s,box-shadow 0.3s; cursor:pointer; animation:fadeUp 0.8s 0.45s ease both; border:none; font-family:inherit; }
+        .hero-scroll-btn:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 12px 32px rgba(0,78,146,0.5); }
+        .hero-scroll-btn i { color:var(--primary-teal); }
+        
+        /* Hero stats strip */
+        .hero-stats { position:absolute; bottom:0; left:0; right:0; z-index:5; background:rgba(0,30,70,0.55); backdrop-filter:blur(16px); border-top:1px solid rgba(0,160,160,0.3); display:flex; justify-content:center; gap:5rem; padding:1.5rem; }
+        .hero-stat { text-align:center; color:#fff; }
+        .hero-stat .val { font-size:1.6rem; font-weight:900; letter-spacing:-0.02em; color:var(--accent-green); display:block; }
+        .hero-stat .lab { font-size:0.75rem; font-weight:500; opacity:0.7; text-transform:uppercase; letter-spacing:0.05em; }
+
+        /* ========================= SECTION ========================= */
+        .page-section { max-width:1280px; margin:0 auto; padding:5rem 2rem; }
+
+        .section-header { text-align:center; margin-bottom:4rem; }
+        .section-label { display:inline-block; background:rgba(0,78,146,0.1); color:var(--primary-blue); font-size:0.72rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; padding:0.5rem 1.2rem; border-radius:50px; margin-bottom:1.2rem; }
+        .section-header h2 { font-size:clamp(2rem,4vw,3rem); font-weight:900; letter-spacing:-0.02em; color:var(--text-main); margin-bottom:0.8rem; }
+        .section-header p { font-size:1.05rem; color:var(--text-mut); max-width:520px; margin:0 auto; line-height:1.6; }
+
+        /* ========================= CATEGORY GRID ========================= */
+        .cat-grid {
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            grid-template-rows:auto;
+            gap:1.5rem;
+        }
+
+        .cat-card {
+            position:relative; border-radius:var(--r-xl); overflow:hidden;
+            cursor:pointer; box-shadow:0 4px 20px rgba(45,70,153,0.1);
+            background:#d8dff5;
+            opacity:0; transform:translateY(30px);
+            animation:fadeReveal 0.6s ease forwards;
+        }
+        .cat-card:nth-child(1) { grid-column:span 2; height:360px; animation-delay:0.05s; }
+        .cat-card:nth-child(2) { height:360px; animation-delay:0.1s; }
+        .cat-card:nth-child(3) { height:280px; animation-delay:0.15s; }
+        .cat-card:nth-child(4) { height:280px; animation-delay:0.2s; }
+        .cat-card:nth-child(5) { height:280px; animation-delay:0.25s; }
+        
+        .cat-card:hover { transform:translateY(-6px) !important; box-shadow:0 20px 50px rgba(0,78,146,0.22); }
+        .cat-card:hover .cat-img { transform:scale(1.07); }
+        .cat-card:hover .cat-arrow { background:#fff; color:var(--primary-blue); transform:translate(3px,-3px) scale(1.15); }
+
+        .cat-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform 0.9s cubic-bezier(0.2,0.8,0.2,1); }
+        .cat-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(8,12,20,0.9) 0%, rgba(8,12,20,0.3) 55%, transparent 100%); transition:opacity 0.3s; }
+        
+        .cat-content { position:absolute; inset:0; padding:1.8rem; display:flex; flex-direction:column; justify-content:flex-end; color:#fff; }
+        
+        .cat-chip { display:inline-flex; align-items:center; gap:0.4rem; background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:0.72rem; font-weight:700; letter-spacing:0.06em; padding:0.35rem 0.85rem; border-radius:50px; margin-bottom:auto; width:fit-content; }
+        
+        .cat-title { font-size:1.75rem; font-weight:900; letter-spacing:-0.02em; margin-bottom:0.3rem; text-shadow:0 2px 10px rgba(0,0,0,0.3); }
+        .cat-desc { font-size:0.88rem; opacity:0.85; line-height:1.4; margin-bottom:1.2rem; }
+        
+        .cat-footer { display:flex; align-items:center; justify-content:space-between; }
+        .cat-count { font-size:0.78rem; font-weight:700; color:#fff; background:rgba(0,160,160,0.55); backdrop-filter:blur(12px); border:1px solid rgba(0,210,210,0.45); padding:0.3rem 0.85rem; border-radius:50px; letter-spacing:0.03em; text-shadow:0 1px 4px rgba(0,0,0,0.3); }
+        .cat-arrow { width:40px; height:40px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.3); border-radius:50%; display:flex; align-items:center; justify-content:center; transition:all 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+
+        /* Small card adjustments */
+        .cat-card:is(:nth-child(3),:nth-child(4),:nth-child(5)) .cat-title { font-size:1.4rem; }
+
+        /* ========================= SERVICES VIEW ========================= */
+        #view-services { display:none; }
+        .srv-wrap { max-width:1280px; margin:0 auto; padding:7rem 2rem 6rem; min-height:100vh; }
+
+        .srv-breadcrumb { display:flex; align-items:center; gap:0.7rem; margin-bottom:2.5rem; }
+        .crumb-back { display:flex; align-items:center; gap:0.5rem; padding:0.7rem 1.3rem; background:var(--surface); border:2px solid var(--border); border-radius:50px; font-size:0.9rem; font-weight:700; color:var(--text-main); transition:all 0.25s; }
+        .crumb-back:hover { border-color:var(--primary-blue); color:var(--primary-blue); }
+        .crumb-sep { color:var(--text-mut); font-size:0.9rem; }
+        .crumb-curr { font-size:0.9rem; font-weight:600; color:var(--text-mut); }
+
+        .srv-page-title { margin-bottom:3rem; }
+        .srv-page-title h2 { font-size:clamp(2rem,4vw,3rem); font-weight:900; letter-spacing:-0.02em; margin-bottom:0.4rem; }
+        .srv-page-title p { color:var(--text-mut); font-size:1.05rem; }
+
+        .items-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1.8rem; }
+
+        /* Item Card */
+        .item-card {
+            background:var(--surface); border-radius:var(--r-xl); overflow:hidden; display:flex; flex-direction:column;
+            border:1px solid var(--border);
+            box-shadow:0 2px 12px rgba(0,0,0,0.04);
+            transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.35s ease;
+            opacity:0; transform:translateY(20px); animation:fadeReveal 0.5s ease forwards;
+        }
+        .item-card:hover { transform:translateY(-8px); box-shadow:0 20px 40px rgba(0,0,0,0.1); }
+        
+        .item-img-wrap { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; background:#dde3ed; }
+        .item-img { width:100%; height:100%; object-fit:cover; transition:transform 0.8s cubic-bezier(0.2,0.8,0.2,1); }
+        .item-card:hover .item-img { transform:scale(1.06); }
+
+        /* Image count pills */
+        .img-dot-strip { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:4px; }
+        .img-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.5); }
+        .img-dot.on { background:#fff; width:16px; border-radius:4px; }
+
+        .item-body { padding:1.4rem 1.5rem 1.5rem; flex-grow:1; display:flex; flex-direction:column; gap:0.6rem; }
+        
+        .item-top { display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; }
+        .item-title { font-size:1.15rem; font-weight:800; line-height:1.25; color:var(--text-main); }
+        .price-pill { background:var(--teal-light); color:var(--teal-dark); font-size:0.85rem; font-weight:900; padding:0.3rem 0.8rem; border-radius:8px; white-space:nowrap; flex-shrink:0; }
+        
+        .item-desc { font-size:0.9rem; color:var(--text-mut); line-height:1.55; flex-grow:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; line-clamp:3; overflow:hidden; }
+        
+        .item-meta { font-size:0.78rem; font-weight:600; color:var(--text-mut); background:#f5f7fb; padding:0.45rem 0.8rem; border-radius:8px; display:inline-block; }
+        
+        .item-cta { display:flex; width:100%; align-items:center; justify-content:center; gap:0.5rem; padding:0.95rem; background:var(--gradient-main); color:#fff; font-size:0.95rem; font-weight:800; border-radius:12px; margin-top:0.4rem; transition:all 0.3s; }
+        .item-cta:hover { box-shadow:0 8px 22px rgba(0,78,146,0.35); filter:brightness(1.07); }
+        .item-cta:active { transform:scale(0.98); }
+
+        /* ========================= MODAL ========================= */
+        .modal-wrap {
+            position:fixed; inset:0; background:rgba(8,14,28,0.55); backdrop-filter:blur(8px); z-index:300;
+            display:flex; align-items:center; justify-content:center; padding:1rem;
+            opacity:0; pointer-events:none; transition:opacity 0.35s;
+        }
+        .modal-wrap.open { opacity:1; pointer-events:all; }
+        
+        .modal-comp {
+            background:var(--surface); width:100%; max-width:540px; border-radius:var(--r-xl); overflow:hidden;
+            box-shadow:0 40px 80px rgba(0,0,0,0.3);
+            transform:translateY(30px) scale(0.97); transition:transform 0.45s cubic-bezier(0.2,0.8,0.2,1);
+            display:flex; flex-direction:column; max-height:92vh;
+        }
+        .modal-wrap.open .modal-comp { transform:translateY(0) scale(1); }
+        
+        /* Modal image header */
+        .modal-img-head { position:relative; width:100%; height:180px; overflow:hidden; background:#dde3ed; flex-shrink:0; }
+        .modal-img-head img { width:100%; height:100%; object-fit:cover; }
+        .modal-img-head-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.1)); }
+        .modal-img-info { position:absolute; bottom:1.2rem; left:1.5rem; right:4rem; color:#fff; }
+        .modal-img-cat { font-size:0.7rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; opacity:0.75; margin-bottom:0.3rem; }
+        .modal-img-title { font-size:1.3rem; font-weight:900; line-height:1.1; }
+        .modal-img-price { position:absolute; bottom:1.1rem; right:1.2rem; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.25); color:#fff; font-size:0.9rem; font-weight:800; padding:0.4rem 0.9rem; border-radius:50px; }
+        .modal-close-btn { position:absolute; top:1rem; right:1rem; z-index:5; width:36px; height:36px; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; transition:background 0.2s; }
+        .modal-close-btn:hover { background:rgba(0,0,0,0.6); }
+        
+        .modal-body { padding:1.5rem 2rem 2rem; overflow-y:auto; }
+        
+        .ref-box { display:none; background:#ecfdf5; border:1.5px dashed #6ee7b7; padding:0.9rem 1.1rem; border-radius:12px; font-size:0.85rem; color:#065f46; font-weight:700; margin-bottom:1.5rem; }
+        .ref-box.show { display:flex; align-items:center; gap:0.6rem; }
+
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.2rem; }
+        .f-group { display:flex; flex-direction:column; }
+        .f-group:not(:last-child):not(.f-group + .form-row) { margin-bottom:1.2rem; }
+        label { font-size:0.72rem; font-weight:900; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-mut); margin-bottom:0.5rem; display:block; }
+        input, textarea { padding:0.9rem 1rem; border:2px solid var(--border); border-radius:12px; font-family:inherit; font-size:0.95rem; color:var(--text-main); outline:none; background:#f8fafd; transition:all 0.25s; width:100%; }
+        input:focus, textarea:focus { border-color:var(--primary-blue); background:#fff; box-shadow:0 0 0 4px rgba(0,78,146,0.1); }
+        
+        .btn-submit { width:100%; padding:1.1rem; background:var(--gradient-main); color:#fff; border-radius:14px; font-size:1rem; font-weight:800; letter-spacing:0.02em; margin-top:0.8rem; transition:all 0.3s; display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+        .btn-submit:hover { filter:brightness(1.08); box-shadow:0 10px 24px rgba(0,78,146,0.4); }
+        .btn-submit:disabled { opacity:0.6; cursor:wait; }
+
+        /* FOOTER */
+        .ts-footer { background:linear-gradient(135deg,#003870,#004e92); color:rgba(255,255,255,0.6); text-align:center; padding:2.5rem 1.5rem; font-size:0.85rem; margin-top:2rem; }
+        .ts-footer a { color:var(--accent-green); text-decoration:none; }
+
+        /* ========================= ANIMATIONS ========================= */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeReveal { to { opacity:1; transform:translateY(0); } }
+
+        /* ========================= RESPONSIVE ========================= */
+        @media(max-width:900px) {
+            .cat-grid { grid-template-columns:1fr 1fr; }
+            .cat-card:nth-child(1) { grid-column:span 2; height:300px; }
+            .cat-card:nth-child(n) { height:240px; }
+            .hero-stats { gap:2rem; }
+        }
+        @media(max-width:600px) {
+            .cat-grid { grid-template-columns:1fr; }
+            .cat-card:nth-child(1) { grid-column:span 1; height:260px; }
+            .hero-stats { flex-wrap:wrap; gap:1.5rem; }
+            .items-grid { grid-template-columns:1fr; }
+            .form-row { grid-template-columns:1fr; }
+            .ts-nav { padding:0 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER — same style as home -->
+    <header style="background:linear-gradient(135deg,rgba(0,78,146,0.97) 0%,rgba(0,160,160,0.95) 60%,rgba(140,198,63,0.9) 100%);position:sticky;top:0;z-index:1000;padding:10px 0;border-bottom:2px solid rgba(255,255,255,0.15);box-shadow:0 4px 30px rgba(0,78,146,0.3);backdrop-filter:blur(20px);">
+        <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;">
+            <!-- Logo -->
+            <div style="display:flex;align-items:center;height:60px;background:rgba(255,255,255,0.92);padding:6px 16px;border-radius:14px;box-shadow:0 4px 20px rgba(0,78,146,0.15);border:1px solid rgba(255,255,255,0.6);">
+                <img src="/logo.png" alt="LocalPoint" style="height:100%;width:auto;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=\'font-size:1.1rem;font-weight:900;color:#004e92\'>LocalPoint</span>'">
+            </div>
+            <!-- Nav links (desktop) -->
+            <nav id="ts-desktop-nav" style="display:flex;gap:28px;align-items:center;">
+                <a href="/" style="font-weight:600;font-size:1rem;color:rgba(255,255,255,0.9);text-decoration:none;padding:8px 0;transition:color 0.3s;">🏠 Home</a>
+                <a href="/tourist-services.html" style="font-weight:700;font-size:1rem;color:#fff;text-decoration:none;padding:8px 0;text-shadow:0 0 10px rgba(255,255,255,0.4);">🌴 Servizi Turistici</a>
+                <a href="/#contact" style="font-weight:600;font-size:1rem;color:rgba(255,255,255,0.9);text-decoration:none;padding:8px 0;transition:color 0.3s;">📍 Contatti</a>
+            </nav>
+            <!-- Hamburger (mobile) -->
+            <button id="ts-menu-btn" class="mobile-menu-toggle" onclick="document.getElementById('ts-mobile-nav').classList.toggle('open')" aria-label="Menu" style="display:none;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);color:#fff;width:44px;height:44px;border-radius:10px;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;">
+                <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
+                <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
+                <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
+            </button>
+        </div>
+        <!-- Mobile nav overlay -->
+        <div id="ts-mobile-nav" style="display:none;flex-direction:column;gap:0;background:linear-gradient(135deg,rgba(0,78,146,0.99) 0%,rgba(0,160,160,0.97) 100%);backdrop-filter:blur(20px);padding:0;border-top:1px solid rgba(255,255,255,0.1);">
+            <a href="/index.html" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🏠 Home</a>
+            <a href="/tourist-services.html" style="display:block;padding:1rem 1.5rem;color:#fff;text-decoration:none;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.08);">🌴 Servizi Turistici</a>
+            <a href="/#contact" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;">📍 Contatti</a>
+        </div>
+    </header>
+
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/393793283803" target="_blank" rel="noopener" class="whatsapp-float" aria-label="Chatta su WhatsApp" data-track="whatsapp_float">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <style>
+        /* Mobile nav toggle */
+        #ts-mobile-nav.open { display:flex !important; }
+        @media (max-width: 768px) {
+            #ts-desktop-nav { display:none !important; }
+            #ts-menu-btn { display:inline-flex !important; }
+        }
+        /* WhatsApp float - identical to home */
+        @keyframes pulse {
+          0%,100% { box-shadow:0 6px 30px rgba(37,211,102,0.5); }
+          50% { box-shadow:0 6px 40px rgba(37,211,102,0.8),0 0 0 8px rgba(37,211,102,0.15); }
+        }
+        @keyframes float {
+          0%,100% { transform:translateY(0); }
+          50% { transform:translateY(-4px); }
+        }
+        .whatsapp-float {
+            position:fixed;
+            bottom:30px;
+            right:30px;
+            z-index:9999;
+            width:65px;
+            height:65px;
+            background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:2.2rem;
+            color:#fff;
+            box-shadow:0 6px 30px rgba(37,211,102,0.5);
+            transition:all 0.3s ease;
+            text-decoration:none;
+            animation:pulse 2s infinite;
+        }
+        .whatsapp-float:hover {
+            transform:scale(1.15);
+            box-shadow:0 10px 40px rgba(37,211,102,0.7);
+        }
+        .whatsapp-float i { animation:float 3s ease-in-out infinite; }
+        @media (max-width:768px) {
+            .whatsapp-float { bottom:20px; right:20px; width:55px; height:55px; font-size:1.8rem; }
+        }
+        /* ========================= FOOTER ========================= */
+        footer { background: linear-gradient(135deg, var(--primary-blue) 0%, #001a33 100%); color: white; padding: 60px 0 0; position: relative; margin-top: 0; }
+        footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-main); }
+        .footer-grid { max-width: 1200px; margin: 0 auto; padding: 0 20px 48px; display: grid; grid-template-columns: 1.4fr 1fr 1.4fr; gap: 48px; }
+        .footer-brand .footer-logo { display: block; height: 52px; margin-bottom: 16px; margin-left: -8px; filter: brightness(0) invert(1); }
+        .footer-brand .footer-tagline { font-size: 0.92rem; opacity: 0.75; line-height: 1.65; margin-bottom: 20px; }
+        .socials { display: flex; gap: 16px; }
+        .socials a { color: white; font-size: 1.3rem; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.1); text-decoration: none; }
+        .socials a:hover { color: var(--accent-green); background: rgba(255,255,255,0.18); transform: translateY(-3px); }
+        .footer-col-title { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-green); margin-bottom: 18px; }
+        .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        .footer-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.93rem; transition: color 0.2s; }
+        .footer-links a:hover { color: white; }
+        .footer-contact-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+        .footer-contact-list li, .footer-contact-list a { color: rgba(255,255,255,0.75); font-size: 0.9rem; line-height: 1.5; text-decoration: none; display: flex; align-items: flex-start; gap: 10px; transition: color 0.2s; }
+        .footer-contact-list a:hover { color: white; }
+        .footer-contact-list i { color: var(--accent-green); font-size: 0.95rem; margin-top: 2px; flex-shrink: 0; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding: 16px 20px; }
+        .footer-bottom p { font-size: 0.82rem; opacity: 0.55; text-align: center; margin: 0; max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 768px) {
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+            .footer-brand .footer-logo { margin-left: auto; margin-right: auto; }
+            .socials { justify-content: center; }
+            .footer-contact-list li, .footer-contact-list a { justify-content: center; }
+        }
+    </style>
+
+    <!-- REFERRAL BANNER -->
+    <div class="ref-banner" id="ref-banner">
+        <i class="fa-solid fa-gift"></i>&nbsp; Partner <strong id="ref-name"></strong> — Tariffe convenzionate attive per te
+    </div>
+
+    <!-- ========================= VIEW 1: CATEGORIES ========================= -->
+    <div id="view-categories">
+        <!-- HERO -->
+        <div class="hero-wrap" id="hero-wrap">
+            <div class="hero-bg">
+                <img src="https://i.postimg.cc/cHbhhYMB/immagine.png" alt="Milazzo">
+            </div>
+            <div class="hero-content">
+                <span class="hero-eyebrow"><i class="fa-solid fa-location-dot"></i> Milazzo, Sicilia</span>
+                <h1>Vivi la tua <em>migliore</em> vacanza</h1>
+                <p>Escursioni, noleggi, transfer e tutti i servizi locali selezionati da LocalPoint.</p>
+                <button class="hero-scroll-btn" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">
+                    <i class="fa-solid fa-compass"></i> Esplora i Servizi
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat"><span class="val" data-count="5" data-suffix="+">0+</span><span class="lab">categorie</span></div>
+                <div class="hero-stat"><span class="val" data-count="20" data-suffix="+">0+</span><span class="lab">esperienze</span></div>
+                <div class="hero-stat"><span class="val" data-count="100" data-suffix="%">0%</span><span class="lab">garantiti</span></div>
+            </div>
+        </div>
+
+        <!-- CATEGORIES SECTION -->
+        <section class="page-section" id="cats-section">
+            <div class="section-header">
+                <div class="section-label">Cosa vuoi fare?</div>
+                <h2>Scegli la tua categoria</h2>
+                <p>Ogni esperienza è pensata per renderti il soggiorno indimenticabile.</p>
+            </div>
+
+            <div class="cat-grid" id="cat-grid"></div>
+        </section>
+        <!-- SUPPORT BLOCK (categorie) — dentro view-categories così si nasconde con esso -->
+        <div style="background:linear-gradient(135deg,#004e92 0%,#00a0a0 60%,#8cc63f 100%);padding:3.5rem 1.5rem;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+            <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
+                <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);">💬 Assistenza Personale</div>
+                <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;">Non trovi il servizio che cerchi?</h2>
+                <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
+                <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
+                    <a href="/#contact" style="display:inline-flex;align-items:center;gap:0.7rem;background:#fff;color:#004e92;padding:1rem 2.5rem;border-radius:50px;font-size:1rem;font-weight:800;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,0.2);transition:transform 0.3s,box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.2)'">
+                        <i class="fa-solid fa-paper-plane"></i> Contattaci
+                    </a>
+                </div>
+                <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================= VIEW 2: SERVICES ========================= -->
+    <div id="view-services">
+        <div class="srv-wrap">
+            <div class="srv-breadcrumb">
+                <button class="crumb-back" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> Tutte le categorie</button>
+                <span class="crumb-sep">/</span>
+                <span class="crumb-curr" id="crumb-curr">Categoria</span>
+            </div>
+            <div class="srv-page-title">
+                <h2 id="srv-title"></h2>
+                <p id="srv-sub"></p>
+            </div>
+            <div class="items-grid" id="items-grid"></div>
+        </div>
+        <!-- SUPPORT BLOCK -->
+        <div style="background:linear-gradient(135deg,#004e92 0%,#00a0a0 60%,#8cc63f 100%);padding:3.5rem 1.5rem;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+            <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
+                <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);">💬 Assistenza Personale</div>
+                <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;">Non trovi il servizio che cerchi?</h2>
+                <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
+                <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
+                    <a href="/#contact"
+                       style="display:inline-flex;align-items:center;gap:0.7rem;background:#fff;color:#004e92;padding:1rem 2.5rem;border-radius:50px;font-size:1rem;font-weight:800;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,0.2);transition:transform 0.3s,box-shadow 0.3s;"
+                       onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.2)'">
+                        <i class="fa-solid fa-paper-plane"></i> Contattaci
+                    </a>
+                </div>
+                <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer style="margin-top: 0;">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
+                <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+                <div class="socials">
+                    <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://wa.me/393793283803" target="_blank" aria-label="WhatsApp" data-track="whatsapp_footer"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Link Utili</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/tourist-services.html">Servizi Turistici</a></li>
+                    <li><a href="/#shipping">Spedizioni</a></li>
+                    <li><a href="/#luggage">Deposito Bagagli</a></li>
+                    <li><a href="/become-partner.html">Diventa Partner</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+                <ul class="footer-contact-list">
+                    <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+                    <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
+                    <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
+                    <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <!-- ========================= LUGGAGE MODAL ========================= -->
+    <div class="modal-wrap" id="luggage-modal">
+        <div class="modal-comp" style="max-width:560px;">
+            <!-- Image header -->
+            <div class="modal-img-head">
+                <img src="https://i.postimg.cc/cLX7xwgf/immagine.png" alt="Deposito bagagli">
+                <div class="modal-img-head-overlay"></div>
+                <div class="modal-img-info">
+                    <div class="modal-img-cat">🎒 Deposito Bagagli</div>
+                    <div class="modal-img-title">Prenota il tuo spazio</div>
+                </div>
+                <button class="modal-close-btn" onclick="closeLuggageModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="luggage-form-public" data-track="luggage_booking_submit">
+                    <div class="f-group" style="margin-bottom:1.2rem;">
+                        <label>Nome e Cognome</label>
+                        <input type="text" id="lug-name" placeholder="es. Marco Bianchi" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group">
+                            <label>Email</label>
+                            <input type="email" id="lug-email" placeholder="mario@mail.com" required>
+                        </div>
+                        <div class="f-group">
+                            <label>Telefono / WhatsApp</label>
+                            <input type="tel" id="lug-phone" placeholder="+39 3..." required>
+                        </div>
+                    </div>
+
+                    <!-- Bag counter -->
+                    <div class="f-group" style="margin-bottom:1.2rem;">
+                        <label>Numero di Bagagli</label>
+                        <div style="display:flex;align-items:center;gap:0.8rem;">
+                            <button type="button" onclick="changeBags(-1)" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);font-size:1.4rem;font-weight:700;color:var(--primary-blue);display:flex;align-items:center;justify-content:center;transition:all 0.2s;background:#fff;cursor:pointer;">−</button>
+                            <input type="number" id="lug-bags" value="1" min="1" max="20" style="text-align:center;font-size:1.4rem;font-weight:900;color:var(--primary-blue);width:70px;border:2px solid var(--border);border-radius:12px;padding:0.5rem;" oninput="recalcLug()">
+                            <button type="button" onclick="changeBags(1)" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);font-size:1.4rem;font-weight:700;color:var(--primary-blue);display:flex;align-items:center;justify-content:center;transition:all 0.2s;background:#fff;cursor:pointer;">+</button>
+                            <span style="font-size:0.85rem;color:var(--text-mut);">bagagli</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group">
+                            <label><i class="fa-solid fa-arrow-right-to-bracket" style="color:var(--primary-teal);margin-right:0.3rem;"></i> Check-in (lascia i bagagli)</label>
+                            <input type="datetime-local" id="lug-checkin" required oninput="recalcLug()">
+                        </div>
+                        <div class="f-group">
+                            <label><i class="fa-solid fa-arrow-right-from-bracket" style="color:var(--accent-green);margin-right:0.3rem;"></i> Ritiro previsto</label>
+                            <input type="datetime-local" id="lug-checkout" required oninput="recalcLug()">
+                        </div>
+                    </div>
+
+                    <div class="f-group" style="margin-bottom:1.5rem;">
+                        <label>Note (facoltative)</label>
+                        <textarea id="lug-notes" rows="2" placeholder="Bagagli fragili, richieste particolari..."></textarea>
+                    </div>
+
+                    <!-- Where to go -->
+                    <div style="background:linear-gradient(135deg,rgba(0,160,160,0.07),rgba(0,78,146,0.05));border:1.5px solid rgba(0,160,160,0.25);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:0.8rem;">
+                        <span style="font-size:1.5rem;flex-shrink:0;">📍</span>
+                        <div>
+                            <div style="font-size:0.85rem;font-weight:800;color:var(--primary-blue);margin-bottom:0.3rem;">Dove consegnare i bagagli</div>
+                            <a href="https://maps.app.goo.gl/EN8XDhEJVaJGKXFb6?g_st=ic" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem;font-weight:700;color:var(--primary-teal);text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.15rem;">LocalPoint — Via Tenente Brigiano 6, Milazzo <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;opacity:0.7;"></i></a>
+                            <div style="font-size:0.8rem;color:var(--text-mut);line-height:1.4;">Presentati con il codice di prenotazione che riceverai via email. Il nostro staff ti aspetta.</div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing info -->
+                    <div style="background:linear-gradient(135deg,rgba(0,78,146,0.06),rgba(0,160,160,0.06));border:1.5px solid rgba(0,78,146,0.15);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:0.8rem;">
+                        <span style="font-size:1.5rem;flex-shrink:0;">🧳</span>
+                        <div>
+                            <div style="font-size:0.85rem;font-weight:800;color:var(--primary-blue);margin-bottom:0.2rem;">Tariffa: €4,00 per bagaglio / giorno</div>
+                            <div style="font-size:0.8rem;color:var(--text-mut);line-height:1.4;">Minimo 1 giorno. Oltre la data prevista: supplemento di €1 ogni 6 ore per bagaglio. Il prezzo viene calcolato automaticamente.</div>
+                        </div>
+                    </div>
+
+                    <!-- Live price summary -->
+                    <div id="lug-summary" style="background:#f0f9ff;border:2px solid var(--border);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1.2rem;display:none;">
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--text-mut);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">Riepilogo Preventivo</div>
+                        <div id="lug-calc-text" style="font-size:0.95rem;color:var(--primary-blue);font-weight:700;"></div>
+                        <div style="margin-top:0.6rem;font-size:1.3rem;font-weight:900;color:var(--primary-blue);" id="lug-total-display"></div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="lug-submit-btn">
+                        <i class="fa-solid fa-calendar-check"></i> Prenota — Pagamento in ufficio
+                    </button>
+                </form>
+
+                <!-- Success panel (hidden by default) -->
+                <div id="lug-success" style="display:none;text-align:center;padding:1.5rem 0;">
+                    <div style="font-size:3.5rem;margin-bottom:0.8rem;">✅</div>
+                    <div style="font-size:1.3rem;font-weight:900;color:var(--primary-blue);margin-bottom:0.5rem;">Prenotazione Confermata!</div>
+                    <div id="lug-success-code" style="display:inline-block;background:linear-gradient(135deg,var(--primary-blue),var(--primary-teal));color:white;font-size:1.5rem;font-weight:900;font-family:monospace;letter-spacing:0.1em;padding:0.6rem 1.4rem;border-radius:12px;margin-bottom:1rem;"></div>
+                    <div id="lug-success-details" style="font-size:0.95rem;color:var(--text-mut);line-height:1.7;margin-bottom:1.5rem;"></div>
+                    <div style="font-size:0.85rem;background:#f0f9ff;border-radius:12px;padding:0.8rem 1rem;color:var(--primary-blue);">
+                        Presenta il codice al momento del check-in.<br>
+                        <a href="https://maps.app.goo.gl/EN8XDhEJVaJGKXFb6?g_st=ic" target="_blank" rel="noopener noreferrer" style="color:var(--primary-blue);font-weight:700;text-decoration:underline;">📍 Via Tenente Brigiano 6, Milazzo</a>
+                    </div>
+                    <button onclick="closeLuggageModal()" style="margin-top:1.2rem;padding:0.7rem 2rem;background:var(--primary-blue);color:white;border:none;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================= MODAL ========================= -->
+    <div class="modal-wrap" id="modal">
+        <div class="modal-comp">
+            <!-- Image Header -->
+            <div class="modal-img-head">
+                <img id="mod-bg-img" src="" alt="">
+                <div class="modal-img-head-overlay"></div>
+                <div class="modal-img-info">
+                    <div class="modal-img-cat" id="mod-cat-label">Categoria</div>
+                    <div class="modal-img-title" id="mod-title-head">Titolo Servizio</div>
+                </div>
+                <div class="modal-img-price" id="mod-price-head">Prezzo</div>
+                <button class="modal-close-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="ref-box" id="mod-ref">
+                    <i class="fa-solid fa-circle-check" style="color:#10b981;font-size:1.2rem;"></i>
+                    Tariffa convenzionata partner applicata
+                </div>
+
+                <form id="book-form" data-track="reservation_submit">
+                    <input type="hidden" id="in-svc">
+
+                    <div class="f-group" style="margin-bottom:1.2rem;">
+                        <label>Nome e Cognome</label>
+                        <input type="text" id="in-name" placeholder="es. Giulia Ferrari" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group">
+                            <label>Data Preferita</label>
+                            <input type="date" id="in-date" required>
+                        </div>
+                        <div class="f-group">
+                            <label>N° Persone / Qtà</label>
+                            <input type="number" id="in-pax" value="2" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="f-group">
+                            <label>Telefono / WhatsApp</label>
+                            <input type="tel" id="in-phone" placeholder="+39 3..." required>
+                        </div>
+                        <div class="f-group">
+                            <label>Email</label>
+                            <input type="email" id="in-email" placeholder="mail@esempio.it" required>
+                        </div>
+                    </div>
+
+                    <div class="f-group">
+                        <label>Note Aggiuntive</label>
+                        <textarea id="in-notes" rows="2" placeholder="Orari desiderati, richieste speciali..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btn-submit">
+                        <i class="fa-solid fa-paper-plane"></i> Invia Richiesta di Prenotazione
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="module">
+        import { supabase } from '/src/supabaseClient.js';
+        let CATALOG_DATA = {};
+
+        // EmailJS — unico template universale per tutte le email
+        const EMAIL_SVC  = 'service_dmf1g2a';
+        const EMAIL_TPL  = 'template_ihapitu';
+        emailjs.init('0nPf665f0pWsHFx1j');
+
+        // ===================================================================
+        // DEPARTMENTS — big category cards
+        // ===================================================================
+        const DEPARTMENTS = [
+            { id:'escursioni', title:'Escursioni & Tour', chip:'🏝️ Natura & Avventura', desc:'Tour alle Isole Eolie, immersioni in Area Marina Protetta, trekking ed esperienze culturali.', img:'https://i.postimg.cc/VNVFRm49/gpt-image-1-5-high-fidelity-a-mi-serve-solo-l-imma.png' },
+            { id:'noleggi', title:'Noleggi', chip:'🚗 Mobilità', desc:'Scooter, auto moderne e barche di lusso a noleggio per la tua totale libertà.', img:'https://i.postimg.cc/4dPkx8Gk/immagine.png' },
+            { id:'transfer', title:'Transfer & NCC', chip:'✈️ Trasferimenti', desc:'Transfer professionali per Catania e Palermo, e limousine per eventi esclusivi.', img:'https://i.postimg.cc/Qdybgc8K/immagine.png' },
+            { id:'parcheggio', title:'Parcheggio Porto', chip:'🅿️ Sosta Sicura', desc:'Parcheggio custodito e videosorvegliato a 5 minuti dagli imbarchi per le Eolie.', img:'https://i.postimg.cc/vmm5KTm3/immagine.png' },
+            { id:'bagagli', title:'Deposito Bagagli', chip:'🎒 Viaggia Leggero', desc:'Custodia sicura dei tuoi bagagli in ufficio mentre esplori Milazzo libero.', img:'https://i.postimg.cc/cLX7xwgf/immagine.png' }
+        ];
+
+        // ===================================================================
+        // RENDER CATEGORIES BENTO
+        // ===================================================================
+        function renderCats() {
+            const grid = document.getElementById('cat-grid');
+            grid.innerHTML = DEPARTMENTS.map((c, idx) => {
+                const count = (CATALOG_DATA[c.id] || []).length;
+                return `
+                <div class="cat-card" style="animation-delay:${0.05 + idx * 0.07}s;" onclick="openCat('${c.id}')">
+                    <img src="${c.img}" class="cat-img" alt="${c.title}" loading="lazy">
+                    <div class="cat-overlay"></div>
+                    <div class="cat-content">
+                        <div class="cat-chip">${c.chip}</div>
+                        <h3 class="cat-title">${c.title}</h3>
+                        <p class="cat-desc">${c.desc}</p>
+                        <div class="cat-footer">
+                            <span class="cat-count">${count} proposte disponibili</span>
+                            <div class="cat-arrow"><i class="fa-solid fa-arrow-right" style="font-size:0.9rem;"></i></div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ===================================================================
+        // OPEN A CATEGORY
+        // ===================================================================
+        window.openCat = (catId) => {
+            const cat = DEPARTMENTS.find(x => x.id === catId);
+            const items = CATALOG_DATA[catId] || [];
+
+            document.getElementById('crumb-curr').textContent = cat.title;
+            document.getElementById('srv-title').textContent = cat.title;
+            document.getElementById('srv-sub').textContent = `${items.length} esperienze disponibili — Scegli e prenota in 2 minuti`;
+
+            const grid = document.getElementById('items-grid');
+            grid.style.opacity = '0';
+
+            if (!items.length) {
+                grid.innerHTML = '<p style="color:var(--text-mut);">Nessun servizio disponibile in questa categoria al momento.</p>';
+            } else {
+                grid.innerHTML = items.map((i, idx) => {
+                    const imgUrl = (i.images && i.images.length > 0) ? i.images[0] : 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80';
+                    const dotCount = i.images ? Math.min(i.images.length, 5) : 0;
+                    const dotsHtml = dotCount > 1 ? `<div class="img-dot-strip">${[...Array(dotCount)].map((_,di) => `<div class="img-dot ${di===0?'on':''}"></div>`).join('')}</div>` : '';
+                    return `
+                    <article class="item-card" style="animation-delay:${idx * 0.06}s;">
+                        <div class="item-img-wrap">
+                            <img src="${imgUrl}" class="item-img" loading="lazy"
+                                onerror="this.src='https://images.unsplash.com/photo-1544644181-1484b3fdfc66'">
+                            ${dotsHtml}
+                        </div>
+                        <div class="item-body">
+                            <div class="item-top">
+                                <h3 class="item-title">${i.emoji ? i.emoji : ''} ${i.title}</h3>
+                                <div class="price-pill">${i.price}</div>
+                            </div>
+                            ${i.preview ? `<p class="item-desc">${i.preview}</p>` : ''}
+                            ${i.priceNote ? `<span class="item-meta">${i.priceNote}</span>` : ''}
+                            <button class="item-cta" onclick="${catId === 'bagagli' ? 'openLuggageMod()' : `window.location.href='/service-details.html?cat=${catId}&id=${i.slug_id || i.id}'`}">
+                                <i class="fa-solid ${catId === 'bagagli' ? 'fa-calendar-check' : 'fa-circle-info'}"></i> ${catId === 'bagagli' ? 'Prenota Ora' : 'Vedi Dettagli'}
+                            </button>
+                        </div>
+                    </article>`;
+                }).join('');
+            }
+
+            document.getElementById('view-categories').style.display = 'none';
+            document.getElementById('view-services').style.display = 'block';
+            if (!openCat._fromUrl) history.pushState({ cat: catId }, '', `?cat=${catId}`);
+            else history.replaceState({ cat: catId }, '', `?cat=${catId}`);
+            openCat._fromUrl = false;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Fade in grid with slight delay
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    grid.style.transition = 'opacity 0.4s ease';
+                    grid.style.opacity = '1';
+                });
+            });
+        };
+
+        window.goBack = () => {
+            document.getElementById('view-services').style.display = 'none';
+            document.getElementById('view-categories').style.display = 'block';
+            history.replaceState(null, '', window.location.pathname);
+            window.scrollTo({ top: document.getElementById('cats-section').offsetTop - 80, behavior: 'smooth' });
+        };
+
+        // ===================================================================
+        // LUGGAGE MODAL
+        // ===================================================================
+        const PRICE_PER_BAG_DAY = 4.00;
+        const lugModal = document.getElementById('luggage-modal');
+
+        function setLuggageDefaults() {
+            const now = new Date();
+            const offset = now.getTimezoneOffset();
+            const local = new Date(now.getTime() - offset * 60000);
+            const tomorrow = new Date(local.getTime() + 24 * 60 * 60000);
+            const toISO = d => d.toISOString().slice(0,16);
+            document.getElementById('lug-checkin').value = toISO(local);
+            document.getElementById('lug-checkout').value = toISO(tomorrow);
+            recalcLug();
+        }
+
+        window.recalcLug = () => {
+            const bags = parseInt(document.getElementById('lug-bags')?.value) || 1;
+            const checkin = document.getElementById('lug-checkin')?.value;
+            const checkout = document.getElementById('lug-checkout')?.value;
+            if (!checkin || !checkout) return;
+            const diffMs = new Date(checkout) - new Date(checkin);
+            const days = diffMs > 0 ? Math.ceil(diffMs / (1000 * 60 * 60 * 24)) : 1;
+            const total = bags * days * PRICE_PER_BAG_DAY;
+            const summaryEl = document.getElementById('lug-summary');
+            const calcText = document.getElementById('lug-calc-text');
+            const totalDisp = document.getElementById('lug-total-display');
+            const priceDisp = document.getElementById('lug-price-display');
+            if (summaryEl) summaryEl.style.display = 'block';
+            if (calcText) calcText.textContent = `${bags} bagagli × ${days} giorn${days===1?'o':'i'} × €${PRICE_PER_BAG_DAY.toFixed(2)} =`;
+            if (totalDisp) totalDisp.textContent = `€ ${total.toFixed(2).replace('.',',')}`;
+            if (priceDisp) priceDisp.textContent = `€ ${total.toFixed(2).replace('.',',')}`;
+        };
+
+        window.changeBags = (delta) => {
+            const inp = document.getElementById('lug-bags');
+            if (!inp) return;
+            inp.value = Math.max(1, Math.min(20, (parseInt(inp.value)||1) + delta));
+            recalcLug();
+        };
+
+        window.openLuggageMod = () => {
+            setLuggageDefaults();
+            lugModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeLuggageModal = () => {
+            lugModal.classList.remove('open');
+            document.body.style.overflow = '';
+            document.getElementById('luggage-form-public').style.display = '';
+            document.getElementById('luggage-form-public').reset();
+            document.getElementById('lug-success').style.display = 'none';
+        };
+
+        lugModal?.addEventListener('click', e => { if (e.target === lugModal) closeLuggageModal(); });
+
+        document.getElementById('luggage-form-public')?.addEventListener('submit', async e => {
+            e.preventDefault();
+            const emailVal = document.getElementById('lug-email').value.trim();
+            const phoneVal = document.getElementById('lug-phone').value.trim();
+            if (!emailVal) { document.getElementById('lug-email').focus(); return; }
+            if (!phoneVal) { document.getElementById('lug-phone').focus(); return; }
+
+            const btn = document.getElementById('lug-submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Elaborazione...';
+
+            const bags = parseInt(document.getElementById('lug-bags').value) || 1;
+            const checkin = document.getElementById('lug-checkin').value;
+            const checkout = document.getElementById('lug-checkout').value;
+            const diffMs = new Date(checkout) - new Date(checkin);
+            const days = diffMs > 0 ? Math.ceil(diffMs / (1000 * 60 * 60 * 24)) : 1;
+            const total = parseFloat((bags * days * PRICE_PER_BAG_DAY).toFixed(2));
+
+            const bookingId = crypto.randomUUID();
+            const shortId   = bookingId.slice(0, 8).toUpperCase();
+
+            const payload = {
+                id:             bookingId,
+                customer_name:  document.getElementById('lug-name').value,
+                customer_email: document.getElementById('lug-email').value,
+                customer_phone: document.getElementById('lug-phone').value,
+                bag_count:      bags,
+                price:          total,
+                notes:          document.getElementById('lug-notes')?.value || '',
+                expected_end:   checkout ? new Date(checkout).toISOString() : null,
+                status:         'pending',
+                payment_method: 'online',
+                affiliate_id:   affData?.id || null
+            };
+
+            const { error } = await supabase.from('luggage_tickets').insert([payload]);
+
+            if (error) {
+                alert('Errore: ' + error.message);
+            } else {
+
+                // Email al admin e al cliente (best-effort)
+                try {
+                    const fmtDate = v => v ? new Date(v).toLocaleString('it-IT', {dateStyle:'short',timeStyle:'short'}) : '—';
+                    const checkinFmt  = fmtDate(checkin);
+                    const checkoutFmt = fmtDate(checkout);
+                    const totalFmt    = `€ ${total.toFixed(2).replace('.',',')}`;
+                    const provenienza = affData?.name || 'Prenotazione diretta';
+
+                    // — Email admin —
+                    const adminHtml = `
+<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;background:#f0f4f3;padding:20px;">
+  <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(27,58,92,0.12);">
+    <div style="background:linear-gradient(90deg,#1B3A5C 0%,#2A9D8F 100%);height:6px;"></div>
+    <div style="background:#ffffff;padding:28px 24px;text-align:center;border-bottom:1px solid #eef2f0;">
+      <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width:160px;height:auto;">
+      <p style="color:#2A9D8F;margin:8px 0 0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Milazzo</p>
+    </div>
+    <div style="padding:24px;">
+      <p style="color:#1B3A5C;font-size:15px;font-weight:700;margin:0 0 4px;">🔔 Nuova prenotazione bagagli online</p>
+      <p style="color:#4a5568;font-size:13px;margin:0 0 20px;">Provenienza: <strong>${provenienza}</strong></p>
+      <div style="background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:2px solid #2A9D8F;border-radius:14px;padding:18px;text-align:center;margin:0 0 20px;">
+        <p style="color:#2A9D8F;font-size:11px;margin:0 0 4px;text-transform:uppercase;font-weight:600;letter-spacing:1px;">Codice Prenotazione</p>
+        <p style="color:#1B3A5C;font-size:32px;font-weight:900;font-family:'Courier New',monospace;letter-spacing:4px;margin:0;">#${shortId}</p>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin:0 0 20px;">
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">👤 Cliente</td><td style="padding:9px 0;text-align:right;font-weight:700;color:#1B3A5C;font-size:14px;">${payload.customer_name}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📧 Email</td><td style="padding:9px 0;text-align:right;color:#1B3A5C;font-size:13px;">${payload.customer_email}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📞 Telefono</td><td style="padding:9px 0;text-align:right;color:#1B3A5C;font-size:13px;">${payload.customer_phone}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">🧳 Bagagli</td><td style="padding:9px 0;text-align:right;font-weight:700;color:#1B3A5C;font-size:15px;">${payload.bag_count}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📅 Check-in</td><td style="padding:9px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:13px;">${checkinFmt}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📅 Ritiro previsto</td><td style="padding:9px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:13px;">${checkoutFmt}</td></tr>
+        <tr><td style="padding:12px 0;color:#6b7280;font-size:13px;">💵 Totale stimato</td><td style="padding:12px 0;text-align:right;font-weight:800;color:#7BC142;font-size:20px;">${totalFmt}</td></tr>
+      </table>
+      <div style="background:#fef9e7;border-left:4px solid #2A9D8F;border-radius:0 8px 8px 0;padding:12px 16px;">
+        <p style="color:#1B3A5C;font-size:13px;margin:0;">ℹ️ Il pagamento avverrà in ufficio al momento del check-in.</p>
+      </div>
+    </div>
+    <div style="border-top:3px solid #7BC142;background:#f7faf8;padding:18px 24px;text-align:center;">
+      <p style="color:#2A9D8F;font-size:12px;margin:0;">www.local-point.it</p>
+    </div>
+  </div>
+</div>`;
+                    await emailjs.send(EMAIL_SVC, EMAIL_TPL, {
+                        to_email: 'localpointmilazzo@gmail.com',
+                        subject:  `Nuova prenotazione bagagli #${shortId} — ${payload.customer_name}`,
+                        message:  adminHtml
+                    });
+
+                    // — Email cliente —
+                    if (payload.customer_email) {
+                        const clientHtml = `
+<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;background:#f0f4f3;padding:20px;">
+  <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(27,58,92,0.12);">
+    <div style="background:linear-gradient(90deg,#1B3A5C 0%,#2A9D8F 100%);height:6px;"></div>
+    <div style="background:#ffffff;padding:28px 24px;text-align:center;border-bottom:1px solid #eef2f0;">
+      <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width:160px;height:auto;">
+      <p style="color:#2A9D8F;margin:8px 0 0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Milazzo</p>
+    </div>
+    <div style="padding:24px;">
+      <p style="color:#1B3A5C;font-size:16px;margin:0 0 6px;">Gentile <strong>${payload.customer_name}</strong>,</p>
+      <p style="color:#4a5568;font-size:14px;line-height:1.5;margin:0 0 20px;">La tua prenotazione deposito bagagli è confermata!</p>
+      <div style="background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:2px solid #2A9D8F;border-radius:14px;padding:20px;text-align:center;margin:0 0 20px;">
+        <p style="color:#2A9D8F;font-size:11px;margin:0 0 6px;text-transform:uppercase;font-weight:600;letter-spacing:1px;">Codice Prenotazione</p>
+        <p style="color:#1B3A5C;font-size:34px;font-weight:900;font-family:'Courier New',monospace;letter-spacing:4px;margin:0;">#${shortId}</p>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin:0 0 20px;">
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">🧳 Bagagli</td><td style="padding:10px 0;text-align:right;font-weight:700;color:#1B3A5C;font-size:15px;">${payload.bag_count}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">📅 Check-in</td><td style="padding:10px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:14px;">${checkinFmt}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">📅 Ritiro previsto</td><td style="padding:10px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:14px;">${checkoutFmt}</td></tr>
+        <tr><td style="padding:12px 0;color:#6b7280;font-size:13px;">💵 Totale</td><td style="padding:12px 0;text-align:right;font-weight:800;color:#7BC142;font-size:20px;">${totalFmt}</td></tr>
+      </table>
+      <div style="background:#fef9e7;border-left:4px solid #2A9D8F;border-radius:0 8px 8px 0;padding:12px 16px;margin:0 0 16px;">
+        <p style="color:#1B3A5C;font-size:13px;margin:0;">ℹ️ Presenta questo codice al momento del check-in. Il pagamento avverrà in ufficio.</p>
+      </div>
+      <div style="background:#e6f7f4;border-radius:12px;padding:14px 16px;text-align:center;">
+        <p style="color:#1B3A5C;font-size:13px;font-weight:700;margin:0 0 4px;">📍 Dove venire</p>
+        <p style="color:#2A9D8F;font-size:14px;font-weight:700;margin:0 0 2px;">LocalPoint — Via Tenente Brigiano 6, Milazzo</p>
+        <p style="color:#6b7280;font-size:12px;margin:0;">Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+      </div>
+    </div>
+    <div style="border-top:3px solid #7BC142;background:#f7faf8;padding:18px 24px;text-align:center;">
+      <p style="color:#1B3A5C;font-size:13px;margin:0 0 4px;font-weight:700;">Grazie per aver scelto LocalPoint!</p>
+      <p style="color:#2A9D8F;font-size:12px;margin:0 0 6px;">Il Team LocalPoint — Milazzo</p>
+      <p style="color:#a0aec0;font-size:11px;margin:0;">www.local-point.it</p>
+    </div>
+  </div>
+</div>`;
+                        await emailjs.send(EMAIL_SVC, EMAIL_TPL, {
+                            to_email: payload.customer_email,
+                            subject:  `Conferma prenotazione bagagli #${shortId} — LocalPoint Milazzo`,
+                            message:  clientHtml
+                        });
+                    }
+                } catch (emailErr) {
+                    console.warn('Email non inviata:', emailErr);
+                }
+
+                document.getElementById('luggage-form-public').style.display = 'none';
+                document.getElementById('lug-success-code').textContent = `#${shortId}`;
+                document.getElementById('lug-success-details').innerHTML =
+                    `🧳 ${bags} bagagli &nbsp;·&nbsp; ${days} giorno/i<br>💶 Totale: <strong>€${total.toFixed(2).replace('.',',')}</strong><br><span style="font-size:0.85rem;color:var(--text-mut);">📧 Ti verrà inviata una mail di conferma con tutti i dettagli.</span>`;
+                document.getElementById('lug-success').style.display = 'block';
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Prenota Deposito';
+        });
+
+        // ===================================================================
+        // MODAL
+        // ===================================================================
+        let affData = null;
+        const modal = document.getElementById('modal');
+
+        window.openMod = (catId, svcId) => {
+            const cat = DEPARTMENTS.find(x => x.id === catId);
+            const svcArr = CATALOG_DATA[catId] || [];
+            const svc = svcArr.find(x => x.id === svcId);
+            if (!svc) return;
+
+            const imgUrl = (svc.images && svc.images.length > 0) ? svc.images[0] : 'https://images.unsplash.com/photo-1544644181-1484b3fdfc66';
+            document.getElementById('mod-bg-img').src = imgUrl;
+            document.getElementById('mod-cat-label').textContent = cat.chip || cat.title;
+            document.getElementById('mod-title-head').textContent = (svc.emoji ? svc.emoji+' ' : '') + svc.title;
+            document.getElementById('mod-price-head').textContent = svc.price;
+            document.getElementById('in-svc').value = `${svc.title} — ${svc.price}`;
+            document.getElementById('mod-ref').className = 'ref-box' + (affData ? ' show' : '');
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('in-date').min = today;
+            if (!document.getElementById('in-date').value) document.getElementById('in-date').value = today;
+
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeModal = () => { modal.classList.remove('open'); document.body.style.overflow = ''; };
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        // ===================================================================
+        // REFERRAL
+        // ===================================================================
+        async function checkRef() {
+            const code = new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('localpoint_referral');
+            if (!code) return;
+            const { data, error } = await supabase.from('affiliates').select('*').eq('referral_code', code).single();
+            if (!error && data) {
+                affData = data;
+                localStorage.setItem('localpoint_referral', code);
+                const banner = document.getElementById('ref-banner');
+                banner.classList.add('active');
+                document.getElementById('ref-name').textContent = data.name;
+                document.getElementById('hero-wrap').classList.add('has-ref');
+            }
+        }
+
+        // ===================================================================
+        // FORM SUBMIT
+        // ===================================================================
+        document.getElementById('book-form').addEventListener('submit', async e => {
+            // Tracking is handled automatically by cookie-manager.js due to data-track on form element or via direct call
+            // But I'll add data-track to the form in HTML if I find it.
+
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso...';
+
+            const payload = {
+                customer_name:   document.getElementById('in-name').value,
+                customer_email:  document.getElementById('in-email').value,
+                customer_phone:  document.getElementById('in-phone').value,
+                reservation_date:document.getElementById('in-date').value,
+                service_type:    document.getElementById('in-svc').value,
+                notes:           document.getElementById('in-notes').value,
+                affiliate_id:    affData?.id || null,
+                status:'pending', total_price:0
+            };
+
+            const { error } = await supabase.from('reservations').insert([payload]);
+            if (error) {
+                alert('Errore: ' + error.message);
+            } else {
+                if (affData?.email) {
+                    try {
+                        await emailjs.send(EMAIL_SVC, EMAIL_TPL, {
+                            to_name:affData.name, to_email:affData.email,
+                            subject:'Nuova Prenotazione', message:`Prenotazione per ${payload.service_type} da ${payload.customer_name}`
+                        });
+                    } catch {}
+                }
+                closeModal();
+                document.getElementById('book-form').reset();
+                alert('✅ Richiesta inviata! Sarai contattato entro 24h per la conferma.');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia Richiesta di Prenotazione';
+        });
+
+        // INIT CATALOG FROM SUPABASE
+        async function initCatalog() {
+            try {
+                const { data, error } = await supabase.from('experiences').select('*').eq('is_active', true).order('sort_order', { ascending: true, nullsFirst: false }).order('created_at', { ascending: true });
+                if (error) throw error;
+                
+                // Group by category
+                (data || []).forEach(exp => {
+                    if (!CATALOG_DATA[exp.category]) CATALOG_DATA[exp.category] = [];
+                    CATALOG_DATA[exp.category].push(exp);
+                });
+            } catch (err) {
+                console.error("Errore caricamento catalogo:", err);
+            }
+            renderCats();
+            checkRef();
+            const catParam = new URLSearchParams(window.location.search).get('cat');
+            if (catParam) { openCat._fromUrl = true; window.scrollTo({ top: 0, behavior: 'instant' }); openCat(catParam); }
+
+            window.addEventListener('popstate', (e) => {
+                const cat = e.state?.cat || new URLSearchParams(window.location.search).get('cat');
+                if (cat) {
+                    openCat._fromUrl = true;
+                    openCat(cat);
+                } else {
+                    document.getElementById('view-services').style.display = 'none';
+                    document.getElementById('view-categories').style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                }
+            });
+        }
+
+        initCatalog();
+
+        // COUNT-UP ANIMATION
+        const countEls = document.querySelectorAll('.val[data-count]');
+        const runCountUp = (el) => {
+            const target = parseInt(el.dataset.count);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1200;
+            const start = performance.now();
+            const step = (now) => {
+                const progress = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+                el.textContent = Math.floor(eased * target) + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    runCountUp(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        countEls.forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

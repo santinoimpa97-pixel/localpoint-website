@@ -1,4 +1,4 @@
-﻿import { supabase } from '../../src/supabaseClient.js'
+import { supabase } from '../../src/supabaseClient.js'
 import emailjs from '@emailjs/browser'
 
 // --- EMAILJS CONFIG ---
@@ -28,7 +28,9 @@ const views = {
     luggage: document.getElementById('view-luggage'),
     accounting: document.getElementById('view-accounting'),
     reservations: document.getElementById('view-reservations'),
-    shipping: document.getElementById('view-shipping')
+    shipping: document.getElementById('view-shipping'),
+    experiences: document.getElementById('view-experiences'),
+    partners: document.getElementById('view-partners')
 }
 
 const navBtns = {
@@ -36,7 +38,9 @@ const navBtns = {
     luggage: document.getElementById('nav-luggage'),
     accounting: document.getElementById('nav-accounting'),
     reservations: document.getElementById('nav-reservations'),
-    shipping: document.getElementById('nav-shipping')
+    shipping: document.getElementById('nav-shipping'),
+    experiences: document.getElementById('nav-experiences'),
+    partners: document.getElementById('nav-partners')
 }
 
 // Global Shipping Refs
@@ -63,7 +67,9 @@ function switchView(viewName) {
     if (viewName === 'luggage') {
         loadLuggage()
         loadReturnedLuggage()
-
+        startLuggageAutoRefresh()
+    } else {
+        stopLuggageAutoRefresh()
     }
     if (viewName === 'accounting') {
         loadAccounting()
@@ -74,6 +80,12 @@ function switchView(viewName) {
     if (viewName === 'shipping') {
         loadShipping()
     }
+    if (viewName === 'experiences') {
+        loadExperiences()
+    }
+    if (viewName === 'partners') {
+        loadPartners()
+    }
 }
 
 // Bind clicks
@@ -81,6 +93,51 @@ Object.keys(navBtns).forEach(key => {
     navBtns[key].addEventListener('click', () => switchView(key))
 })
 window.switchView = switchView
+window.loadLuggage = loadLuggage
+
+// In-page confirm() replacement (browser may block native confirm)
+function askConfirm(msg) {
+    return new Promise(resolve => {
+        const modal = document.getElementById('confirm-modal')
+        document.getElementById('confirm-msg').textContent = msg
+        modal.classList.remove('hidden')
+        modal.classList.add('flex')
+        const yes = document.getElementById('confirm-yes')
+        const no = document.getElementById('confirm-no')
+        const close = (result) => {
+            modal.classList.add('hidden')
+            modal.classList.remove('flex')
+            yes.replaceWith(yes.cloneNode(true))
+            no.replaceWith(no.cloneNode(true))
+            resolve(result)
+        }
+        document.getElementById('confirm-yes').addEventListener('click', () => close(true))
+        document.getElementById('confirm-no').addEventListener('click', () => close(false))
+    })
+}
+
+// Returns 'cash' | 'digital' | null (cancelled)
+function askPaymentMethod() {
+    return new Promise(resolve => {
+        const modal = document.getElementById('pay-method-modal')
+        modal.classList.remove('hidden')
+        modal.classList.add('flex')
+        const cash   = document.getElementById('pay-cash')
+        const card   = document.getElementById('pay-card')
+        const cancel = document.getElementById('pay-cancel')
+        const close = (result) => {
+            modal.classList.add('hidden')
+            modal.classList.remove('flex')
+            cash.replaceWith(cash.cloneNode(true))
+            card.replaceWith(card.cloneNode(true))
+            cancel.replaceWith(cancel.cloneNode(true))
+            resolve(result)
+        }
+        document.getElementById('pay-cash').addEventListener('click',   () => close('cash'))
+        document.getElementById('pay-card').addEventListener('click',   () => close('digital'))
+        document.getElementById('pay-cancel').addEventListener('click', () => close(null))
+    })
+}
 
 // Logout
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
@@ -160,32 +217,80 @@ setDefaultDatetime()
 let allLuggageTickets = []
 const luggageSearch = document.getElementById('luggage-search')
 
-// Search filter
-if (luggageSearch) {
-    luggageSearch.addEventListener('input', () => {
-        const q = luggageSearch.value.trim().toLowerCase().replace('#', '')
-        if (!q) {
-            renderLuggageList(allLuggageTickets)
-            return
-        }
-        const filtered = allLuggageTickets.filter(t =>
-            t.id.slice(0, 8).toLowerCase().includes(q) ||
-            t.customer_name.toLowerCase().includes(q)
+function applyLuggageFilters() {
+    const q = (luggageSearch?.value || '').trim().toLowerCase().replace('#', '')
+    const activeBtn = document.querySelector('.lug-filter-btn.active')
+    const statusFilter = activeBtn ? activeBtn.dataset.lugFilter : 'all'
+    const dateFilter = (document.getElementById('luggage-filter-date')?.value || '')
+
+    let filtered = allLuggageTickets
+
+    if (q) {
+        filtered = filtered.filter(t =>
+            (t.id || '').slice(0, 8).toLowerCase().includes(q) ||
+            (t.customer_name || '').toLowerCase().includes(q) ||
+            (t.customer_email || '').toLowerCase().includes(q) ||
+            (t.customer_phone || '').toLowerCase().includes(q)
         )
-        renderLuggageList(filtered)
-    })
+    }
+
+    if (statusFilter === 'pending') {
+        filtered = filtered.filter(t => t.status === 'pending')
+    } else if (statusFilter === 'stored') {
+        filtered = filtered.filter(t => t.status === 'stored')
+    }
+
+    if (dateFilter) {
+        filtered = filtered.filter(t => {
+            if (!t.created_at) return false
+            return t.created_at.slice(0, 10) === dateFilter
+        })
+    }
+
+    renderLuggageList(filtered)
+}
+window.applyLuggageFilters = applyLuggageFilters
+
+// Search / filter event listeners
+if (luggageSearch) {
+    luggageSearch.addEventListener('input', applyLuggageFilters)
+}
+
+document.addEventListener('click', e => {
+    const btn = e.target.closest('.lug-filter-btn')
+    if (!btn) return
+    document.querySelectorAll('.lug-filter-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    applyLuggageFilters()
+})
+
+const luggageDateInput = document.getElementById('luggage-filter-date')
+if (luggageDateInput) {
+    luggageDateInput.addEventListener('change', applyLuggageFilters)
 }
 
 async function loadLuggage() {
     const { data, error } = await supabase
         .from('luggage_tickets')
         .select('*')
-        .eq('status', 'stored')
+        .in('status', ['stored', 'pending'])
         .order('created_at', { ascending: false })
 
     if (error) {
         console.error('Error loading luggage:', error)
         return
+    }
+
+    // Pre-fetch affiliates to map names without relying on SQL explicit foreign keys
+    const { data: affData } = await supabase.from('affiliates').select('id, name')
+    if (affData) {
+        const affMap = {}
+        affData.forEach(a => affMap[a.id] = a.name)
+        data.forEach(t => {
+            if (t.affiliate_id && affMap[t.affiliate_id]) {
+                t.affiliates = { name: affMap[t.affiliate_id] }
+            }
+        })
     }
 
     allLuggageTickets = data || []
@@ -194,6 +299,22 @@ async function loadLuggage() {
     renderLuggageList(allLuggageTickets)
     const statsEl = document.getElementById('stats-luggage-dash')
     if (statsEl) statsEl.innerText = allLuggageTickets.length
+}
+
+// Auto-refresh luggage section every 30s while active
+let _luggageRefreshTimer = null
+function startLuggageAutoRefresh() {
+    stopLuggageAutoRefresh()
+    _luggageRefreshTimer = setInterval(() => {
+        loadLuggage()
+        loadReturnedLuggage()
+    }, 30000)
+}
+function stopLuggageAutoRefresh() {
+    if (_luggageRefreshTimer) {
+        clearInterval(_luggageRefreshTimer)
+        _luggageRefreshTimer = null
+    }
 }
 
 // Helper: format elapsed time
@@ -226,10 +347,26 @@ function getRowStatus(ticket) {
     return { bg: '', label: '✅ OK', badge: 'bg-green-100 text-green-700' }
 }
 
+function updateLuggageBulkBar() {
+    const checks = luggageList.querySelectorAll('.luggage-row-check')
+    const checked = luggageList.querySelectorAll('.luggage-row-check:checked')
+    const bulkBar = document.getElementById('luggage-bulk-bar')
+    const countEl = document.getElementById('luggage-selected-count')
+    const selectAll = document.getElementById('luggage-select-all')
+    if (countEl) countEl.textContent = checked.length
+    if (bulkBar) {
+        checked.length > 0 ? bulkBar.classList.remove('hidden') : bulkBar.classList.add('hidden')
+    }
+    if (selectAll) selectAll.checked = checks.length > 0 && checked.length === checks.length
+}
+
 function renderLuggageList(tickets) {
     luggageList.innerHTML = ''
+    const bulkBar = document.getElementById('luggage-bulk-bar')
+    if (bulkBar) bulkBar.classList.add('hidden')
+
     if (tickets.length === 0) {
-        luggageList.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Nessun bagaglio trovato</td></tr>'
+        luggageList.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Nessun bagaglio trovato</td></tr>'
         return
     }
 
@@ -242,48 +379,132 @@ function renderLuggageList(tickets) {
         const status = getRowStatus(ticket)
         const endDateStr = ticket.expected_end ? new Date(ticket.expected_end).toLocaleString('it-IT') : '—'
 
+        const isOnline = ticket.status === 'pending'
+        const sourceBadge = isOnline
+            ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">🟡 Online (Da confermare)</span>`
+            : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">🟢 In Negozio</span>`
+
+        const refName = ticket.affiliates?.name ? `<div class="mt-1 text-xs font-semibold text-purple-600">🤝 Via: ${ticket.affiliates.name}</div>` : ''
+
+        const buttons = isOnline ? `
+            <button class="text-green-600 hover:text-green-900 block w-full text-right font-bold" onclick="window.confirmOnlineLuggage('${ticket.id}')">✅ Accetta Bagagli</button>
+            <button class="text-red-400 hover:text-red-600 block w-full text-right text-xs mt-3" onclick="window.deleteActiveLuggage('${ticket.id}')">🗑️ Annulla / No Show</button>
+        ` : `
+            <button class="text-gray-600 hover:text-gray-900 block w-full text-right" onclick="window.printLuggageLabels('${ticket.customer_name}', '${shortId}', ${ticket.bag_count}, '${new Date(ticket.created_at).toLocaleString('it-IT')}')">🖨️ Stampa</button>
+            <button class="text-blue-600 hover:text-blue-900 block w-full text-right" onclick="window.editLuggage('${ticket.id}')">✏️ Modifica</button>
+            <button class="text-red-600 hover:text-red-900 block w-full text-right" onclick="window.returnLuggage('${ticket.id}')">✅ Restituisci</button>
+            <button class="text-gray-400 hover:text-red-600 block w-full text-right text-xs" onclick="window.deleteActiveLuggage('${ticket.id}')">🗑️ Elimina</button>
+        `
+
         const row = document.createElement('tr')
         row.className = status.bg
         row.innerHTML = `
+      <td class="px-4 py-4">
+        <input type="checkbox" class="luggage-row-check rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" data-id="${ticket.id}">
+      </td>
       <td class="px-6 py-4 whitespace-nowrap">
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 mb-1">
           #${shortId}
         </span>
-        ${status.label ? `<span class="ml-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${status.badge}">${status.label}</span>` : ''}
+        <br>
+        ${sourceBadge}
+        <br>
+        ${status.label ? `<span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${status.badge}">${status.label}</span>` : ''}
       </td>
       <td class="px-6 py-4 whitespace-nowrap">
         <div class="text-sm font-medium text-gray-900">${ticket.customer_name}</div>
         <div class="text-sm text-gray-500">${ticket.customer_email || ''}</div>
         ${ticket.customer_phone ? `<div class="text-sm text-gray-400">📞 ${ticket.customer_phone}</div>` : ''}
+        ${refName}
       </td>
       <td class="px-6 py-4">
         <div class="text-sm text-gray-900">${ticket.bag_count} bagagli — € ${ticket.price}</div>
-        <div class="text-xs text-gray-500">Inizio: ${new Date(ticket.created_at).toLocaleString('it-IT')}</div>
-        <div class="text-xs text-gray-500">Fine: ${endDateStr}</div>
-        <div class="text-xs font-medium text-blue-600 mt-1">⌛ In deposito da: ${elapsed}</div>
+        <div class="text-xs text-gray-500">Prenotazione: ${new Date(ticket.created_at).toLocaleString('it-IT')}</div>
+        <div class="text-xs text-gray-500">Ritiro previsto: ${endDateStr}</div>
+        ${!isOnline ? `<div class="text-xs font-medium text-blue-600 mt-1">⌛ In deposito da: ${elapsed}</div>` : ''}
       </td>
       <td class="px-6 py-4">
         <div class="text-sm text-gray-600 max-w-xs truncate" title="${notes}">${notes}</div>
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-y-1">
-        <button class="text-gray-600 hover:text-gray-900 block w-full text-right" onclick="window.printLuggageLabels('${ticket.customer_name}', '${shortId}', ${ticket.bag_count}, '${new Date(ticket.created_at).toLocaleString('it-IT')}')">🖨️ Stampa</button>
-        <button class="text-blue-600 hover:text-blue-900 block w-full text-right" onclick="window.editLuggage('${ticket.id}')">✏️ Modifica</button>
-        <button class="text-red-600 hover:text-red-900 block w-full text-right" onclick="window.returnLuggage('${ticket.id}')">✅ Restituisci</button>
-        <button class="text-gray-400 hover:text-red-600 block w-full text-right text-xs" onclick="window.deleteActiveLuggage('${ticket.id}')">🗑️ Elimina</button>
+        ${buttons}
       </td>
     `
         luggageList.appendChild(row)
     })
+
+    // Bind checkboxes
+    luggageList.querySelectorAll('.luggage-row-check').forEach(cb => {
+        cb.addEventListener('change', updateLuggageBulkBar)
+    })
 }
+
+// Select-all for active luggage
+document.getElementById('luggage-select-all')?.addEventListener('change', function() {
+    luggageList.querySelectorAll('.luggage-row-check').forEach(cb => cb.checked = this.checked)
+    updateLuggageBulkBar()
+})
+
+// Bulk delete for active luggage
+document.getElementById('luggage-bulk-delete')?.addEventListener('click', async () => {
+    const checked = luggageList.querySelectorAll('.luggage-row-check:checked')
+    if (!checked.length) return
+    if (!await askConfirm(`Eliminare ${checked.length} prenotazion${checked.length === 1 ? 'e' : 'i'} selezionat${checked.length === 1 ? 'a' : 'e'}? L'operazione non è reversibile.`)) return
+
+    const ids = Array.from(checked).map(cb => cb.dataset.id)
+    const { error } = await supabase.from('luggage_tickets').delete().in('id', ids)
+    if (error) { alert('Errore: ' + error.message); return }
+    await loadLuggage()
+})
 
 // Refresh timer every 60 seconds
 setInterval(() => {
     if (allLuggageTickets.length > 0) renderLuggageList(allLuggageTickets)
 }, 60000)
 
+window.confirmOnlineLuggage = async (id) => {
+    const payMethod = await askPaymentMethod()
+    if (payMethod === null) return  // cancelled
+
+    const ticket = allLuggageTickets.find(t => t.id === id)
+    if (!ticket) return
+
+    // 1. Update ticket status
+    const { error: updErr } = await supabase
+        .from('luggage_tickets')
+        .update({ status: 'stored', created_at: new Date().toISOString() }) // reset timer to actual drop-off time
+        .eq('id', id)
+
+    if (updErr) {
+        alert('Errore: ' + updErr.message)
+        return
+    }
+
+    // 2. Add transaction to accounting
+    const shortId = ticket.id.slice(0, 8).toUpperCase()
+    const descExtra = ticket.affiliates?.name ? ` (via ${ticket.affiliates.name})` : ' (Online)'
+
+    await supabase.from('transactions').insert([{
+        type: 'income',
+        category: 'Deposito Bagagli',
+        amount: parseFloat(ticket.price),
+        description: `Deposito #${shortId}${descExtra} — ${ticket.customer_name} (${ticket.bag_count} bagagli)`,
+        date: new Date().toISOString().slice(0, 10),
+        payment_method: payMethod,
+        status: 'active'
+    }])
+
+    loadLuggage()
+    
+    // Refresh transactions list if loaded in background
+    if (typeof loadTransactions === 'function' && typeof allTransactions !== 'undefined' && allTransactions.length > 0) {
+        setTimeout(loadTransactions, 1000)
+    }
+}
+
 // Add global function for button click
 window.returnLuggage = async (id) => {
-    if (!confirm('Confermi la restituzione dei bagagli?')) return
+    if (!await askConfirm('Confermi la restituzione dei bagagli?')) return
 
     // Fetch full ticket data for the email
     const { data: ticket, error: fetchErr } = await supabase
@@ -453,7 +674,7 @@ document.getElementById('returned-bulk-delete')?.addEventListener('click', async
     const ids = Array.from(checked).map(cb => cb.dataset.id)
     if (ids.length === 0) return
 
-    if (!confirm(`⚠️ Eliminare definitivamente ${ids.length} record?\nQuesta azione non può essere annullata.`)) return
+    if (!await askConfirm(`⚠️ Eliminare definitivamente ${ids.length} record?\nQuesta azione non può essere annullata.`)) return
 
     let errors = 0
     for (const id of ids) {
@@ -472,7 +693,7 @@ document.getElementById('returned-bulk-delete')?.addEventListener('click', async
 
 // Soft-delete luggage ticket (move to trash)
 window.deleteLuggage = async (id) => {
-    if (!confirm('Spostare questo record nel cestino?')) return
+    if (!await askConfirm('Spostare questo record nel cestino?')) return
     const { error } = await supabase.from('luggage_tickets').update({ status: 'deleted' }).eq('id', id)
     if (error) alert('Errore: ' + error.message)
     else { loadReturnedLuggage() }
@@ -480,7 +701,7 @@ window.deleteLuggage = async (id) => {
 
 // Soft-delete active luggage (move to trash)
 window.deleteActiveLuggage = async (id) => {
-    if (!confirm('⚠️ Spostare questo deposito nel cestino?')) return
+    if (!await askConfirm('⚠️ Spostare questo deposito nel cestino?')) return
     const { error } = await supabase.from('luggage_tickets').update({ status: 'deleted' }).eq('id', id)
     if (error) alert('Errore: ' + error.message)
     else { loadLuggage() }
@@ -563,7 +784,7 @@ if (luggageForm) {
             luggageForm.reset()
             setDefaultDatetime()
             loadLuggage()
-            const doPrint = confirm(`Deposito registrato!\nCODICE PRENOTAZIONE: #${shortId}${customerEmail ? '\n📧 Email di conferma inviata!' : ''}\n\nVuoi stampare le etichette per i bagagli?`)
+            const doPrint = await askConfirm(`Deposito registrato!\nCODICE PRENOTAZIONE: #${shortId}${customerEmail ? '\n📧 Email di conferma inviata!' : ''}\n\nVuoi stampare le etichette per i bagagli?`)
             if (doPrint) {
                 printLuggageLabels(customerName, shortId, bagCount, dateStr)
             }
@@ -944,9 +1165,10 @@ function buildEmailHtml({ customer_name, code, bag_count, price, start_date, end
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f0f4f3; padding: 20px;">
         <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(27,58,92,0.12);">
             <!-- Header with logo -->
-            <div style="background: linear-gradient(135deg, #1B3A5C 0%, #2A9D8F 100%); padding: 28px 24px; text-align: center;">
-                <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto; margin-bottom: 8px;">
-                <p style="color: #b8e6df; margin: 0; font-size: 13px; letter-spacing: 0.5px;">Milazzo</p>
+            <div style="background: linear-gradient(90deg, #1B3A5C 0%, #2A9D8F 100%); height: 6px;"></div>
+            <div style="background: #ffffff; padding: 28px 24px; text-align: center; border-bottom: 1px solid #eef2f0;">
+                <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto;">
+                <p style="color: #2A9D8F; margin: 8px 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Milazzo</p>
             </div>
             <!-- Body -->
             <div style="padding: 28px 24px;">
@@ -1092,11 +1314,13 @@ function buildReturnEmailHtml({ customer_name, code, bag_count, price, start_dat
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f0f4f3; padding: 20px;">
         <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(27,58,92,0.12);">
             <!-- Header with logo -->
-            <div style="background: linear-gradient(135deg, #2A9D8F 0%, #7BC142 100%); padding: 28px 24px; text-align: center;">
-                <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto; margin-bottom: 8px;">
-                <div style="background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block; padding: 6px 20px; margin-top: 8px;">
-                    <span style="color: white; font-size: 16px; font-weight: 700;">✅ ${t.intro}</span>
-                </div>
+            <div style="background: linear-gradient(90deg, #1B3A5C 0%, #2A9D8F 100%); height: 6px;"></div>
+            <div style="background: #ffffff; padding: 28px 24px; text-align: center; border-bottom: 1px solid #eef2f0;">
+                <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto;">
+                <p style="color: #2A9D8F; margin: 8px 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Milazzo</p>
+            </div>
+            <div style="background: #e6f7f4; padding: 12px 24px; text-align: center; border-bottom: 1px solid #d0ece8;">
+                <span style="color: #1B3A5C; font-size: 15px; font-weight: 700;">✅ ${t.intro}</span>
             </div>
             <!-- Body -->
             <div style="padding: 28px 24px;">
@@ -1168,7 +1392,7 @@ const TRANSACTION_CATEGORIES = {
     ],
     expense: [
         'Affitto', 'Stipendi', 'Utenze', 'Forniture', 'Tasse', 'Marketing', 'Manutenzione',
-        'Rimborso Santino', 'Rimborso Giovanni', 'Altro'
+        'Rimborso Santino', 'Rimborso Giovanni', 'Provvigione Partner', 'Pagamento Provvigione', 'Altro'
     ]
 }
 
@@ -1476,6 +1700,12 @@ function renderAccountingSummary(data) {
     const reimbursementsToGiovanni = source.filter(t => t.type === 'expense' && t.category === 'Rimborso Giovanni').reduce((s, t) => s + parseFloat(t.amount), 0)
     const netDebtGiovanni = expensesByGiovanni - reimbursementsToGiovanni
 
+    // Partner Commissions (Expenses) MINUS Payments to Partners (Expenses)
+    // NOTE: Automated entries are 'Provvigione Partner'. Manual payments should be 'Pagamento Provvigione'.
+    const totalCommissions = source.filter(t => t.type === 'expense' && t.category === 'Provvigione Partner').reduce((s, t) => s + parseFloat(t.amount), 0)
+    const totalPayments = source.filter(t => t.type === 'expense' && t.category === 'Pagamento Provvigione').reduce((s, t) => s + parseFloat(t.amount), 0)
+    const netDebtPartners = totalCommissions - totalPayments
+
     // Real Cash = Income (Cash) - Shop Expenses (Cash)
     // We assume old transactions (null payment_method) are CASH for safety, unless we migrate them.
     // Ideally user manually sets them. For now: if (payment_method == 'cash' OR null) -> Cash
@@ -1521,6 +1751,9 @@ function renderAccountingSummary(data) {
 
     if (debtSanEl) debtSanEl.textContent = fmt(netDebtSantino)
     if (debtGioEl) debtGioEl.textContent = fmt(netDebtGiovanni)
+    const debtPartEl = document.getElementById('debt-partners')
+    if (debtPartEl) debtPartEl.textContent = fmt(netDebtPartners)
+
     if (realCashEl) {
         realCashEl.textContent = fmt(realCash)
         realCashEl.className = `text-2xl font-bold mt-1 ${realCash >= 0 ? 'text-green-600' : 'text-red-600'}`
@@ -1783,7 +2016,7 @@ document.getElementById('acc-bulk-delete')?.addEventListener('click', async () =
     const checked = accList.querySelectorAll('.acc-row-check:checked')
     const ids = Array.from(checked).map(cb => cb.dataset.id)
     if (ids.length === 0) return
-    if (!confirm(`⚠️ Spostare nel cestino ${ids.length} transazioni?`)) return
+    if (!await askConfirm(`⚠️ Spostare nel cestino ${ids.length} transazioni?`)) return
 
     let errors = 0
     for (const id of ids) {
@@ -1797,7 +2030,7 @@ document.getElementById('acc-bulk-delete')?.addEventListener('click', async () =
 // --- Single delete (Soft) ---
 window.deleteTransaction = async (id) => {
     // Soft delete
-    if (!confirm('Spostare questa transazione nel cestino?')) return
+    if (!await askConfirm('Spostare questa transazione nel cestino?')) return
     const { error } = await supabase.from('transactions').update({ status: 'deleted' }).eq('id', id)
     if (error) {
         alert('Errore: ' + error.message)
@@ -1939,6 +2172,7 @@ const resFilterFrom = document.getElementById('res-filter-from')
 const resFilterTo = document.getElementById('res-filter-to')
 const resFilterType = document.getElementById('res-filter-type')
 const resFilterStatus = document.getElementById('res-filter-status')
+const resFilterSource = document.getElementById('res-filter-source')
 const resSearchInput = document.getElementById('res-search')
 
 let allReservations = []
@@ -1969,7 +2203,17 @@ async function loadReservations() {
     const from = resFilterFrom?.value
     const to = resFilterTo?.value
 
-    let query = supabase.from('reservations').select('*').neq('status', 'deleted').order('reservation_date', { ascending: false })
+    let query = supabase
+        .from('reservations')
+        .select(`
+            *,
+            affiliates (
+                name,
+                commission_rate
+            )
+        `)
+        .neq('status', 'deleted')
+        .order('reservation_date', { ascending: false })
 
     if (from) query = query.gte('reservation_date', from)
     if (to) query = query.lte('reservation_date', to + 'T23:59:59')
@@ -1993,6 +2237,10 @@ function applyResFilters() {
 
     const statusF = resFilterStatus?.value || 'all'
     if (statusF !== 'all') list = list.filter(r => r.status === statusF)
+
+    const sourceF = resFilterSource?.value || 'all'
+    if (sourceF === 'direct') list = list.filter(r => !r.affiliate_id)
+    if (sourceF === 'partner') list = list.filter(r => r.affiliate_id)
 
     const q = (resSearchInput?.value || '').trim().toLowerCase()
     if (q) {
@@ -2018,6 +2266,7 @@ resFilterFrom?.addEventListener('change', loadReservations)
 resFilterTo?.addEventListener('change', loadReservations)
 resFilterType?.addEventListener('change', applyResFilters)
 resFilterStatus?.addEventListener('change', applyResFilters)
+resFilterSource?.addEventListener('change', applyResFilters)
 resSearchInput?.addEventListener('input', applyResFilters)
 
 // --- Summary cards ---
@@ -2068,6 +2317,13 @@ function renderResList() {
         const total = parseFloat(res.total_price || 0)
         const remaining = total - deposit
         const bookingCode = res.id.slice(0, 8).toUpperCase()
+        
+        // --- Source Label ---
+        let sourceHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] bg-gray-100 text-gray-500 font-bold border border-gray-200">🏢 UFFICIO</span>'
+        if (res.affiliate_id) {
+            const partnerName = res.affiliates?.name || 'Partner'
+            sourceHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] bg-blue-100 text-blue-700 font-bold border border-blue-200" title="Referral: ${partnerName}">🤝 ${partnerName.toUpperCase()}</span>`
+        }
 
         const row = document.createElement('tr')
         row.className = 'hover:bg-gray-50'
@@ -2094,14 +2350,15 @@ function renderResList() {
         <div class="text-sm font-bold text-gray-900">€ ${total.toFixed(2)}</div>
         ${deposit > 0 ? `<div class="text-xs text-green-600">Acconto: € ${deposit.toFixed(2)}</div><div class="text-xs text-orange-600">Saldo: € ${remaining.toFixed(2)}</div>` : ''}
       </td>
+      <td class="px-3 py-3 whitespace-nowrap">${sourceHtml}</td>
       <td class="px-3 py-3 text-sm text-gray-600">${res.supplier_name || '—'}</td>
       <td class="px-3 py-3 whitespace-nowrap">
         <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${st.bg}">${st.label}</span>
       </td>
       <td class="px-3 py-3 whitespace-nowrap text-right text-sm space-y-1">
-        ${res.status === 'confirmed' || res.status === 'pending' ? `<button class="text-green-600 hover:text-green-800 block w-full text-right" onclick="window.completeReservation('${res.id}')">✅ Completa</button>` : ''}
+        ${res.status === 'confirmed' || res.status === 'pending' ? `<button class="text-green-600 hover:text-green-800 block w-full text-right font-bold" onclick="window.completeReservation('${res.id}')">🏁 COMPLETA</button>` : ''}
         ${res.status !== 'cancelled' && res.status !== 'completed' ? `<button class="text-yellow-600 hover:text-yellow-800 block w-full text-right" onclick="window.cancelReservation('${res.id}')">❌ Annulla</button>` : ''}
-        <button class="text-red-400 hover:text-red-700 block w-full text-right text-xs" onclick="window.deleteReservation('${res.id}')">🗑️ Elimina</button>
+        <button class="text-red-400 hover:text-red-700 block w-full text-right text-[10px]" onclick="window.deleteReservation('${res.id}')">🗑️ Elimina</button>
       </td>
     `
         resList.appendChild(row)
@@ -2139,7 +2396,7 @@ document.getElementById('res-bulk-delete')?.addEventListener('click', async () =
     const checked = resList.querySelectorAll('.res-row-check:checked')
     const ids = Array.from(checked).map(cb => cb.dataset.id)
     if (ids.length === 0) return
-    if (!confirm(`⚠️ Spostare ${ids.length} prenotazioni nel cestino?`)) return
+    if (!await askConfirm(`⚠️ Spostare ${ids.length} prenotazioni nel cestino?`)) return
 
     let errors = 0
     for (const id of ids) {
@@ -2153,7 +2410,7 @@ document.getElementById('res-bulk-delete')?.addEventListener('click', async () =
 
 // --- Single soft-delete ---
 window.deleteReservation = async (id) => {
-    if (!confirm('Spostare questa prenotazione nel cestino?')) return
+    if (!await askConfirm('Spostare questa prenotazione nel cestino?')) return
     const { error } = await supabase.from('reservations').update({ status: 'deleted' }).eq('id', id)
     if (error) alert('Errore: ' + error.message)
     else { loadReservations() }
@@ -2161,7 +2418,7 @@ window.deleteReservation = async (id) => {
 
 // --- Cancel reservation ---
 window.cancelReservation = async (id) => {
-    if (!confirm('Annullare questa prenotazione?')) return
+    if (!await askConfirm('Annullare questa prenotazione?')) return
     const { error } = await supabase.from('reservations').update({ status: 'cancelled' }).eq('id', id)
     if (error) alert('Errore: ' + error.message)
     else loadReservations()
@@ -2176,10 +2433,14 @@ const resTrashList = document.getElementById('res-trash-list')
 
 // --- Complete reservation (+ auto accounting) ---
 window.completeReservation = async (id) => {
-    if (!confirm('Segnare come completata? Verrà creata una transazione in contabilità per il SALDO RIMANENTE.')) return
+    if (!await askConfirm('Segnare come completata? Verrà creata una transazione in contabilità per il SALDO RIMANENTE. Se presente un partner, verrà calcolata anche la sua provvigione.')) return
 
-    // Fetch reservation data
-    const { data: res, error: fetchErr } = await supabase.from('reservations').select('*').eq('id', id).single()
+    // Fetch reservation data with affiliate info
+    const { data: res, error: fetchErr } = await supabase
+        .from('reservations')
+        .select('*, affiliates(name, commission_rate)')
+        .eq('id', id)
+        .single()
     if (fetchErr || !res) {
         alert('Errore: prenotazione non trovata')
         return
@@ -2216,8 +2477,25 @@ window.completeReservation = async (id) => {
         }])
     }
 
+    // 2. Auto-create COMMISSION expense if affiliate exists
+    if (res.affiliate_id && res.total_price > 0) {
+        const rate = res.affiliates?.commission_rate || 10
+        const commissionAmount = (res.total_price * rate) / 100
+        const partnerName = res.affiliates?.name || 'Partner'
+
+        await supabase.from('transactions').insert([{
+            type: 'expense',
+            category: 'Provvigione Partner',
+            amount: parseFloat(commissionAmount),
+            description: `PROVVIGIONE (${rate}%): ${res.customer_name} — Rif: ${partnerName}`,
+            date: new Date().toISOString().slice(0, 10),
+            payment_method: 'cash', // Commissions are usually virtual or cash for shop accounting
+            status: 'active'
+        }])
+    }
+
     loadReservations()
-    // Reload accounting if acceptable, but we might be in res view
+    if (typeof loadAccounting === 'function') loadAccounting()
 }
 
 // --- Form Submit ---
@@ -2471,9 +2749,10 @@ function buildReservationEmailHtml(params) {
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f0f4f3; padding: 20px;">
         <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(27,58,92,0.12);">
             <!-- Header with logo -->
-            <div style="background: linear-gradient(135deg, #1B3A5C 0%, #2A9D8F 100%); padding: 28px 24px; text-align: center;">
-                <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto; margin-bottom: 8px;">
-                <p style="color: #b8e6df; margin: 0; font-size: 13px; letter-spacing: 0.5px;">Milazzo</p>
+            <div style="background: linear-gradient(90deg, #1B3A5C 0%, #2A9D8F 100%); height: 6px;"></div>
+            <div style="background: #ffffff; padding: 28px 24px; text-align: center; border-bottom: 1px solid #eef2f0;">
+                <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto;">
+                <p style="color: #2A9D8F; margin: 8px 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Milazzo</p>
             </div>
             <!-- Status Banner -->
             <div style="background: ${params.status === 'confirmed' ? '#e6f7f4' : '#fef9e7'}; padding: 12px 24px; text-align: center; border-bottom: 1px solid #e8eeec;">
@@ -2720,6 +2999,8 @@ initAccounting().catch(err => {
     alert('Errore inizializzazione contabilità: ' + err.message)
 })
 
+loadDashboardHome()
+
 // ========================
 // --- SHIPPING MODULE ---
 // ========================
@@ -2806,7 +3087,7 @@ window.deleteSelectedShipments = async () => {
     const shippingList = document.getElementById('shipping-list')
     const selected = Array.from(shippingList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
     if (selected.length === 0) return
-    if (!confirm(`Eliminare ${selected.length} spedizioni selezionate?`)) return
+    if (!await askConfirm(`Eliminare ${selected.length} spedizioni selezionate?`)) return
 
     const { error } = await supabase.from('shipments').delete().in('id', selected)
     if (!error) {
@@ -2874,7 +3155,7 @@ function renderShippingList(list) {
             <td class="px-4 py-3 text-sm text-gray-600">${s.customer_email || '-'}</td>
             <td class="px-4 py-3 text-sm text-gray-600">${s.customer_phone || '-'}</td>
             <td class="px-4 py-3 text-sm text-gray-600">${s.courier === 'SDA/POSTE' ? 'POSTE' : s.courier}</td>
-            <td class="px-4 py-3 text-sm font-mono text-blue-600 font-bold">${s.tracking_number}</td>
+            <td class="px-4 py-3 text-sm font-mono font-bold">${(() => { const url = getTrackingUrl(s.courier, s.tracking_number); return url ? `<a href="${url}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline" title="Traccia su ${s.courier === 'SDA/POSTE' ? 'POSTE' : s.courier}">${s.tracking_number}</a>` : `<span class="text-blue-600">${s.tracking_number}</span>`; })()}</td>
             <td class="px-4 py-3 text-sm text-gray-500 italic max-w-xs truncate" title="${s.notes || ''}">${s.notes || '-'}</td>
             <td class="px-4 py-3 text-sm text-gray-800 font-medium">€${(s.amount || 0).toFixed(2)}</td>
             <td class="px-4 py-3 text-sm text-gray-600 capitalize">${s.payment_method === 'cash' ? 'Contanti' : (s.payment_method === 'card' ? 'Carta' : s.payment_method || '-')}</td>
@@ -2887,33 +3168,36 @@ function renderShippingList(list) {
 }
 
 window.deleteShipment = async (id) => {
-    if (!confirm('Eliminare questa spedizione?')) return
+    if (!await askConfirm('Eliminare questa spedizione?')) return
     const { error } = await supabase.from('shipments').delete().eq('id', id)
     if (!error) loadShipping()
 }
 
-async function sendShippingEmail({ customer_name, customer_email, courier, tracking_number, notes }) {
-    let trackingUrl = '#'
-
+function getTrackingUrl(courier, tracking_number) {
     if (courier === 'POSTE' || courier === 'SDA/POSTE') {
-        trackingUrl = `https://www.poste.it/cerca/#/risultati-spedizioni/${tracking_number}`
+        return `https://www.poste.it/cerca/#/risultati-spedizioni/${tracking_number}`
     } else if (courier === 'UPS') {
-        trackingUrl = `https://www.ups.com/track?loc=en_US&tracknum=${tracking_number}&requester=WT/trackdetails`
+        return `https://www.ups.com/track?loc=en_US&tracknum=${tracking_number}&requester=WT/trackdetails`
     } else if (courier === 'BRT') {
-        trackingUrl = `https://as777.brt.it/vas/sped_det_show.hsm?referer=sped_numspe_par.htm&Nspediz=${tracking_number}&RicercaNumeroSpedizione=Ricerca`
+        return `https://as777.brt.it/vas/sped_det_show.hsm?referer=sped_numspe_par.htm&Nspediz=${tracking_number}&RicercaNumeroSpedizione=Ricerca`
     }
+    return null
+}
+
+async function sendShippingEmail({ customer_name, customer_email, courier, tracking_number, notes }) {
+    const trackingUrl = getTrackingUrl(courier, tracking_number) || '#'
 
     const htmlBody = `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f0f4f3; padding: 20px;">
         <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(27,58,92,0.12); width: 100%;">
             <!-- Header with logo -->
-            <div style="background: linear-gradient(135deg, #1B3A5C 0%, #2A9D8F 100%); padding: 32px 24px; text-align: center;">
-                <div style="margin-bottom: 16px; display: block;">
-                    <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto; margin: 0 auto; display: block;">
-                </div>
-                <div style="background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block; padding: 8px 24px;">
-                    <span style="color: white; font-size: 15px; font-weight: 700;">📦 Conferma Spedizione</span>
-                </div>
+            <div style="background: linear-gradient(90deg, #1B3A5C 0%, #2A9D8F 100%); height: 6px;"></div>
+            <div style="background: #ffffff; padding: 28px 24px; text-align: center; border-bottom: 1px solid #eef2f0;">
+                <img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width: 180px; height: auto; margin: 0 auto; display: block;">
+                <p style="color: #2A9D8F; margin: 8px 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Milazzo</p>
+            </div>
+            <div style="background: #e6f7f4; padding: 12px 24px; text-align: center; border-bottom: 1px solid #d0ece8;">
+                <span style="color: #1B3A5C; font-size: 15px; font-weight: 700;">📦 Conferma Spedizione</span>
             </div>
 
             <!-- Body -->
@@ -2973,3 +3257,592 @@ async function sendShippingEmail({ customer_name, customer_email, courier, track
 }
 
 initShipping()
+
+// ==========================================
+// EXPERIENCES (CATALOGO) LOGIC
+// ==========================================
+
+const expList = document.getElementById('exp-list')
+const expModal = document.getElementById('modal-experience')
+const expForm = document.getElementById('exp-form')
+let allExperiences = []
+let expImages = []
+
+// ── Rich Text Editor helpers ──
+const expEditor = () => document.getElementById('exp-description-editor')
+let expHtmlMode = false
+
+const EXP_PURIFY_CONFIG = {
+    ALLOWED_TAGS: ['b','strong','i','em','u','h3','ul','ol','li','p','br','a','span'],
+    ALLOWED_ATTR: ['href','target','rel']
+}
+const purifyExp = (html) => {
+    // Normalize browser-inserted <div> line breaks to <p> so they survive sanitization
+    const normalized = (html || '')
+        .replace(/<div>/gi, '<p>')
+        .replace(/<\/div>/gi, '</p>')
+    return (typeof DOMPurify !== 'undefined')
+        ? DOMPurify.sanitize(normalized, EXP_PURIFY_CONFIG)
+        : normalized
+}
+
+window.expFormat = (cmd) => {
+    if (expHtmlMode) return
+    expEditor()?.focus()
+    document.execCommand(cmd, false, null)
+    syncExpDescription()
+}
+
+window.expFormatBlock = (tag) => {
+    if (expHtmlMode) return
+    expEditor()?.focus()
+    document.execCommand('formatBlock', false, tag)
+    syncExpDescription()
+}
+
+function syncExpDescription() {
+    const hidden = document.getElementById('exp-description')
+    if (hidden) hidden.value = expHtmlMode
+        ? (document.getElementById('exp-html-source')?.value || '')
+        : (expEditor()?.innerHTML || '')
+}
+
+window.expToggleHtmlMode = () => {
+    const editor    = expEditor()
+    const source    = document.getElementById('exp-html-source')
+    const toggle    = document.getElementById('exp-html-toggle')
+    const toolbtns  = document.getElementById('exp-toolbar-btns')
+    if (!editor || !source) return
+
+    expHtmlMode = !expHtmlMode
+
+    if (expHtmlMode) {
+        // visual → source: mostra l'HTML corrente da modificare
+        source.value = editor.innerHTML
+        editor.classList.add('hidden')
+        source.classList.remove('hidden')
+        toggle.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-700')
+        toolbtns?.querySelectorAll('button').forEach(b => b.disabled = true)
+        source.focus()
+    } else {
+        // source → visual: sanitizza prima di applicare
+        editor.innerHTML = purifyExp(source.value)
+        source.classList.add('hidden')
+        editor.classList.remove('hidden')
+        toggle.classList.remove('bg-yellow-100', 'border-yellow-500', 'text-yellow-700')
+        toolbtns?.querySelectorAll('button').forEach(b => b.disabled = false)
+        editor.focus()
+    }
+    syncExpDescription()
+}
+
+// Keep hidden textarea in sync as the user types
+document.addEventListener('DOMContentLoaded', () => {
+    const editor = document.getElementById('exp-description-editor')
+    if (editor) {
+        // Force <p> as paragraph separator instead of browser-default <div>
+        editor.addEventListener('focus', () => {
+            document.execCommand('defaultParagraphSeparator', false, 'p')
+        })
+        editor.addEventListener('input', syncExpDescription)
+    }
+    document.getElementById('exp-html-source')?.addEventListener('input', syncExpDescription)
+})
+
+function renderExpPreviews() {
+    const container = document.getElementById('exp-image-previews')
+    if (!container) return
+    if (expImages.length === 0) { container.innerHTML = ''; return }
+
+    container.innerHTML = expImages.map((url, i) => `
+        <div draggable="true" data-idx="${i}"
+            style="width:80px;height:80px;flex-shrink:0;position:relative;cursor:grab;border-radius:8px;border:2px solid ${i === 0 ? '#3b82f6' : '#e5e7eb'};overflow:visible;">
+            <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;display:block;">
+            ${i === 0 ? '<div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);background:#3b82f6;color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap;">COVER</div>' : ''}
+            <button type="button" onclick="window.removeExpImage(${i})"
+                style="position:absolute;top:-8px;right:-8px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;">✕</button>
+        </div>
+    `).join('')
+
+    // Drag-and-drop reorder
+    let dragIdx = null
+    container.querySelectorAll('[draggable]').forEach(el => {
+        el.addEventListener('dragstart', () => { dragIdx = parseInt(el.dataset.idx); el.style.opacity = '0.4' })
+        el.addEventListener('dragend', () => { el.style.opacity = '1' })
+        el.addEventListener('dragover', e => { e.preventDefault(); el.style.outline = '2px dashed #3b82f6' })
+        el.addEventListener('dragleave', () => { el.style.outline = '' })
+        el.addEventListener('drop', e => {
+            e.preventDefault()
+            el.style.outline = ''
+            const dropIdx = parseInt(el.dataset.idx)
+            if (dragIdx === null || dragIdx === dropIdx) return
+            const moved = expImages.splice(dragIdx, 1)[0]
+            expImages.splice(dropIdx, 0, moved)
+            renderExpPreviews()
+        })
+    })
+}
+
+window.removeExpImage = (idx) => {
+    expImages.splice(idx, 1)
+    renderExpPreviews()
+}
+
+document.getElementById('exp-image-upload')?.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files)
+    if (!files.length) return
+    const slugId = document.getElementById('exp-slug').value.trim()
+    if (!slugId) {
+        alert('Inserisci prima lo Slug ID prima di caricare le immagini.')
+        e.target.value = ''
+        return
+    }
+    const statusEl = document.getElementById('exp-upload-status')
+    statusEl.textContent = `Caricamento 0/${files.length}…`
+    let uploaded = 0
+    for (const file of files) {
+        const ext = file.name.split('.').pop().toLowerCase()
+        const path = `${slugId}/${crypto.randomUUID()}.${ext}`
+        const { error: uploadError } = await supabase.storage.from('experiences').upload(path, file, { upsert: false })
+        if (uploadError) {
+            statusEl.textContent = `Errore: ${uploadError.message}`
+            continue
+        }
+        const { data: urlData } = supabase.storage.from('experiences').getPublicUrl(path)
+        expImages.push(urlData.publicUrl)
+        uploaded++
+        statusEl.textContent = `Caricamento ${uploaded}/${files.length}…`
+        renderExpPreviews()
+    }
+    statusEl.textContent = uploaded === files.length ? `${uploaded} immagini aggiunte` : `${uploaded}/${files.length} caricate`
+    e.target.value = ''
+})
+
+async function loadExperiences() {
+    if (!expList) return
+    expList.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500">In caricamento...</td></tr>'
+    
+    let query = supabase.from('experiences').select('*').order('sort_order', { ascending: true, nullsFirst: false }).order('created_at', { ascending: true })
+    
+    const catFilter = document.getElementById('exp-filter-cat')?.value
+    if (catFilter && catFilter !== 'all') {
+        query = query.eq('category', catFilter)
+    }
+
+    const { data, error } = await query
+    
+    if (error) {
+        console.error('Error loading experiences:', error)
+        expList.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-sm text-red-500">Errore carimento esperienze</td></tr>'
+        return
+    }
+
+    allExperiences = data || []
+    renderExperiences()
+}
+
+function renderExperiences() {
+    if (!expList) return
+    const searchVal = document.getElementById('exp-search')?.value.toLowerCase().trim() || ''
+    const isFiltering = !!searchVal
+
+    const filtered = allExperiences.filter(exp =>
+        exp.title.toLowerCase().includes(searchVal) ||
+        exp.category.toLowerCase().includes(searchVal) ||
+        exp.slug_id.toLowerCase().includes(searchVal)
+    )
+
+    if (filtered.length === 0) {
+        expList.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">Nessuna esperienza trovata.</td></tr>'
+        return
+    }
+
+    expList.innerHTML = filtered.map((exp, idx) => `
+        <tr class="hover:bg-gray-50 ${!exp.is_active ? 'opacity-50' : ''}" draggable="${!isFiltering}" data-id="${exp.id}">
+            <td class="px-2 py-3 w-8 text-center ${isFiltering ? 'text-gray-200' : 'text-gray-400 cursor-grab exp-drag-handle hover:text-gray-600'}" title="${isFiltering ? '' : 'Trascina per riordinare'}">
+                <i class="fa-solid fa-grip-vertical" style="font-size:14px"></i>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${exp.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                    ${exp.is_active ? 'Attivo' : 'Nascosto'}
+                </span>
+                <div class="mt-1 text-xs text-gray-400 font-mono">#${exp.slug_id}</div>
+            </td>
+            <td class="px-4 py-3">
+                <div class="flex items-center">
+                    ${exp.emoji ? `<span class="mr-2 text-xl">${exp.emoji}</span>` : ''}
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">${exp.title}</div>
+                        <div class="text-xs text-gray-500 max-w-[200px] truncate">${(exp.description || '').replace(/<[^>]*>/g, '')}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-sm text-gray-900 capitalize">${exp.category}</div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">${exp.price}</div>
+                <div class="text-xs text-gray-500">${exp.price_note || ''}</div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium space-y-1">
+                <button class="text-blue-600 hover:text-blue-900 block w-full text-right" onclick="window.editExperience('${exp.id}')">✏️ Modifica</button>
+                <a class="text-purple-600 hover:text-purple-900 block w-full text-right" href="/service-details.html?cat=${exp.category}&id=${exp.slug_id}" target="_blank">👁️ Anteprima</a>
+                <button class="text-red-500 hover:text-red-700 block w-full text-right" onclick="window.deleteExperience('${exp.id}')">🗑️ Elimina</button>
+            </td>
+        </tr>
+    `).join('')
+
+    if (!isFiltering) initExpDragSort()
+}
+
+let expDragSrcId = null
+
+function initExpDragSort() {
+    const rows = expList.querySelectorAll('tr[draggable="true"]')
+    rows.forEach(row => {
+        row.addEventListener('dragstart', e => {
+            expDragSrcId = row.dataset.id
+            row.classList.add('opacity-40')
+            e.dataTransfer.effectAllowed = 'move'
+        })
+        row.addEventListener('dragend', () => {
+            row.classList.remove('opacity-40')
+            expList.querySelectorAll('tr').forEach(r => r.classList.remove('border-t-2', 'border-blue-400'))
+        })
+        row.addEventListener('dragover', e => {
+            e.preventDefault()
+            e.dataTransfer.dropEffect = 'move'
+            expList.querySelectorAll('tr').forEach(r => r.classList.remove('border-t-2', 'border-blue-400'))
+            row.classList.add('border-t-2', 'border-blue-400')
+        })
+        row.addEventListener('dragleave', () => {
+            row.classList.remove('border-t-2', 'border-blue-400')
+        })
+        row.addEventListener('drop', e => {
+            e.preventDefault()
+            row.classList.remove('border-t-2', 'border-blue-400')
+            if (!expDragSrcId || expDragSrcId === row.dataset.id) return
+
+            const srcIdx = allExperiences.findIndex(x => x.id === expDragSrcId)
+            const dstIdx = allExperiences.findIndex(x => x.id === row.dataset.id)
+            if (srcIdx < 0 || dstIdx < 0) return
+
+            // reorder in memory
+            const [moved] = allExperiences.splice(srcIdx, 1)
+            allExperiences.splice(dstIdx, 0, moved)
+
+            renderExperiences()
+            saveExpOrder()
+        })
+    })
+}
+
+async function saveExpOrder() {
+    const updates = allExperiences.map((exp, idx) =>
+        supabase.from('experiences').update({ sort_order: idx + 1 }).eq('id', exp.id)
+    )
+    await Promise.all(updates)
+    showNotification('Ordine salvato ✓')
+}
+
+document.getElementById('exp-filter-cat')?.addEventListener('change', loadExperiences)
+document.getElementById('exp-search')?.addEventListener('input', renderExperiences)
+
+window.openExpModal = () => {
+    expForm.reset()
+    document.getElementById('exp-id').value = ''
+    document.getElementById('exp-modal-title').innerText = 'Aggiungi Esperienza'
+    document.getElementById('exp-active').value = "true"
+    const editor = expEditor()
+    if (editor) editor.innerHTML = ''
+    expImages = []
+    renderExpPreviews()
+    document.getElementById('exp-upload-status').textContent = ''
+    expModal.classList.remove('hidden')
+}
+
+window.closeExpModal = () => {
+    expModal.classList.add('hidden')
+    // reset html mode if active
+    if (expHtmlMode) expToggleHtmlMode()
+}
+
+window.editExperience = (id) => {
+    const exp = allExperiences.find(e => e.id === id)
+    if (!exp) return
+    
+    document.getElementById('exp-modal-title').innerText = 'Modifica Esperienza'
+    document.getElementById('exp-id').value = exp.id
+    document.getElementById('exp-title').value = exp.title
+    document.getElementById('exp-slug').value = exp.slug_id
+    document.getElementById('exp-category').value = exp.category
+    document.getElementById('exp-emoji').value = exp.emoji || ''
+    document.getElementById('exp-active').value = exp.is_active.toString()
+    document.getElementById('exp-preview').value = exp.preview || ''
+    document.getElementById('exp-price').value = exp.price || ''
+    document.getElementById('exp-pricenote').value = exp.price_note || ''
+    const editor = expEditor()
+    const safeDesc = purifyExp(exp.description || '')
+    if (editor) editor.innerHTML = safeDesc
+    const hidden = document.getElementById('exp-description')
+    if (hidden) hidden.value = safeDesc
+
+    expImages = Array.isArray(exp.images) ? [...exp.images] : []
+    renderExpPreviews()
+    document.getElementById('exp-upload-status').textContent = ''
+    expModal.classList.remove('hidden')
+}
+
+window.deleteExperience = async (id) => {
+    if (!await askConfirm('Sicuro di voler eliminare questa esperienza?')) return
+    const { error } = await supabase.from('experiences').delete().eq('id', id)
+    if (error) alert('Errore: ' + error.message)
+    else loadExperiences()
+}
+
+expForm?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    
+    const id = document.getElementById('exp-id').value
+    const imagesArray = [...expImages]
+    
+    const payload = {
+        title: document.getElementById('exp-title').value,
+        slug_id: document.getElementById('exp-slug').value,
+        category: document.getElementById('exp-category').value,
+        emoji: document.getElementById('exp-emoji').value,
+        is_active: document.getElementById('exp-active').value === 'true',
+        preview: document.getElementById('exp-preview').value,
+        price: document.getElementById('exp-price').value,
+        price_note: document.getElementById('exp-pricenote').value,
+        description: purifyExp(expEditor()?.innerHTML || document.getElementById('exp-description').value),
+        images: imagesArray
+    }
+    
+    const btn = document.getElementById('exp-submit-btn')
+    const originalText = btn.innerHTML
+    btn.innerHTML = '⏳ Salvataggio...'
+    btn.disabled = true
+    
+    let error = null
+    if (id) {
+        const res = await supabase.from('experiences').update(payload).eq('id', id)
+        error = res.error
+    } else {
+        const res = await supabase.from('experiences').insert([payload])
+        error = res.error
+    }
+    
+    btn.innerHTML = originalText
+    btn.disabled = false
+    
+    if (error) {
+        alert('Errore durante i salvataggio: ' + error.message)
+    } else {
+        window.closeExpModal()
+        loadExperiences()
+        showNotification('Esperienza salvata con successo ✓')
+    }
+})
+
+// ==========================================
+// PARTNERS (AFFILIATI) LOGIC
+// ==========================================
+
+let allPartners = []
+let partnerDateFilter = 'all'
+
+async function loadPartners() {
+    const listEl = document.getElementById('partners-list')
+    if (!listEl) return
+    listEl.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500">Caricamento...</td></tr>'
+
+    const { data, error } = await supabase
+        .from('affiliates')
+        .select(`*, reservations(*)`)
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error('Error loading partners:', error)
+        listEl.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-sm text-red-500">Errore caricamento partner</td></tr>'
+        return
+    }
+
+    allPartners = (data || []).map(p => {
+        let filteredRes = p.reservations || []
+        if (partnerDateFilter === 'month') {
+            const now = new Date()
+            filteredRes = filteredRes.filter(r => {
+                const d = new Date(r.reservation_date)
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+            })
+        } else if (partnerDateFilter === 'prev') {
+            const now = new Date()
+            const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1
+            const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear()
+            filteredRes = filteredRes.filter(r => {
+                const d = new Date(r.reservation_date)
+                return d.getMonth() === prevMonth && d.getFullYear() === prevYear
+            })
+        }
+        const totalVolume = filteredRes.reduce((sum, r) => sum + (r.total_price || 0), 0)
+        const commissionRate = p.commission_rate || 10
+        const totalComm = (totalVolume * commissionRate) / 100
+        return { ...p, totalVolume, totalComm, resCount: filteredRes.length }
+    })
+
+    renderPartners(allPartners)
+}
+
+function renderPartners(partners) {
+    const listEl = document.getElementById('partners-list')
+    const countEl = document.getElementById('partner-count')
+    if (!listEl) return
+    countEl && (countEl.textContent = partners.length)
+
+    if (partners.length === 0) {
+        listEl.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500">Nessun partner trovato.</td></tr>'
+        return
+    }
+
+    listEl.innerHTML = partners.map(p => {
+        const adminUrl = `${window.location.origin}/admin/partner-portal.html?key=${p.secret_token}`
+        const printKitUrl = `${window.location.origin}/admin/print-kit.html?ref=${p.referral_code}&name=${encodeURIComponent(p.name)}`
+        return `
+        <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3">
+                <div class="text-sm font-bold text-gray-900">${p.name}</div>
+                <div class="text-xs text-gray-500 capitalize">${p.business_type || ''}</div>
+            </td>
+            <td class="px-4 py-3 text-xs">
+                <div class="text-gray-600"><i class="fa-solid fa-envelope mr-1"></i>${p.email || '-'}</div>
+                <div class="text-gray-600"><i class="fa-solid fa-phone mr-1"></i>${p.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3">
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-mono font-bold">${p.referral_code}</span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-500">${p.commission_rate || 10}%</td>
+            <td class="px-4 py-3 text-sm font-bold text-gray-700">${p.resCount}</td>
+            <td class="px-4 py-3 text-sm font-bold text-gray-900">€ ${p.totalVolume.toFixed(2)}</td>
+            <td class="px-4 py-3 text-sm font-bold text-blue-600">€ ${p.totalComm.toFixed(2)}</td>
+            <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+                <button onclick="window.viewPartnerBookings('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="bg-green-100 text-green-700 hover:bg-green-200 p-2 rounded text-xs" title="Vedi prenotazioni">
+                    <i class="fa-solid fa-list"></i>
+                </button>
+                <a href="${printKitUrl}" target="_blank" class="bg-orange-100 text-orange-700 hover:bg-orange-200 p-2 rounded inline-block text-xs" title="Stampa Locandina">
+                    <i class="fa-solid fa-print"></i>
+                </a>
+                <button onclick="window.copyPartnerLink('${adminUrl}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded text-xs" title="Copia link accesso">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+                <button onclick="window.deletePartner('${p.id}')" class="bg-red-100 text-red-600 hover:bg-red-200 p-2 rounded text-xs" title="Elimina">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        </tr>`
+    }).join('')
+}
+
+document.getElementById('partner-search')?.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase()
+    renderPartners(allPartners.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.referral_code.toLowerCase().includes(q) ||
+        (p.email && p.email.toLowerCase().includes(q))
+    ))
+})
+
+document.getElementById('partner-filter-date')?.addEventListener('change', (e) => {
+    partnerDateFilter = e.target.value
+    loadPartners()
+})
+
+document.getElementById('partner-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const btn = e.target.querySelector('button[type="submit"]')
+    const originalText = btn.innerHTML
+    btn.disabled = true
+    btn.textContent = 'Invio...'
+
+    const name = document.getElementById('partner-name').value
+    const type = document.getElementById('partner-type').value
+    const email = document.getElementById('partner-email').value
+    const phone = document.getElementById('partner-phone').value
+    const ref = document.getElementById('partner-ref').value
+    const rate = document.getElementById('partner-rate').value
+    const secretToken = crypto.randomUUID()
+
+    const { data, error } = await supabase.from('affiliates').insert([{
+        name, business_type: type, email, phone,
+        referral_code: ref, commission_rate: parseInt(rate), secret_token: secretToken
+    }]).select()
+
+    if (error) {
+        alert(error.message)
+        btn.disabled = false
+        btn.innerHTML = originalText
+        return
+    }
+
+    if (email) {
+        const magicLink = `${window.location.origin}/admin/partner-portal.html?key=${secretToken}`
+        const htmlBody = `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto"><div style="background:linear-gradient(135deg,#1B3A5C,#2A9D8F);padding:32px 24px;text-align:center;border-radius:16px 16px 0 0"><img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width:180px;margin:0 auto;display:block"><div style="background:rgba(255,255,255,0.2);border-radius:20px;display:inline-block;padding:8px 24px;margin-top:12px"><span style="color:white;font-size:15px;font-weight:700">🤝 Benvenuto Partner!</span></div></div><div style="background:white;padding:28px 24px;border-radius:0 0 16px 16px"><p style="color:#1B3A5C;font-size:18px;font-weight:700;margin:0 0 10px">Benvenuto in LocalPoint, ${name}!</p><div style="background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:2px solid #2A9D8F;border-radius:14px;padding:24px;text-align:center;margin:20px 0"><p style="color:#2A9D8F;font-size:11px;margin:0 0 8px;text-transform:uppercase;font-weight:600">Il Tuo Codice Referral</p><p style="color:#1B3A5C;font-size:24px;font-weight:900;font-family:monospace;letter-spacing:2px;margin:0 0 20px">${ref}</p><a href="${magicLink}" style="display:inline-block;background:linear-gradient(135deg,#2A9D8F,#7BC142);color:white;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:700">Accedi al Tuo Portale</a></div></div></div>`
+        try {
+            await emailjs.send('service_dmf1g2a', 'template_ihapitu', {
+                to_name: name, to_email: email, message: htmlBody,
+                subject: 'Benvenuto in LocalPoint - Il tuo Portale Partner'
+            })
+        } catch (err) {
+            console.error('Errore invio email partner:', err)
+        }
+    }
+
+    document.getElementById('partner-form').reset()
+    btn.disabled = false
+    btn.innerHTML = originalText
+    alert('Partner registrato con successo!')
+    loadPartners()
+})
+
+window.copyPartnerLink = (url) => {
+    navigator.clipboard.writeText(url)
+    alert('Link di accesso partner copiato!')
+}
+
+window.deletePartner = async (id) => {
+    if (!await askConfirm('Sicuro di voler eliminare questo partner?')) return
+    const { error } = await supabase.from('affiliates').delete().eq('id', id)
+    if (error) alert(error.message)
+    else loadPartners()
+}
+
+window.viewPartnerBookings = async (partnerId, partnerName) => {
+    const { data, error } = await supabase
+        .from('reservations')
+        .select('*')
+        .eq('affiliate_id', partnerId)
+        .order('reservation_date', { ascending: false })
+
+    if (error) { alert('Errore: ' + error.message); return }
+
+    document.getElementById('partner-modal-title').textContent = `Prenotazioni: ${partnerName}`
+    const list = document.getElementById('partner-modal-list')
+
+    if (!data || data.length === 0) {
+        list.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Nessuna prenotazione trovata.</td></tr>'
+    } else {
+        list.innerHTML = data.map(r => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm text-gray-900">${new Date(r.reservation_date).toLocaleDateString('it-IT')}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">${r.customer_name}</td>
+                <td class="px-4 py-3 text-sm text-gray-500">${r.service_type}</td>
+                <td class="px-4 py-3 text-sm text-right font-bold text-blue-600">€ ${(r.total_price || 0).toFixed(2)}</td>
+            </tr>`).join('')
+    }
+
+    document.getElementById('partner-bookings-modal').classList.remove('hidden')
+}
+
+window.closePartnerModal = () => {
+    document.getElementById('partner-bookings-modal').classList.add('hidden')
+}

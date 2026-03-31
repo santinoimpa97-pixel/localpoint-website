@@ -47,7 +47,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/src/style.css">
+  <script type="module" src="/src/cookie-manager.js"></script>
 
   <!-- Schema.org Structured Data (JSON-LD) -->
   <script type="application/ld+json">
@@ -102,12 +103,12 @@
       </div>
       <nav id="nav">
         <ul>
-          <li><a href="#hero" data-i18n="nav.home">Home</a></li>
-          <li><a href="#services" data-i18n="nav.services">Servizi</a></li>
-          <li><a href="#shipping" data-i18n="nav.shipping">Spedizioni</a></li>
-          <li><a href="#luggage" data-i18n="nav.luggage">Deposito</a></li>
-          <li><a href="#gallery" data-i18n="nav.gallery">Galleria</a></li>
-          <li><a href="#contact" data-i18n="nav.contact">Contatti</a></li>
+          <li><a href="#hero"><span aria-hidden="true">🏠</span> <span data-i18n="nav.home">Home</span></a></li>
+          <li><a href="/tourist-services.html"><span aria-hidden="true">🌴</span> <span data-i18n="nav.tourist">Servizi Turistici</span></a></li>
+          <li><a href="#shipping"><span aria-hidden="true">📦</span> <span data-i18n="nav.shipping">Spedizioni</span></a></li>
+          <li><a href="#luggage"><span aria-hidden="true">🧳</span> <span data-i18n="nav.luggage">Deposito</span></a></li>
+          <li><a href="#gallery"><span aria-hidden="true">🖼️</span> <span data-i18n="nav.gallery">Galleria</span></a></li>
+          <li><a href="#contact"><span aria-hidden="true">📍</span> <span data-i18n="nav.contact">Contatti</span></a></li>
         </ul>
       </nav>
       <!-- Language Selector -->
@@ -124,8 +125,10 @@
           <button class="lang-option" data-lang="fr">🇫🇷 Français</button>
         </div>
       </div>
-      <button id="mobile-menu-btn" aria-label="Menu">
-        <i class="fa-solid fa-bars"></i>
+      <button id="mobile-menu-btn" class="mobile-menu-toggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
     </div>
   </header>
@@ -286,13 +289,97 @@
       </div>
     </section>
 
-    <section id="shipping" class="highlight-section">
+    <!-- ========================= TOURIST SERVICES PREVIEW ========================= -->
+    <style>
+      .tp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2.5rem; }
+      .tp-card { text-decoration:none; display:block; border-radius:20px; overflow:hidden; position:relative; height:280px; cursor:pointer; box-shadow:0 8px 32px rgba(0,78,146,0.15); transition:transform 0.3s,box-shadow 0.3s; }
+      .tp-card:hover { transform:translateY(-6px); box-shadow:0 20px 50px rgba(0,78,146,0.25); }
+      .tp-card img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.9s ease; }
+      .tp-card:hover img { transform:scale(1.07); }
+      .tp-card-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(8,12,20,0.88) 0%,rgba(8,12,20,0.2) 60%,transparent 100%); }
+      .tp-card-label { position:absolute; bottom:1.5rem; left:1.5rem; color:#fff; }
+      .tp-card-chip { font-size:0.75rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; opacity:0.8; margin-bottom:0.3rem; }
+      .tp-card-title { font-size:1.3rem; font-weight:900; margin:0; }
+      @media (max-width:900px) { .tp-grid { grid-template-columns:repeat(2,1fr); } }
+      @media (max-width:600px) {
+        .tp-grid { grid-template-columns:1fr; gap:1rem; }
+        .tp-card { height:200px; }
+        .tp-card-title { font-size:1.1rem; }
+      }
+    </style>
+    <section id="tourist-preview" style="padding:80px 20px;background:#f0f9ff;position:relative;overflow:hidden;">
+      <!-- Subtle background decoration -->
+      <div style="position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,160,160,0.08) 0%,transparent 70%);pointer-events:none;"></div>
+      <div style="position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(140,198,63,0.07) 0%,transparent 70%);pointer-events:none;"></div>
+
+      <div style="max-width:1200px;margin:0 auto;position:relative;z-index:1;">
+
+        <!-- Section header -->
+        <div style="text-align:center;margin-bottom:3rem;">
+          <div style="display:inline-block;background:rgba(0,78,146,0.08);color:#004e92;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.5rem 1.2rem;border-radius:50px;margin-bottom:1rem;" data-i18n="tourist.badge">🏝️ Turismo a Milazzo</div>
+          <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;color:#2d3748;margin-bottom:0.8rem;letter-spacing:-0.02em;" data-i18n="tourist.title">Parti senza pensieri</h2>
+          <p style="font-size:1.1rem;color:#4a5568;max-width:520px;margin:0 auto;line-height:1.6;" data-i18n="tourist.subtitle">Escursioni, noleggi, transfer e molto altro. Tutto prenotabile online in 2 minuti.</p>
+        </div>
+
+        <!-- Cards grid -->
+        <div class="tp-grid">
+
+          <!-- Escursioni -->
+          <a href="/tourist-services.html" class="tp-card">
+            <img src="https://i.postimg.cc/VNVFRm49/gpt-image-1-5-high-fidelity-a-mi-serve-solo-l-imma.png" alt="Escursioni">
+            <div class="tp-card-overlay"></div>
+            <div class="tp-card-label">
+              <div class="tp-card-chip" data-i18n="tourist.card.excursions.chip">🏝️ Natura & Avventura</div>
+              <h3 class="tp-card-title" data-i18n="tourist.card.excursions.title">Escursioni & Tour</h3>
+            </div>
+          </a>
+
+          <!-- Noleggi -->
+          <a href="/tourist-services.html" class="tp-card">
+            <img src="https://i.postimg.cc/4dPkx8Gk/immagine.png" alt="Noleggi">
+            <div class="tp-card-overlay"></div>
+            <div class="tp-card-label">
+              <div class="tp-card-chip" data-i18n="tourist.card.rentals.chip">🚗 Mobilità</div>
+              <h3 class="tp-card-title" data-i18n="tourist.card.rentals.title">Noleggi</h3>
+            </div>
+          </a>
+
+          <!-- Transfer -->
+          <a href="/tourist-services.html" class="tp-card">
+            <img src="https://i.postimg.cc/Qdybgc8K/immagine.png" alt="Transfer">
+            <div class="tp-card-overlay"></div>
+            <div class="tp-card-label">
+              <div class="tp-card-chip" data-i18n="tourist.card.transfer.chip">✈️ Aeroporti</div>
+              <h3 class="tp-card-title" data-i18n="tourist.card.transfer.title">Transfer & NCC</h3>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- Main CTA -->
+        <div style="text-align:center;">
+          <a href="/tourist-services.html" style="display:inline-flex;align-items:center;gap:0.7rem;background:linear-gradient(135deg,#004e92 0%,#00a0a0 50%,#8cc63f 100%);color:#fff;padding:1rem 2.5rem;border-radius:50px;font-size:1.05rem;font-weight:800;text-decoration:none;box-shadow:0 8px 28px rgba(0,78,146,0.35);transition:transform 0.3s,box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(0,78,146,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,78,146,0.35)'">
+            <i class="fa-solid fa-compass"></i> <span data-i18n="tourist.cta">Esplora tutti i Servizi Turistici</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <p style="margin-top:1rem;font-size:0.85rem;color:#4a5568;" data-i18n="tourist.cta.sub">5 categorie · 20+ esperienze · Prenota in 2 minuti</p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <div class="shipping-block">
+    <section id="shipping">
       <div class="container">
         <div class="split-layout">
           <div class="text-content">
+            <div class="ship-speed-badge">
+              <i class="fa-solid fa-bolt"></i> <span data-i18n="shipping.badge">Spedizioni veloci in 24/48h</span>
+            </div>
             <h2 data-i18n="shipping.title">Spedisci con Noi</h2>
-            <p data-i18n="shipping.subtitle">Tariffe nazionali semplici e convenienti. Imballaggio escluso. Tracking
-              incluso.</p>
+            <p data-i18n="shipping.subtitle">Tariffe nazionali semplici e convenienti.</p>
+
             <ul class="price-list">
               <li>
                 <span class="weight">0 - 3 kg</span>
@@ -321,14 +408,75 @@
             </ul>
           </div>
           <div class="image-content">
-            <!-- Placeholder for shipping image or illustration -->
-            <div class="shipping-illustration">
-              <i class="fa-solid fa-truck-fast"></i>
+            <div class="ship-features">
+              <div class="ship-feat">
+                <div class="ship-feat-icon"><i class="fa-solid fa-bolt"></i></div>
+                <div class="ship-feat-text">
+                  <strong data-i18n="shipping.feat.speed.title">24 / 48h</strong>
+                  <span data-i18n="shipping.feat.speed.desc">Consegna nazionale</span>
+                </div>
+              </div>
+              <div class="ship-feat">
+                <div class="ship-feat-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="ship-feat-text">
+                  <strong data-i18n="shipping.feat.tracking.title">Tracking Live</strong>
+                  <span data-i18n="shipping.feat.tracking.desc">Incluso su ogni spedizione</span>
+                </div>
+              </div>
+              <div class="ship-feat">
+                <div class="ship-feat-icon"><i class="fa-solid fa-earth-europe"></i></div>
+                <div class="ship-feat-text">
+                  <strong data-i18n="shipping.feat.intl.title">Spedizioni Internazionali</strong>
+                  <span data-i18n="shipping.feat.intl.desc">a partire da € 19,90</span>
+                </div>
+              </div>
+              <div class="ship-feat">
+                <div class="ship-feat-icon"><i class="fa-solid fa-box-open"></i></div>
+                <div class="ship-feat-text">
+                  <strong data-i18n="shipping.feat.packaging.title">Imballaggio</strong>
+                  <span data-i18n="shipping.feat.packaging.desc">Disponibile in sede</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- ══ PARTNER CORRIERI ══ -->
+    <section id="partners-strip">
+
+      <div class="ps-divider" aria-hidden="true">
+        <span class="ps-divider-line"></span>
+        <span class="ps-divider-label"><i class="fa-solid fa-truck-fast"></i> <span data-i18n="partners.label">I nostri corrieri partner</span></span>
+        <span class="ps-divider-line"></span>
+      </div>
+      <div class="container">
+        <div class="ps-grid">
+          <div class="ps-card ps-card--poste">
+            <div class="ps-card-inner">
+              <img src="https://i.postimg.cc/qq6ntDZr/image.png" alt="Poste Italiane" class="ps-img">
+            </div>
+          </div>
+          <div class="ps-card ps-card--gls">
+            <div class="ps-card-inner">
+              <img src="https://i.postimg.cc/NjkNfLHN/image.png" alt="GLS" class="ps-img">
+            </div>
+          </div>
+          <div class="ps-card ps-card--ups">
+            <div class="ps-card-inner">
+              <img src="https://i.postimg.cc/ydvnhGPz/image.png" alt="UPS" class="ps-img">
+            </div>
+          </div>
+          <div class="ps-card ps-card--brt">
+            <div class="ps-card-inner">
+              <img src="https://i.postimg.cc/fL9mygr8/image.png" alt="BRT Bartolini" class="ps-img">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </div>
 
     <section id="luggage">
       <div class="container">
@@ -415,19 +563,19 @@
         <p class="section-subtitle" data-i18n="gallery.subtitle">Vieni a trovarci in Via Tenente Brigiano 6, a pochi
           passi dal porto</p>
 
-        <div class="gallery-grid">
-          <div class="gallery-item" onclick="openLightbox(0)">
-            <img src="/store-exterior.jpg" alt="LocalPoint Milazzo - Esterno del negozio" loading="lazy">
-            <div class="gallery-overlay">
+        <div class="gallery-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin-top:2rem;">
+          <div class="gallery-item" onclick="openLightbox(0)" style="position:relative;border-radius:20px;overflow:hidden;cursor:pointer;aspect-ratio:4/3;background:#e2e8f0;">
+            <img src="/store-exterior.jpg" alt="LocalPoint Milazzo - Esterno del negozio" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            <div class="gallery-overlay" style="position:absolute;inset:0;background:rgba(0,78,146,0.5);display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;transition:opacity 0.3s;color:#fff;font-size:1.2rem;gap:0.5rem;">
               <i class="fa-solid fa-expand"></i>
-              <span data-i18n="gallery.exterior">Esterno</span>
+              <span data-i18n="gallery.exterior" style="font-size:0.9rem;font-weight:700;">Esterno</span>
             </div>
           </div>
-          <div class="gallery-item" onclick="openLightbox(1)">
-            <img src="/store-interior.jpg" alt="LocalPoint Milazzo - Interno del negozio" loading="lazy">
-            <div class="gallery-overlay">
+          <div class="gallery-item" onclick="openLightbox(1)" style="position:relative;border-radius:20px;overflow:hidden;cursor:pointer;aspect-ratio:4/3;background:#e2e8f0;">
+            <img src="/store-interior.jpg" alt="LocalPoint Milazzo - Interno del negozio" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            <div class="gallery-overlay" style="position:absolute;inset:0;background:rgba(0,78,146,0.5);display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;transition:opacity 0.3s;color:#fff;font-size:1.2rem;gap:0.5rem;">
               <i class="fa-solid fa-expand"></i>
-              <span data-i18n="gallery.interior">Interno</span>
+              <span data-i18n="gallery.interior" style="font-size:0.9rem;font-weight:700;">Interno</span>
             </div>
           </div>
         </div>
@@ -498,94 +646,49 @@
   </main>
 
   <footer>
-    <div class="container footer-content">
-      <p data-i18n="footer.copyright">&copy; 2025 LocalPoint Milazzo. Tutti i diritti riservati.</p>
-      <div class="socials">
-        <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i
-            class="fa-brands fa-facebook"></i></a>
-        <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i
-            class="fa-brands fa-instagram"></i></a>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
+        <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+        <div class="socials">
+          <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://wa.me/393793283803" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Link Utili</h4>
+        <ul class="footer-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/tourist-services.html">Servizi Turistici</a></li>
+          <li><a href="/#shipping">Spedizioni</a></li>
+          <li><a href="/#luggage">Deposito Bagagli</a></li>
+          <li><a href="/become-partner.html">Diventa Partner</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+        <ul class="footer-contact-list">
+          <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+          <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
+          <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
+          <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
       </div>
     </div>
   </footer>
 
   <!-- WhatsApp Floating Button -->
-  <a href="https://wa.me/393793283803" target="_blank" class="whatsapp-float" aria-label="Chatta su WhatsApp">
+  <a href="https://wa.me/393793283803" target="_blank" class="whatsapp-float" aria-label="Chatta su WhatsApp" data-track="whatsapp_float">
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
-  <!-- GDPR Cookie Banner -->
-  <div id="cookie-banner" class="cookie-banner">
-    <div class="cookie-content">
-      <div class="cookie-text">
-        <i class="fa-solid fa-cookie-bite cookie-icon"></i>
-        <div>
-          <h4 data-i18n="cookie.title">🍪 Utilizziamo i cookie</h4>
-          <p data-i18n="cookie.text">Questo sito utilizza cookie tecnici e di analisi per migliorare la tua esperienza.
-            Puoi accettare tutti i cookie o personalizzare le tue preferenze.</p>
-        </div>
-      </div>
-      <div class="cookie-buttons">
-        <button id="cookie-accept" class="cookie-btn accept" data-i18n="cookie.accept">Accetta tutti</button>
-        <button id="cookie-reject" class="cookie-btn reject" data-i18n="cookie.reject">Solo necessari</button>
-        <a href="#" class="cookie-link" data-i18n="cookie.moreinfo"
-          onclick="alert('Informativa Cookie: Utilizziamo cookie tecnici per il funzionamento del sito e cookie analitici (Google Analytics) per comprendere come i visitatori interagiscono con il sito. I cookie tecnici sono necessari per il corretto funzionamento. Puoi rifiutare i cookie analitici senza alcun impatto sulla navigazione. Per maggiori informazioni contattaci a localpointmilazzo@gmail.com'); return false;">Maggiori
-          info</a>
-      </div>
-    </div>
-  </div>
 
-  <script type="module" src="/src/main.js"></script>
-
-  <!-- Cookie Consent Script -->
-  <script>
-    (function () {
-      const banner = document.getElementById('cookie-banner');
-      const acceptBtn = document.getElementById('cookie-accept');
-      const rejectBtn = document.getElementById('cookie-reject');
-
-      // Check if user already made a choice
-      const cookieConsent = localStorage.getItem('cookieConsent');
-
-      if (cookieConsent === null) {
-        // Show banner if no choice made
-        setTimeout(() => {
-          banner.classList.add('show');
-        }, 1000);
-      } else if (cookieConsent === 'accepted') {
-        // Load analytics if accepted
-        loadAnalytics();
-      }
-
-      acceptBtn.addEventListener('click', function () {
-        localStorage.setItem('cookieConsent', 'accepted');
-        banner.classList.remove('show');
-        loadAnalytics();
-      });
-
-      rejectBtn.addEventListener('click', function () {
-        localStorage.setItem('cookieConsent', 'rejected');
-        banner.classList.remove('show');
-      });
-
-      function loadAnalytics() {
-        // Placeholder for Google Analytics
-        // Uncomment and add your GA ID when ready:
-        /*
-        const script = document.createElement('script');
-        script.async = true;
-        script.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
-        document.head.appendChild(script);
-        
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'GA_MEASUREMENT_ID');
-        */
-        console.log('Analytics cookies accepted');
-      }
-    })();
-  </script>
 
   <!-- Dynamic Opening Hours Script -->
   <script type="module">
