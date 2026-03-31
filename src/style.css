@@ -2519,6 +2519,20 @@ footer::before {
 /* ============================================
    PARTNER CORRIERI SECTION
    ============================================ */
+/* Scroll Reveal Effects */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  visibility: hidden;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
 #partners-strip {
   padding: 60px 0;
   background: white;

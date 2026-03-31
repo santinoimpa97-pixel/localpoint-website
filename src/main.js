@@ -97,5 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Final check for hash on full load
-window.addEventListener('load', handleHashOnLoad);
+window.addEventListener('load', handleHashOnLoad)
+
+// Partner cards scroll-in animation
+const psObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('ps-card--visible'), i * 100)
+      psObserver.unobserve(entry.target)
+    }
+  })
+}, { threshold: 0.15 })
+
+document.querySelectorAll('.ps-card').forEach(card => psObserver.observe(card));
 
