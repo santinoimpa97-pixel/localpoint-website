@@ -1244,15 +1244,24 @@ nav a:hover {
 /* Card */
 .ps-card {
   border-radius: 20px;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 3px solid var(--ps-accent, rgba(255,255,255,0.2));
   backdrop-filter: blur(20px);
   position: relative; overflow: hidden;
   cursor: default;
-  opacity: 0; transform: translateY(28px);
-  transition: opacity 0.55s ease, transform 0.55s ease, border-color 0.3s, box-shadow 0.3s;
+  animation: ps-reveal 0.55s ease both;
+  transition: background 0.3s, box-shadow 0.3s;
 }
-.ps-card--visible { opacity: 1; transform: translateY(0); }
+.ps-card:nth-child(1) { animation-delay: 0.05s; }
+.ps-card:nth-child(2) { animation-delay: 0.15s; }
+.ps-card:nth-child(3) { animation-delay: 0.25s; }
+.ps-card:nth-child(4) { animation-delay: 0.35s; }
+@keyframes ps-reveal {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ps-card--visible { opacity: 1; }
 .ps-card-inner {
   display: flex; align-items: center; justify-content: center;
   height: 120px; padding: 20px 28px;
@@ -1271,30 +1280,35 @@ nav a:hover {
 .ps-card:hover::before { animation: ps-shimmer 0.65s ease forwards; }
 @keyframes ps-shimmer { from { left: -90%; } to { left: 140%; } }
 
-/* Bottom brand accent line */
+/* Hover inner glow overlay */
 .ps-card::after {
   content: '';
-  position: absolute; bottom: 0; left: 20%; right: 20%;
-  height: 2px; border-radius: 2px;
-  background: var(--ps-accent, rgba(255,255,255,0.15));
-  transform: scaleX(0); transition: transform 0.35s ease;
+  position: absolute; inset: 0;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
 }
-.ps-card:hover::after { transform: scaleX(1); }
+.ps-card:hover::after { opacity: 1; }
+.ps-card--poste::after { background: radial-gradient(circle at 50% 100%, rgba(255,210,0,0.18), transparent 70%); }
+.ps-card--gls::after   { background: radial-gradient(circle at 50% 100%, rgba(245,166,35,0.18), transparent 70%); }
+.ps-card--ups::after   { background: radial-gradient(circle at 50% 100%, rgba(255,181,0,0.18), transparent 70%); }
+.ps-card--brt::after   { background: radial-gradient(circle at 50% 100%, rgba(227,6,19,0.18), transparent 70%); }
 .ps-card--poste { --ps-accent: #FFD200; }
 .ps-card--gls   { --ps-accent: #F5A623; }
 .ps-card--ups   { --ps-accent: #FFB500; }
 .ps-card--brt   { --ps-accent: #E30613; }
-.ps-card--poste:hover { border-color:rgba(255,210,0,0.3); box-shadow:0 20px 50px rgba(0,0,0,0.35),0 0 40px rgba(255,210,0,0.1); }
-.ps-card--gls:hover   { border-color:rgba(245,166,35,0.3); box-shadow:0 20px 50px rgba(0,0,0,0.35),0 0 40px rgba(245,166,35,0.12); }
-.ps-card--ups:hover   { border-color:rgba(255,181,0,0.3);  box-shadow:0 20px 50px rgba(0,0,0,0.35),0 0 40px rgba(255,181,0,0.1); }
-.ps-card--brt:hover   { border-color:rgba(227,6,19,0.3);   box-shadow:0 20px 50px rgba(0,0,0,0.35),0 0 40px rgba(227,6,19,0.12); }
+.ps-card--poste:hover { background:rgba(255,210,0,0.08);  box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 40px rgba(255,210,0,0.12); }
+.ps-card--gls:hover   { background:rgba(245,166,35,0.08); box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 40px rgba(245,166,35,0.14); }
+.ps-card--ups:hover   { background:rgba(255,181,0,0.08);  box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 40px rgba(255,181,0,0.12); }
+.ps-card--brt:hover   { background:rgba(227,6,19,0.08);   box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 40px rgba(227,6,19,0.14); }
 
 .ps-img {
-  display: block; height: 54px; width: auto; max-width: 150px; object-fit: contain;
-  filter: brightness(1.05) drop-shadow(0 2px 8px rgba(0,0,0,0.35));
-  transition: filter 0.3s;
+  display: block; height: 58px; width: auto; max-width: 155px; object-fit: contain;
+  filter: brightness(1.15) saturate(1.3) drop-shadow(0 2px 12px rgba(0,0,0,0.4));
+  transition: filter 0.3s, transform 0.3s;
 }
-.ps-card:hover .ps-img { filter: brightness(1.12) drop-shadow(0 4px 16px rgba(0,0,0,0.5)); }
+.ps-card:hover .ps-img { filter: brightness(1.25) saturate(1.5) drop-shadow(0 6px 20px rgba(0,0,0,0.5)); }
 
 /* Responsive: shipping block */
 @media (max-width: 768px) {
@@ -2504,125 +2518,3 @@ footer::before {
   color: white;
 }
 
-/* partners-strip Mobile */
-@media (max-width: 768px) {
-  .ps-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-  }
-  .ps-card {
-    height: 90px;
-    padding: 15px;
-  }
-}
-
-/* ============================================
-   PARTNER CORRIERI SECTION
-   ============================================ */
-/* Scroll Reveal Effects */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  visibility: hidden;
-}
-
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
-  visibility: visible;
-}
-
-#partners-strip {
-  padding: 60px 0;
-  background: white;
-  border-top: 1px solid rgba(0, 78, 146, 0.05);
-  border-bottom: 1px solid rgba(0, 78, 146, 0.05);
-  overflow: hidden;
-}
-
-.ps-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 40px;
-  opacity: 0.6;
-}
-
-.ps-divider-line {
-  height: 1px;
-  flex: 1;
-  max-width: 150px;
-  background: linear-gradient(to right, transparent, var(--primary-blue), transparent);
-}
-
-.ps-divider-label {
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--primary-blue);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.ps-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
-}
-
-.ps-card {
-  background: #ffffff;
-  height: 110px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 78, 146, 0.08);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-}
-
-.ps-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 35px rgba(0, 78, 146, 0.12);
-  border-color: var(--primary-teal);
-}
-
-.ps-img {
-  max-width: 100%;
-  max-height: 52px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  transition: all 0.4s ease;
-  filter: grayscale(100%) opacity(0.6);
-}
-
-.ps-card:hover .ps-img {
-  filter: grayscale(0) opacity(1);
-  transform: scale(1.08);
-}
-
-@media (max-width: 900px) {
-  .ps-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .ps-grid {
-    gap: 15px;
-  }
-  .ps-card {
-    height: 90px;
-    padding: 15px;
-  }
-  .ps-img {
-    max-height: 40px;
-  }
-}
