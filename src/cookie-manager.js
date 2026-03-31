@@ -14,28 +14,118 @@ export function initCookieManager() {
 }
 
 function showCookieBanner() {
-    // Check if banner already exists to prevent duplicates
     if (document.getElementById('cookie-banner')) return;
 
+    const bannerStyle = `
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.15);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 999999;
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+        }
+        #cookie-banner.visible {
+            transform: translateY(0);
+        }
+        .cb-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .cb-container {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 40px;
+            }
+        }
+        .cb-content h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cb-content p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+        .cb-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        @media (max-width: 640px) {
+            .cb-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+        .cb-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-align: center;
+            white-space: nowrap;
+        }
+        #btn-cookie-reject {
+            background: transparent;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+        #btn-cookie-reject:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+        #btn-cookie-accept {
+            background: #004e92;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 78, 146, 0.2);
+        }
+        #btn-cookie-accept:hover {
+            background: #003870;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 78, 146, 0.3);
+        }
+    `;
+
+    const styleTag = document.createElement('style');
+    styleTag.textContent = bannerStyle;
+    document.head.appendChild(styleTag);
+
     const bannerHtml = `
-        <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-gray-200 z-[100] transform transition-transform duration-500 translate-y-full">
-            <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex-1 max-w-3xl">
-                    <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
-                        <span>🍪</span> Informativa sui Cookie
-                    </h3>
-                    <p class="text-sm text-gray-600 leading-relaxed">
-                        Utilizziamo cookie tecnici per il funzionamento del sito e, con il tuo consenso, cookie di profilazione e statistici (Google Analytics) per migliorare la tua esperienza e offrirti servizi personalizzati. 
-                        Scegliendo "Accetta tutti", acconsenti all'uso di tutti i cookie.
+        <div id="cookie-banner">
+            <div class="cb-container">
+                <div class="cb-content">
+                    <h3><span>🍪</span> Informativa sui Cookie</h3>
+                    <p>
+                        Utilizziamo cookie tecnici per il funzionamento del sito e, con il tuo consenso, cookie statistici (Google Analytics) per migliorare la tua esperienza. 
+                        Scegliendo "Accetta tutti", acconsenti all'uso dei cookie.
                     </p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
-                    <button id="btn-cookie-reject" class="px-6 py-2.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all text-sm whitespace-nowrap">
-                        Rifiuta non necessari
-                    </button>
-                    <button id="btn-cookie-accept" class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-md shadow-blue-600/20 hover:shadow-blue-600/40 transition-all text-sm whitespace-nowrap">
-                        Accetta tutti
-                    </button>
+                <div class="cb-actions">
+                    <button id="btn-cookie-reject" class="cb-btn">Solo necessari</button>
+                    <button id="btn-cookie-accept" class="cb-btn">Accetta tutti</button>
                 </div>
             </div>
         </div>
@@ -46,7 +136,7 @@ function showCookieBanner() {
     // Animate banner sliding up
     setTimeout(() => {
         const banner = document.getElementById('cookie-banner');
-        if (banner) banner.classList.remove('translate-y-full');
+        if (banner) banner.classList.add('visible');
     }, 100);
 
     const acceptBtn = document.getElementById('btn-cookie-accept');
