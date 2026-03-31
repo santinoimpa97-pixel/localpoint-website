@@ -22,59 +22,60 @@ function showCookieBanner() {
             bottom: 24px;
             left: 24px;
             right: 24px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
-            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(0, 78, 146, 0.98) 0%, rgba(0, 160, 160, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
             z-index: 9999999;
             transform: translateY(calc(100% + 40px));
-            transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
             font-family: 'Outfit', 'Inter', system-ui, sans-serif;
             overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
         #cookie-banner.visible {
             transform: translateY(0);
         }
         .cb-container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 24px 32px;
+            padding: 30px 40px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
         @media (min-width: 900px) {
             .cb-container {
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
-                gap: 48px;
+                gap: 50px;
             }
         }
         .cb-content {
             flex: 1;
         }
         .cb-content h3 {
-            margin: 0 0 6px 0;
-            font-size: 19px;
+            margin: 0 0 8px 0;
+            font-size: 22px;
             font-weight: 800;
-            color: #0f172a;
+            color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             letter-spacing: -0.01em;
         }
         .cb-content p {
             margin: 0;
-            font-size: 14.5px;
+            font-size: 15.5px;
             line-height: 1.6;
-            color: #475569;
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 400;
         }
         .cb-actions {
             display: flex;
-            gap: 12px;
+            gap: 15px;
             flex-shrink: 0;
         }
         @media (max-width: 640px) {
@@ -84,35 +85,35 @@ function showCookieBanner() {
             }
         }
         .cb-btn {
-            padding: 14px 28px;
-            border-radius: 16px;
+            padding: 16px 32px;
+            border-radius: 18px;
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             text-align: center;
             white-space: nowrap;
-            letter-spacing: 0.01em;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
         #btn-cookie-reject {
-            background: #f1f5f9;
-            color: #64748b;
-            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         #btn-cookie-reject:hover {
-            background: #e2e8f0;
-            color: #475569;
+            background: rgba(255, 255, 255, 0.2);
         }
         #btn-cookie-accept {
-            background: linear-gradient(135deg, #004e92 0%, #003870 100%);
-            color: #ffffff;
-            box-shadow: 0 8px 20px rgba(0, 78, 146, 0.25);
+            background: #ffffff;
+            color: #004e92;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         #btn-cookie-accept:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(0, 78, 146, 0.4);
-            filter: brightness(1.1);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            background: #f8fafc;
         }
         #btn-cookie-accept:active {
             transform: translateY(0);
