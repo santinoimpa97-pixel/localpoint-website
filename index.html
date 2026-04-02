@@ -48,6 +48,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/src/style.css">
+  <script type="module" src="/src/main.js"></script>
   <script type="module" src="/src/cookie-manager.js"></script>
 
   <!-- Schema.org Structured Data (JSON-LD) -->
@@ -93,6 +94,10 @@
     ]
   }
   </script>
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","w5cibyg3ds");
+  </script>
 </head>
 
 <body>
@@ -114,15 +119,15 @@
       <!-- Language Selector -->
       <div class="language-selector" id="language-selector">
         <button class="lang-toggle" id="lang-toggle" aria-label="Seleziona lingua">
-          <span id="current-lang">🇮🇹</span>
+          <img id="current-lang" src="https://flagcdn.com/w40/it.png" alt="IT">
           <i class="fa-solid fa-chevron-down"></i>
         </button>
         <div class="lang-dropdown" id="lang-dropdown">
-          <button class="lang-option" data-lang="it">🇮🇹 Italiano</button>
-          <button class="lang-option" data-lang="en">🇬🇧 English</button>
-          <button class="lang-option" data-lang="de">🇩🇪 Deutsch</button>
-          <button class="lang-option" data-lang="es">🇪🇸 Español</button>
-          <button class="lang-option" data-lang="fr">🇫🇷 Français</button>
+          <button class="lang-option" data-lang="it"><img src="https://flagcdn.com/w40/it.png" alt="IT"></button>
+          <button class="lang-option" data-lang="en"><img src="https://flagcdn.com/w40/gb.png" alt="GB"></button>
+          <button class="lang-option" data-lang="de"><img src="https://flagcdn.com/w40/de.png" alt="DE"></button>
+          <button class="lang-option" data-lang="es"><img src="https://flagcdn.com/w40/es.png" alt="ES"></button>
+          <button class="lang-option" data-lang="fr"><img src="https://flagcdn.com/w40/fr.png" alt="FR"></button>
         </div>
       </div>
       <button id="mobile-menu-btn" class="mobile-menu-toggle" aria-label="Menu">
@@ -654,7 +659,7 @@
     <div class="container footer-grid">
       <div class="footer-brand">
         <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
-        <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+        <p class="footer-tagline" data-i18n="footer.tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
         <div class="socials">
           <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
           <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -662,28 +667,28 @@
         </div>
       </div>
       <div class="footer-col">
-        <h4 class="footer-col-title">Link Utili</h4>
+        <h4 class="footer-col-title" data-i18n="footer.links.title">Link Utili</h4>
         <ul class="footer-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/tourist-services.html">Servizi Turistici</a></li>
-          <li><a href="/#shipping">Spedizioni</a></li>
-          <li><a href="/#luggage">Deposito Bagagli</a></li>
-          <li><a href="/become-partner.html">Diventa Partner</a></li>
+          <li><a href="/" data-i18n="nav.home">Home</a></li>
+          <li><a href="/tourist-services.html" data-i18n="footer.links.tourist">Servizi Turistici</a></li>
+          <li><a href="/#shipping" data-i18n="footer.links.shipping">Spedizioni</a></li>
+          <li><a href="/#luggage" data-i18n="footer.links.luggage">Deposito Bagagli</a></li>
+          <li><a href="/become-partner.html" data-i18n="footer.links.partner">Diventa Partner</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+        <h4 class="footer-col-title" data-i18n="footer.contacts.title">Contatti &amp; Orari</h4>
         <ul class="footer-contact-list">
-          <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+          <li><i class="fa-solid fa-location-dot"></i><span data-i18n="contact.address.value">Via Tenente Brigiano 6, 98057 Milazzo</span></li>
           <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
           <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
-          <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+          <li><i class="fa-regular fa-clock"></i><span data-i18n="footer.hours">Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <div class="container">
-        <p>&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
+        <p data-i18n="footer.copyright">&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
       </div>
     </div>
   </footer>

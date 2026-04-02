@@ -231,20 +231,60 @@
             .whatsapp-float { width: 55px; height: 55px; font-size: 1.8rem; bottom: 20px; right: 20px; }
         }
 
+        /* ── LANGUAGE SELECTOR ── */
+        .lp-lang-sel { position:relative; }
+        .lp-lang-toggle { display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);border-radius:10px;padding:8px 14px;cursor:pointer;color:#fff;transition:all 0.3s;backdrop-filter:blur(10px); }
+        .lp-lang-toggle:hover { background:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.6); }
+        .lp-lang-toggle img { width:24px;height:18px;object-fit:cover;border-radius:2px;display:block; }
+        .lp-lang-toggle .lp-chev { font-size:0.7rem;transition:transform 0.3s; }
+        .lp-lang-sel.open .lp-lang-toggle .lp-chev { transform:rotate(180deg); }
+        .lp-lang-drop { position:absolute;top:calc(100% + 10px);right:0;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,78,146,0.18);overflow:hidden;min-width:60px;z-index:9999;opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity 0.3s,transform 0.3s,visibility 0.3s; }
+        .lp-lang-sel.open .lp-lang-drop { opacity:1;visibility:visible;transform:translateY(0); }
+        .lp-lang-opt { display:flex;align-items:center;justify-content:center;width:100%;padding:10px 14px;border:none;background:none;cursor:pointer;transition:background 0.15s; }
+        .lp-lang-opt:hover { background:rgba(0,78,146,0.07); }
+        .lp-lang-opt.lp-active { background:linear-gradient(135deg,#004e92,#00a0a0); }
+        .lp-lang-opt img { width:28px;height:21px;object-fit:cover;border-radius:2px;display:block; }
+        @media(max-width:768px) {
+            .lp-lang-sel { position:absolute;right:62px;top:50%;transform:translateY(-50%); }
+            .lp-lang-toggle { padding:6px 10px; }
+            .lp-lang-toggle img { width:20px;height:15px; }
+            .lp-lang-drop { right:auto;left:50%;transform:translateX(-50%) translateY(-10px); }
+            .lp-lang-sel.open .lp-lang-drop { transform:translateX(-50%) translateY(0); }
+        }
+
     </style>
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","w5cibyg3ds");
+  </script>
 </head>
 <body>
 
     <!-- NAV -->
     <nav class="ts-nav">
-        <div class="ts-nav-inner">
+        <div class="ts-nav-inner" style="position:relative;">
             <a href="/" class="img-wrapper">
                 <img src="/logo.png" alt="LocalPoint" onerror="this.parentElement.innerHTML='<span style=\'font-size:1.4rem;font-family:Outfit;font-weight:900;color:var(--primary-blue);\'>LocalPoint</span>'">
             </a>
+            <!-- Nav links (desktop only) -->
             <div class="ts-links">
-                <a href="/">🏠 Home</a>
-                <a href="/tourist-services.html">🌴 Servizi Turistici</a>
-                <a href="/#contact">📍 Contatti</a>
+                <a href="/">🏠 <span data-i18n="nav.home">Home</span></a>
+                <a href="/tourist-services.html">🌴 <span data-i18n="nav.tourist">Servizi Turistici</span></a>
+                <a href="/#contact">📍 <span data-i18n="nav.contact">Contatti</span></a>
+            </div>
+            <!-- Language selector -->
+            <div class="lp-lang-sel" id="lp-lang-sel">
+                <button class="lp-lang-toggle" onclick="window.lpLangToggle(event)" aria-label="Lingua">
+                    <img id="lp-current-flag" src="https://flagcdn.com/w40/it.png" alt="IT">
+                    <i class="fa-solid fa-chevron-down lp-chev"></i>
+                </button>
+                <div class="lp-lang-drop">
+                    <button class="lp-lang-opt lp-active" data-lang="it" onclick="window.setLang('it')"><img src="https://flagcdn.com/w40/it.png" alt="IT"></button>
+                    <button class="lp-lang-opt" data-lang="en" onclick="window.setLang('en')"><img src="https://flagcdn.com/w40/gb.png" alt="GB"></button>
+                    <button class="lp-lang-opt" data-lang="fr" onclick="window.setLang('fr')"><img src="https://flagcdn.com/w40/fr.png" alt="FR"></button>
+                    <button class="lp-lang-opt" data-lang="es" onclick="window.setLang('es')"><img src="https://flagcdn.com/w40/es.png" alt="ES"></button>
+                    <button class="lp-lang-opt" data-lang="de" onclick="window.setLang('de')"><img src="https://flagcdn.com/w40/de.png" alt="DE"></button>
+                </div>
             </div>
             <!-- Hamburger mobile -->
             <button id="sd-menu-btn" onclick="document.getElementById('sd-mobile-nav').classList.toggle('open')" aria-label="Menu"
@@ -254,17 +294,17 @@
                 <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
             </button>
         </div>
-        <!-- Mobile nav overlay -->
+        <!-- Mobile nav overlay (no lang selector here) -->
         <div id="sd-mobile-nav" style="display:none;flex-direction:column;background:linear-gradient(135deg,rgba(0,78,146,0.99) 0%,rgba(0,160,160,0.97) 100%);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.1);">
-            <a href="/" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🏠 Home</a>
-            <a href="/tourist-services.html" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🌴 Servizi Turistici</a>
-            <a href="/#contact" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;">📍 Contatti</a>
+            <a href="/" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🏠 <span data-i18n="nav.home">Home</span></a>
+            <a href="/tourist-services.html" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🌴 <span data-i18n="nav.tourist">Servizi Turistici</span></a>
+            <a href="/#contact" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;">📍 <span data-i18n="nav.contact">Contatti</span></a>
         </div>
     </nav>
 
     <div class="err-state" id="error-screen">
-        <h2>Esperienza non trovata</h2>
-        <a href="/tourist-services.html" style="color:var(--primary-blue); text-decoration:none; font-weight:800; font-size: 1.2rem;"><i class="fa-solid fa-arrow-left"></i> Torna alla ricerca</a>
+        <h2 data-i18n="sd.error.title">Esperienza non trovata</h2>
+        <a href="/tourist-services.html" style="color:var(--primary-blue); text-decoration:none; font-weight:800; font-size: 1.2rem;"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="sd.error.back">Torna alla ricerca</span></a>
     </div>
 
     <main class="main-container" id="main-content" style="display:none;">
@@ -277,14 +317,14 @@
 
         <!-- TITLE AND META -->
         <div class="title-sec">
-            <div class="badge">LocalPoint Certified – Milazzo</div>
+            <div class="badge" data-i18n="sd.badge">LocalPoint Certified – Milazzo</div>
             <h1 id="gyg-title">Titolo Esperienza</h1>
             <div class="title-meta">
-                <div class="location"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i> Sicilia, Italia</div>
+                <div class="location"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i> <span data-i18n="sd.location">Sicilia, Italia</span></div>
                 <span style="color:var(--border);">•</span>
                 <div class="location" id="gyg-cat-tag">Categoria</div>
                 <button class="share-btn" id="share-btn" onclick="shareExperience()">
-                    <i class="fa-solid fa-share-nodes"></i> Condividi
+                    <i class="fa-solid fa-share-nodes"></i> <span data-i18n="sd.share">Condividi</span>
                 </button>
             </div>
         </div>
@@ -308,53 +348,53 @@
         <div class="content-split">
             <!-- LEFT COLUMN -->
             <div class="left-col">
-                <h3 style="font-family: 'Outfit'; font-size: 1.4rem; color: var(--primary-blue); font-weight: 800; margin-bottom: 15px;">Descrizione completa dell'attività</h3>
+                <h3 style="font-family: 'Outfit'; font-size: 1.4rem; color: var(--primary-blue); font-weight: 800; margin-bottom: 15px;" data-i18n="sd.desc.title">Descrizione completa dell'attività</h3>
                 <div class="full-desc" id="gyg-desc" style="margin-bottom: 40px;"></div>
 
                 <hr style="margin-top: 0;">
 
-                <h2>Informazioni su questa attività</h2>
+                <h2 data-i18n="sd.info.title">Informazioni su questa attività</h2>
                 <ul class="about-list">
                     <li class="about-item">
                         <div class="about-icon"><i class="fa-regular fa-calendar-check"></i></div>
                         <div class="about-text">
-                            <h4>Cancellazione flessibile</h4>
-                            <p>Cancella fino a 24 ore prima per ricevere un rimborso completo o riprogrammare l'esperienza nella massima facilità.</p>
+                            <h4 data-i18n="sd.cancel.title">Cancellazione flessibile</h4>
+                            <p data-i18n="sd.cancel.desc">Cancella fino a 24 ore prima per ricevere un rimborso completo o riprogrammare l'esperienza nella massima facilità.</p>
                         </div>
                     </li>
                     <li class="about-item">
                         <div class="about-icon"><i class="fa-solid fa-wallet"></i></div>
                         <div class="about-text">
-                            <h4>Prenota ora e paga sul posto</h4>
-                            <p>Mantieni i tuoi piani di viaggio flessibili: blocca la disponibilità online e paga direttamente il giorno dell'erogazione del servizio.</p>
+                            <h4 data-i18n="sd.booknow.title">Prenota ora e paga sul posto</h4>
+                            <p data-i18n="sd.booknow.desc">Mantieni i tuoi piani di viaggio flessibili: blocca la disponibilità online e paga direttamente il giorno dell'erogazione del servizio.</p>
                         </div>
                     </li>
                     <li class="about-item">
                         <div class="about-icon"><i class="fa-solid fa-stopwatch"></i></div>
                         <div class="about-text">
-                            <h4>Orari Personalizzati</h4>
-                            <p>Contattaci per valutare gli orari di partenza e adattare l'esperienza alle tue esigenze di viaggio.</p>
+                            <h4 data-i18n="sd.hours.title">Orari Personalizzati</h4>
+                            <p data-i18n="sd.hours.desc">Contattaci per valutare gli orari di partenza e adattare l'esperienza alle tue esigenze di viaggio.</p>
                         </div>
                     </li>
                     <li class="about-item">
                         <div class="about-icon"><i class="fa-brands fa-whatsapp" style="color: #25d366;"></i></div>
                         <div class="about-text">
-                            <h4>Assistenza Locale Multilingua VIP</h4>
-                            <p>Supporto garantito e costante via WhatsApp in Italiano e Inglese direttamente dal nostro ufficio di Via Tenente Brigiano.</p>
+                            <h4 data-i18n="sd.assist.title">Assistenza Locale Multilingua VIP</h4>
+                            <p data-i18n="sd.assist.desc">Supporto garantito e costante via WhatsApp in Italiano e Inglese direttamente dal nostro ufficio di Via Tenente Brigiano.</p>
                         </div>
                     </li>
                 </ul>
 
                 <hr>
 
-                <h2>L'esperienza LocalPoint</h2>
-                
+                <h2 data-i18n="sd.exp.title">L'esperienza LocalPoint</h2>
+
                 <div class="highlights">
-                    <h3><i class="fa-solid fa-star"></i> Perché sceglierla</h3>
+                    <h3 data-i18n="sd.highlights.title">⭐ Perché sceglierla</h3>
                     <ul>
-                        <li>Goditi un'esperienza premium senza stress organizzativo alcuno</li>
-                        <li>Affidati ai migliori partner locali, selezionati dal nostro team di Concierge</li>
-                        <li>Scegli l'affidabilità di LocalPoint, il modo più sicuro di vivere Milazzo</li>
+                        <li data-i18n="sd.highlights.1">Goditi un'esperienza premium senza stress organizzativo alcuno</li>
+                        <li data-i18n="sd.highlights.2">Affidati ai migliori partner locali, selezionati dal nostro team di Concierge</li>
+                        <li data-i18n="sd.highlights.3">Scegli l'affidabilità di LocalPoint, il modo più sicuro di vivere Milazzo</li>
                     </ul>
                 </div>
 
@@ -364,21 +404,21 @@
             <div class="right-col">
                 <div class="booking-card">
                     <div class="price-head">
-                        <span class="from">Prezzo a partire da</span>
+                        <span class="from" data-i18n="sd.price.from">Prezzo a partire da</span>
                         <span class="val" id="gyg-price-val">€0</span>
                         <span class="unit" id="gyg-price-note">A persona</span>
                     </div>
 
                     <div class="form-area">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/WhatsApp_icon.png" alt="WhatsApp">
-                        <h4>Prenota in modo semplice</h4>
-                        <p>Inviaci un rapido messaggio su WhatsApp spiegandoci i tuoi piani. Ti confermeremo all'istante l'effettiva disponibilità!</p>
-                        
+                        <h4 data-i18n="sd.book.title">Prenota in modo semplice</h4>
+                        <p data-i18n="sd.book.desc">Inviaci un rapido messaggio su WhatsApp spiegandoci i tuoi piani. Ti confermeremo all'istante l'effettiva disponibilità!</p>
+
                         <a href="https://wa.me/393793283803" id="wa-book-btn" target="_blank" class="btn-book">
-                            <i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> Scrivici su WhatsApp
+                            <i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> <span data-i18n="sd.wa.btn">Scrivici su WhatsApp</span>
                         </a>
                     </div>
-                    <div class="no-charge-msg"><i class="fa-solid fa-bolt" style="color:#eab308;"></i> Risposta rapida da team locale</div>
+                    <div class="no-charge-msg"><i class="fa-solid fa-bolt" style="color:#eab308;"></i> <span data-i18n="sd.rapid">🔥 Risposta rapida da team locale</span></div>
                 </div>
             </div>
         </div>
@@ -388,17 +428,17 @@
     <div style="background:linear-gradient(135deg,#004e92 0%,#00a0a0 60%,#8cc63f 100%);padding:3.5rem 1.5rem;position:relative;overflow:hidden;">
         <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
         <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);">💬 Assistenza Personale</div>
-            <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;">Non trovi il servizio che cerchi?</h2>
-            <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
+            <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);" data-i18n="ts.support.badge">💬 Assistenza Personale</div>
+            <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;" data-i18n="ts.support.title">Non trovi il servizio che cerchi?</h2>
+            <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;" data-i18n="ts.support.desc">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
             <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
                 <a href="/#contact"
                    style="display:inline-flex;align-items:center;gap:0.7rem;background:#fff;color:#004e92;padding:1rem 2.5rem;border-radius:50px;font-size:1rem;font-weight:800;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,0.2);transition:transform 0.3s,box-shadow 0.3s;"
                    onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.2)'">
-                    <i class="fa-solid fa-paper-plane"></i> Contattaci
+                    <i class="fa-solid fa-paper-plane"></i> <span data-i18n="ts.support.btn">Contattaci</span>
                 </a>
             </div>
-            <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+            <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);" data-i18n="ts.support.address">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
         </div>
     </div>
 
@@ -406,7 +446,7 @@
         <div class="footer-grid">
             <div class="footer-brand">
                 <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
-                <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+                <p class="footer-tagline" data-i18n="footer.tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
                 <div class="socials">
                     <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
                     <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -414,28 +454,28 @@
                 </div>
             </div>
             <div class="footer-col">
-                <h4 class="footer-col-title">Link Utili</h4>
+                <h4 class="footer-col-title" data-i18n="footer.links.title">Link Utili</h4>
                 <ul class="footer-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/tourist-services.html">Servizi Turistici</a></li>
-                    <li><a href="/#shipping">Spedizioni</a></li>
-                    <li><a href="/#luggage">Deposito Bagagli</a></li>
-                    <li><a href="/become-partner.html">Diventa Partner</a></li>
+                    <li><a href="/" data-i18n="nav.home">Home</a></li>
+                    <li><a href="/tourist-services.html" data-i18n="footer.links.tourist">Servizi Turistici</a></li>
+                    <li><a href="/#shipping" data-i18n="footer.links.shipping">Spedizioni</a></li>
+                    <li><a href="/#luggage" data-i18n="footer.links.luggage">Deposito Bagagli</a></li>
+                    <li><a href="/become-partner.html" data-i18n="footer.links.partner">Diventa Partner</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+                <h4 class="footer-col-title" data-i18n="footer.contacts.title">Contatti &amp; Orari</h4>
                 <ul class="footer-contact-list">
-                    <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+                    <li><i class="fa-solid fa-location-dot"></i><span data-i18n="contact.address.value">Via Tenente Brigiano 6, 98057 Milazzo</span></li>
                     <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
                     <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
-                    <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+                    <li><i class="fa-regular fa-clock"></i><span data-i18n="footer.hours">Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
             <div class="container">
-                <p>&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
+                <p data-i18n="footer.copyright">&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
             </div>
         </div>
     </footer>
@@ -445,6 +485,7 @@
     
     <script type="module">
         import { supabase } from '/src/supabaseClient.js';
+        import { setLanguage } from '/src/translations.js';
         
         // Premium Unsplash Fallbacks perfectly mimicking luxury travels
         const FALLBACKS = [
@@ -549,57 +590,116 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const catId = params.get('cat');
-            const itemId = params.get('id');
-            
-            if(!catId || !itemId) {
-                document.getElementById('error-screen').style.display = 'block';
-                return;
-            }
-            
-            const { data: item, error } = await supabase.from('experiences').select('*').eq('slug_id', itemId).single();
-            if(error || !item) {
-                document.getElementById('error-screen').style.display = 'block';
-                return;
-            }
-            
-            // Use only real images, single fallback if none
-            const imgs = (item.images && item.images.length > 0) ? item.images : [FALLBACKS[0]];
-
-            document.getElementById('main-content').style.display = 'block';
-            document.title = item.title + ' | LocalPoint';
-
-            // Text population
-            const CAT_LABELS = { escursioni:'Escursioni & Tour', noleggi:'Noleggi', transfer:'Transfer & NCC', parcheggio:'Parcheggio Porto', bagagli:'Deposito Bagagli' };
-            const catLabel = CAT_LABELS[catId] || catId.charAt(0).toUpperCase() + catId.slice(1);
+        // ===== I18N =====
+        const CAT_LABELS_I18N = {
+            it: { escursioni:'Escursioni & Tour', noleggi:'Noleggi', transfer:'Transfer & NCC', parcheggio:'Parcheggio Porto', bagagli:'Deposito Bagagli' },
+            en: { escursioni:'Excursions & Tours', noleggi:'Rentals', transfer:'Transfer & NCC', parcheggio:'Port Parking', bagagli:'Luggage Storage' },
+            fr: { escursioni:'Excursions & Tours', noleggi:'Locations', transfer:'Transfer & NCC', parcheggio:'Parking du Port', bagagli:'Consigne Bagages' },
+            es: { escursioni:'Excursiones & Tours', noleggi:'Alquileres', transfer:'Transfer & NCC', parcheggio:'Aparcamiento Puerto', bagagli:'Consigna de Equipaje' },
+            de: { escursioni:'Ausflüge & Touren', noleggi:'Vermietungen', transfer:'Transfer & NCC', parcheggio:'Hafenparkplatz', bagagli:'Gepäckaufbewahrung' }
+        };
+        function getLang() {
+            const s = localStorage.getItem('localpoint-lang');
+            if (s) return s;
+            const b = (navigator.language || 'it').split('-')[0].toLowerCase();
+            return ['it','en','fr','es','de'].includes(b) ? b : 'it';
+        }
+        function t(obj, field) {
+            const l = getLang();
+            if (l === 'it') return obj[field] || '';
+            return obj[`${field}_${l}`] || obj[field] || '';
+        }
+        let _loadedItem = null, _loadedCatId = null;
+        function renderItem(item, catId) {
+            const lang = getLang();
+            const catMap = CAT_LABELS_I18N[lang] || CAT_LABELS_I18N.it;
+            const catLabel = catMap[catId] || catId.charAt(0).toUpperCase() + catId.slice(1);
             document.getElementById('gyg-bc-cat-link').textContent = catLabel;
             document.getElementById('gyg-bc-cat-link').href = `/tourist-services.html?cat=${catId}`;
-            document.getElementById('gyg-bc-title').textContent = item.title;
-            document.getElementById('gyg-cat-tag').textContent = catId.charAt(0).toUpperCase() + catId.slice(1);
-            document.getElementById('gyg-title').textContent = item.title;
-            const rawDesc = item.description || 'Nessuna descrizione specificata. Contattaci su WhatsApp per maggiori dettagli.'
+            document.getElementById('gyg-bc-title').textContent = t(item, 'title');
+            document.getElementById('gyg-cat-tag').textContent = catLabel;
+            document.getElementById('gyg-title').textContent = t(item, 'title');
+            const rawDesc = t(item, 'description') || 'Nessuna descrizione specificata. Contattaci su WhatsApp per maggiori dettagli.';
             const safeDesc = (typeof DOMPurify !== 'undefined')
                 ? DOMPurify.sanitize(rawDesc, { ALLOWED_TAGS: ['b','strong','i','em','u','h3','ul','ol','li','p','br','a','span'], ALLOWED_ATTR: ['href','target','rel'] })
-                : rawDesc
-            document.getElementById('gyg-desc').innerHTML = safeDesc
-            document.getElementById('gyg-price-val').textContent = item.price;
-            document.getElementById('gyg-price-note').textContent = item.price_note || 'A persona / unità';
-
-            // WhatsApp Link Logic
+                : rawDesc;
+            document.getElementById('gyg-desc').innerHTML = safeDesc;
+            document.getElementById('gyg-price-val').textContent = t(item, 'price');
+            document.getElementById('gyg-price-note').textContent = t(item, 'price_note') || 'A persona / unità';
             const waLink = document.getElementById('wa-book-btn');
             if (waLink) {
                 const refCode = localStorage.getItem('localpoint_referral');
                 const refLine = refCode ? `\nTariffe agevolate (codice: ${refCode})\n` : '';
                 const msg = `Ciao LocalPoint!\n\nVorrei avere informazioni e disponibilita' per l'esperienza:\n*${item.title}*\n${refLine}\nResto in attesa, grazie!`;
                 waLink.href = `https://wa.me/393793283803?text=${encodeURIComponent(msg)}`;
+                const waFloatBtn = document.getElementById('wa-float-btn');
+                if (waFloatBtn) waFloatBtn.href = waLink.href;
+            }
+        }
+        const LANG_FLAG_CODES = { it:'it', en:'gb', fr:'fr', es:'es', de:'de' };
+
+        function updateLangUI(l) {
+            const flagCode = LANG_FLAG_CODES[l] || 'it';
+            const currentFlag = document.getElementById('lp-current-flag');
+            if (currentFlag) { currentFlag.src = `https://flagcdn.com/w40/${flagCode}.png`; currentFlag.alt = l.toUpperCase(); }
+            document.querySelectorAll('.lp-lang-opt').forEach(b => b.classList.toggle('lp-active', b.dataset.lang === l));
+            document.querySelectorAll('.lp-lang-sel').forEach(s => s.classList.remove('open'));
+        }
+
+        window.lpLangToggle = function(e) {
+            e.stopPropagation();
+            document.getElementById('lp-lang-sel').classList.toggle('open');
+        };
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.lp-lang-sel')) {
+                document.querySelectorAll('.lp-lang-sel').forEach(s => s.classList.remove('open'));
+            }
+        });
+
+        window.setLang = function(l) {
+            setLanguage(l); // handles localStorage, doc.lang, all [data-i18n] elements
+            updateLangUI(l);
+            if (_loadedItem) renderItem(_loadedItem, _loadedCatId);
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Init lang + apply all static translations
+            const initL = getLang();
+            setLanguage(initL); // applies [data-i18n] elements immediately
+            updateLangUI(initL);
+
+            const params = new URLSearchParams(window.location.search);
+            const catId = params.get('cat');
+            const itemId = params.get('id');
+
+            if(!catId || !itemId) {
+                document.getElementById('error-screen').style.display = 'block';
+                return;
             }
 
-            // Update float button with same contextual message
-            const waFloatBtn = document.getElementById('wa-float-btn');
-            if (waFloatBtn) waFloatBtn.href = waLink.href;
+            const { data: item, error } = await supabase.from('experiences').select('*').eq('slug_id', itemId).single();
+            if(error || !item) {
+                document.getElementById('error-screen').style.display = 'block';
+                return;
+            }
 
+            _loadedItem = item;
+            _loadedCatId = catId;
+
+            // Use only real images, single fallback if none
+            const imgs = (item.images && item.images.length > 0) ? item.images : [FALLBACKS[0]];
+
+            document.getElementById('main-content').style.display = 'block';
+            document.title = item.title + ' | LocalPoint';
+            window.trackEvent?.('service_view', {
+                service_id: itemId,
+                service_name: item.title,
+                category: catId,
+                price: item.price || null
+            });
+
+            renderItem(item, catId);
             buildGrid(imgs);
             buildSwiper(imgs);
         });
@@ -612,11 +712,12 @@
             navigator.share({ title, text: `Dai un'occhiata a questa esperienza su LocalPoint: ${title}`, url });
         } else {
             navigator.clipboard.writeText(url).then(() => {
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Link copiato!';
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> <span data-i18n="sd.share.copied">Link copiato!</span>';
                 btn.classList.add('copied');
                 setTimeout(() => {
-                    btn.innerHTML = '<i class="fa-solid fa-share-nodes"></i> Condividi';
+                    btn.innerHTML = '<i class="fa-solid fa-share-nodes"></i> <span data-i18n="sd.share">Condividi</span>';
                     btn.classList.remove('copied');
+                    setLanguage(getLang()); // re-apply translations to restored btn
                 }, 2500);
             });
         }

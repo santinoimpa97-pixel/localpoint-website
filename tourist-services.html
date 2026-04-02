@@ -259,23 +259,68 @@
             .form-row { grid-template-columns:1fr; }
             .ts-nav { padding:0 1.2rem; }
         }
+
+        /* ── LANGUAGE SELECTOR ── */
+        .lp-lang-sel { position:relative; }
+        .lp-lang-toggle { display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);border-radius:10px;padding:8px 14px;cursor:pointer;color:#fff;transition:all 0.3s;backdrop-filter:blur(10px); }
+        .lp-lang-toggle:hover { background:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.6); }
+        .lp-lang-toggle img { width:24px;height:18px;object-fit:cover;border-radius:2px;display:block; }
+        .lp-lang-toggle .lp-chev { font-size:0.7rem;transition:transform 0.3s; }
+        .lp-lang-sel.open .lp-lang-toggle .lp-chev { transform:rotate(180deg); }
+        .lp-lang-drop { position:absolute;top:calc(100% + 10px);right:0;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,78,146,0.18);overflow:hidden;min-width:60px;z-index:9999;opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity 0.3s,transform 0.3s,visibility 0.3s; }
+        .lp-lang-sel.open .lp-lang-drop { opacity:1;visibility:visible;transform:translateY(0); }
+        .lp-lang-opt { display:flex;align-items:center;justify-content:center;width:100%;padding:10px 14px;border:none;background:none;cursor:pointer;transition:background 0.15s; }
+        .lp-lang-opt:hover { background:rgba(0,78,146,0.07); }
+        .lp-lang-opt.lp-active { background:linear-gradient(135deg,#004e92,#00a0a0); }
+        .lp-lang-opt img { width:28px;height:21px;object-fit:cover;border-radius:2px;display:block; }
+        @media(max-width:768px) {
+            .lp-lang-sel { position:absolute;right:62px;top:50%;transform:translateY(-50%); }
+            .lp-lang-toggle { padding:6px 10px; }
+            .lp-lang-toggle img { width:20px;height:15px; }
+            .lp-lang-drop { right:auto;left:50%;transform:translateX(-50%) translateY(-10px); }
+            .lp-lang-sel.open .lp-lang-drop { transform:translateX(-50%) translateY(0); }
+        }
+        /* ── HERO MOBILE FIX ── */
+        @media(max-width:768px) {
+            .hero-content { padding-bottom:80px; }
+            .hero-content h1 { font-size:clamp(2.2rem,9vw,3.2rem) !important; margin-bottom:1rem; }
+            .hero-content p { font-size:1rem; margin-bottom:1.8rem; }
+        }
     </style>
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","w5cibyg3ds");
+  </script>
 </head>
 <body>
 
     <!-- HEADER — same style as home -->
     <header style="background:linear-gradient(135deg,rgba(0,78,146,0.97) 0%,rgba(0,160,160,0.95) 60%,rgba(140,198,63,0.9) 100%);position:sticky;top:0;z-index:1000;padding:10px 0;border-bottom:2px solid rgba(255,255,255,0.15);box-shadow:0 4px 30px rgba(0,78,146,0.3);backdrop-filter:blur(20px);">
-        <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="max-width:1200px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;position:relative;">
             <!-- Logo -->
             <div style="display:flex;align-items:center;height:60px;background:rgba(255,255,255,0.92);padding:6px 16px;border-radius:14px;box-shadow:0 4px 20px rgba(0,78,146,0.15);border:1px solid rgba(255,255,255,0.6);">
                 <img src="/logo.png" alt="LocalPoint" style="height:100%;width:auto;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=\'font-size:1.1rem;font-weight:900;color:#004e92\'>LocalPoint</span>'">
             </div>
-            <!-- Nav links (desktop) -->
+            <!-- Nav links (desktop only) -->
             <nav id="ts-desktop-nav" style="display:flex;gap:28px;align-items:center;">
-                <a href="/" style="font-weight:600;font-size:1rem;color:rgba(255,255,255,0.9);text-decoration:none;padding:8px 0;transition:color 0.3s;">🏠 Home</a>
-                <a href="/tourist-services.html" style="font-weight:700;font-size:1rem;color:#fff;text-decoration:none;padding:8px 0;text-shadow:0 0 10px rgba(255,255,255,0.4);">🌴 Servizi Turistici</a>
-                <a href="/#contact" style="font-weight:600;font-size:1rem;color:rgba(255,255,255,0.9);text-decoration:none;padding:8px 0;transition:color 0.3s;">📍 Contatti</a>
+                <a href="/" style="font-weight:600;font-size:1rem;color:rgba(255,255,255,0.9);text-decoration:none;padding:8px 0;transition:color 0.3s;">🏠 <span data-i18n="nav.home">Home</span></a>
+                <a href="/tourist-services.html" style="font-weight:700;font-size:1rem;color:#fff;text-decoration:none;padding:8px 0;text-shadow:0 0 10px rgba(255,255,255,0.4);">🌴 <span data-i18n="nav.tourist">Servizi Turistici</span></a>
+                <a href="/#contact" style="font-weight:600;font-size:1rem;color:rgba(255,255,255,0.9);text-decoration:none;padding:8px 0;transition:color 0.3s;">📍 <span data-i18n="nav.contact">Contatti</span></a>
             </nav>
+            <!-- Language selector -->
+            <div class="lp-lang-sel" id="lp-lang-sel">
+                <button class="lp-lang-toggle" onclick="window.lpLangToggle(event)" aria-label="Lingua">
+                    <img id="lp-current-flag" src="https://flagcdn.com/w40/it.png" alt="IT">
+                    <i class="fa-solid fa-chevron-down lp-chev"></i>
+                </button>
+                <div class="lp-lang-drop">
+                    <button class="lp-lang-opt lp-active" data-lang="it" onclick="window.setLang('it')"><img src="https://flagcdn.com/w40/it.png" alt="IT"></button>
+                    <button class="lp-lang-opt" data-lang="en" onclick="window.setLang('en')"><img src="https://flagcdn.com/w40/gb.png" alt="GB"></button>
+                    <button class="lp-lang-opt" data-lang="fr" onclick="window.setLang('fr')"><img src="https://flagcdn.com/w40/fr.png" alt="FR"></button>
+                    <button class="lp-lang-opt" data-lang="es" onclick="window.setLang('es')"><img src="https://flagcdn.com/w40/es.png" alt="ES"></button>
+                    <button class="lp-lang-opt" data-lang="de" onclick="window.setLang('de')"><img src="https://flagcdn.com/w40/de.png" alt="DE"></button>
+                </div>
+            </div>
             <!-- Hamburger (mobile) -->
             <button id="ts-menu-btn" class="mobile-menu-toggle" onclick="document.getElementById('ts-mobile-nav').classList.toggle('open')" aria-label="Menu" style="display:none;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.35);color:#fff;width:44px;height:44px;border-radius:10px;cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;">
                 <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
@@ -283,11 +328,11 @@
                 <span style="display:block;width:24px;height:3px;background:white;border-radius:3px;"></span>
             </button>
         </div>
-        <!-- Mobile nav overlay -->
+        <!-- Mobile nav overlay (no lang selector here) -->
         <div id="ts-mobile-nav" style="display:none;flex-direction:column;gap:0;background:linear-gradient(135deg,rgba(0,78,146,0.99) 0%,rgba(0,160,160,0.97) 100%);backdrop-filter:blur(20px);padding:0;border-top:1px solid rgba(255,255,255,0.1);">
-            <a href="/index.html" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🏠 Home</a>
-            <a href="/tourist-services.html" style="display:block;padding:1rem 1.5rem;color:#fff;text-decoration:none;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.08);">🌴 Servizi Turistici</a>
-            <a href="/#contact" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;">📍 Contatti</a>
+            <a href="/index.html" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.08);">🏠 <span data-i18n="nav.home">Home</span></a>
+            <a href="/tourist-services.html" style="display:block;padding:1rem 1.5rem;color:#fff;text-decoration:none;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.08);">🌴 <span data-i18n="nav.tourist">Servizi Turistici</span></a>
+            <a href="/#contact" style="display:block;padding:1rem 1.5rem;color:rgba(255,255,255,0.9);text-decoration:none;font-weight:600;">📍 <span data-i18n="nav.contact">Contatti</span></a>
         </div>
     </header>
 
@@ -368,7 +413,7 @@
 
     <!-- REFERRAL BANNER -->
     <div class="ref-banner" id="ref-banner">
-        <i class="fa-solid fa-gift"></i>&nbsp; Partner <strong id="ref-name"></strong> — Tariffe convenzionate attive per te
+        <i class="fa-solid fa-gift"></i>&nbsp; Partner <strong id="ref-name"></strong> — <span data-i18n="ts.ref.banner">Tariffe convenzionate attive per te</span>
     </div>
 
     <!-- ========================= VIEW 1: CATEGORIES ========================= -->
@@ -376,29 +421,29 @@
         <!-- HERO -->
         <div class="hero-wrap" id="hero-wrap">
             <div class="hero-bg" style="background: #003870;">
-                <img src="https://i.postimg.cc/cHbhhYMB/immagine.png" alt="Milazzo" fetchpriority="high" loading="eager">
+                <img src="/images/tourist-services/hero-milazzo.png" alt="Milazzo" fetchpriority="high" loading="eager">
             </div>
             <div class="hero-content">
-                <span class="hero-eyebrow"><i class="fa-solid fa-location-dot"></i> Milazzo, Sicilia</span>
-                <h1>Vivi la tua <em>migliore</em> vacanza</h1>
-                <p>Escursioni, noleggi, transfer e tutti i servizi locali selezionati da LocalPoint.</p>
+                <span class="hero-eyebrow"><i class="fa-solid fa-location-dot"></i> <span data-i18n="ts.hero.eyebrow">Milazzo, Sicilia</span></span>
+                <h1 data-i18n="ts.hero.title">Vivi la tua <em>migliore</em> vacanza</h1>
+                <p data-i18n="ts.hero.subtitle">Escursioni, noleggi, transfer e tutti i servizi locali selezionati da LocalPoint.</p>
                 <button class="hero-scroll-btn" onclick="document.getElementById('cats-section').scrollIntoView({behavior:'smooth'})">
-                    <i class="fa-solid fa-compass"></i> Esplora i Servizi
+                    <i class="fa-solid fa-compass"></i> <span data-i18n="ts.hero.btn">Esplora i Servizi</span>
                 </button>
             </div>
             <div class="hero-stats">
-                <div class="hero-stat"><span class="val" data-count="5" data-suffix="+">0+</span><span class="lab">categorie</span></div>
-                <div class="hero-stat"><span class="val" data-count="20" data-suffix="+">0+</span><span class="lab">esperienze</span></div>
-                <div class="hero-stat"><span class="val" data-count="100" data-suffix="%">0%</span><span class="lab">garantiti</span></div>
+                <div class="hero-stat"><span class="val" data-count="5" data-suffix="+">0+</span><span class="lab" data-i18n="ts.hero.stat.categories">categorie</span></div>
+                <div class="hero-stat"><span class="val" data-count="20" data-suffix="+">0+</span><span class="lab" data-i18n="ts.hero.stat.experiences">esperienze</span></div>
+                <div class="hero-stat"><span class="val" data-count="100" data-suffix="%">0%</span><span class="lab" data-i18n="ts.hero.stat.guaranteed">garantiti</span></div>
             </div>
         </div>
 
         <!-- CATEGORIES SECTION -->
         <section class="page-section" id="cats-section">
             <div class="section-header">
-                <div class="section-label">Cosa vuoi fare?</div>
-                <h2>Scegli la tua categoria</h2>
-                <p>Ogni esperienza è pensata per renderti il soggiorno indimenticabile.</p>
+                <div class="section-label" data-i18n="ts.cats.label">Cosa vuoi fare?</div>
+                <h2 data-i18n="ts.cats.title">Scegli la tua categoria</h2>
+                <p data-i18n="ts.cats.subtitle">Ogni esperienza è pensata per renderti il soggiorno indimenticabile.</p>
             </div>
 
             <div class="cat-grid" id="cat-grid"></div>
@@ -407,15 +452,15 @@
         <div style="background:linear-gradient(135deg,#004e92 0%,#00a0a0 60%,#8cc63f 100%);padding:3.5rem 1.5rem;position:relative;overflow:hidden;">
             <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
             <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
-                <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);">💬 Assistenza Personale</div>
-                <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;">Non trovi il servizio che cerchi?</h2>
-                <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
+                <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);" data-i18n="ts.support.badge">💬 Assistenza Personale</div>
+                <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;" data-i18n="ts.support.title">Non trovi il servizio che cerchi?</h2>
+                <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;" data-i18n="ts.support.desc">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
                     <a href="/#contact" style="display:inline-flex;align-items:center;gap:0.7rem;background:#fff;color:#004e92;padding:1rem 2.5rem;border-radius:50px;font-size:1rem;font-weight:800;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,0.2);transition:transform 0.3s,box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.2)'">
-                        <i class="fa-solid fa-paper-plane"></i> Contattaci
+                        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="ts.support.btn">Contattaci</span>
                     </a>
                 </div>
-                <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+                <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);" data-i18n="ts.support.address">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
             </div>
         </div>
     </div>
@@ -424,7 +469,7 @@
     <div id="view-services">
         <div class="srv-wrap">
             <div class="srv-breadcrumb">
-                <button class="crumb-back" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> Tutte le categorie</button>
+                <button class="crumb-back" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="ts.back">Tutte le categorie</span></button>
                 <span class="crumb-sep">/</span>
                 <span class="crumb-curr" id="crumb-curr">Categoria</span>
             </div>
@@ -438,17 +483,17 @@
         <div style="background:linear-gradient(135deg,#004e92 0%,#00a0a0 60%,#8cc63f 100%);padding:3.5rem 1.5rem;position:relative;overflow:hidden;">
             <div style="position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
             <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
-                <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);">💬 Assistenza Personale</div>
-                <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;">Non trovi il servizio che cerchi?</h2>
-                <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
+                <div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:0.72rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 1rem;border-radius:50px;margin-bottom:1.2rem;backdrop-filter:blur(10px);" data-i18n="ts.support.badge">💬 Assistenza Personale</div>
+                <h2 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;margin-bottom:0.8rem;letter-spacing:-0.02em;" data-i18n="ts.support.title">Non trovi il servizio che cerchi?</h2>
+                <p style="font-size:1.05rem;color:rgba(255,255,255,0.85);line-height:1.6;max-width:520px;margin:0 auto 2.2rem;" data-i18n="ts.support.desc">Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.</p>
                 <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">
                     <a href="/#contact"
                        style="display:inline-flex;align-items:center;gap:0.7rem;background:#fff;color:#004e92;padding:1rem 2.5rem;border-radius:50px;font-size:1rem;font-weight:800;text-decoration:none;box-shadow:0 8px 28px rgba(0,0,0,0.2);transition:transform 0.3s,box-shadow 0.3s;"
                        onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.2)'">
-                        <i class="fa-solid fa-paper-plane"></i> Contattaci
+                        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="ts.support.btn">Contattaci</span>
                     </a>
                 </div>
-                <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+                <p style="margin-top:1.4rem;font-size:0.82rem;color:rgba(255,255,255,0.6);" data-i18n="ts.support.address">📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00</p>
             </div>
         </div>
     </div>
@@ -458,7 +503,7 @@
         <div class="footer-grid">
             <div class="footer-brand">
                 <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
-                <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+                <p class="footer-tagline" data-i18n="footer.tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
                 <div class="socials">
                     <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
                     <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -466,27 +511,27 @@
                 </div>
             </div>
             <div class="footer-col">
-                <h4 class="footer-col-title">Link Utili</h4>
+                <h4 class="footer-col-title" data-i18n="footer.links.title">Link Utili</h4>
                 <ul class="footer-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/tourist-services.html">Servizi Turistici</a></li>
-                    <li><a href="/#shipping">Spedizioni</a></li>
-                    <li><a href="/#luggage">Deposito Bagagli</a></li>
-                    <li><a href="/become-partner.html">Diventa Partner</a></li>
+                    <li><a href="/" data-i18n="nav.home">Home</a></li>
+                    <li><a href="/tourist-services.html" data-i18n="footer.links.tourist">Servizi Turistici</a></li>
+                    <li><a href="/#shipping" data-i18n="footer.links.shipping">Spedizioni</a></li>
+                    <li><a href="/#luggage" data-i18n="footer.links.luggage">Deposito Bagagli</a></li>
+                    <li><a href="/become-partner.html" data-i18n="footer.links.partner">Diventa Partner</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+                <h4 class="footer-col-title" data-i18n="footer.contacts.title">Contatti &amp; Orari</h4>
                 <ul class="footer-contact-list">
-                    <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+                    <li><i class="fa-solid fa-location-dot"></i><span data-i18n="contact.address.value">Via Tenente Brigiano 6, 98057 Milazzo</span></li>
                     <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
                     <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
-                    <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+                    <li><i class="fa-regular fa-clock"></i><span data-i18n="footer.hours">Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
+            <p data-i18n="footer.copyright">&copy; 2026 LocalPoint Milazzo. Tutti i diritti riservati.</p>
         </div>
     </footer>
 
@@ -498,8 +543,8 @@
                 <img src="https://i.postimg.cc/cLX7xwgf/immagine.png" alt="Deposito bagagli">
                 <div class="modal-img-head-overlay"></div>
                 <div class="modal-img-info">
-                    <div class="modal-img-cat">🎒 Deposito Bagagli</div>
-                    <div class="modal-img-title">Prenota il tuo spazio</div>
+                    <div class="modal-img-cat" data-i18n="ts.lug.title">🎒 Deposito Bagagli</div>
+                    <div class="modal-img-title" data-i18n="ts.lug.subtitle">Prenota il tuo spazio</div>
                 </div>
                 <button class="modal-close-btn" onclick="closeLuggageModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -507,24 +552,24 @@
             <div class="modal-body">
                 <form id="luggage-form-public" data-track="luggage_booking_submit">
                     <div class="f-group" style="margin-bottom:1.2rem;">
-                        <label>Nome e Cognome</label>
+                        <label data-i18n="ts.lug.name">Nome e Cognome</label>
                         <input type="text" id="lug-name" placeholder="es. Marco Bianchi" required>
                     </div>
 
                     <div class="form-row">
                         <div class="f-group">
-                            <label>Email</label>
+                            <label data-i18n="ts.lug.email">Email</label>
                             <input type="email" id="lug-email" placeholder="mario@mail.com" required>
                         </div>
                         <div class="f-group">
-                            <label>Telefono / WhatsApp</label>
+                            <label data-i18n="ts.lug.phone">Telefono / WhatsApp</label>
                             <input type="tel" id="lug-phone" placeholder="+39 3..." required>
                         </div>
                     </div>
 
                     <!-- Bag counter -->
                     <div class="f-group" style="margin-bottom:1.2rem;">
-                        <label>Numero di Bagagli</label>
+                        <label data-i18n="ts.lug.bags">Numero di Bagagli</label>
                         <div style="display:flex;align-items:center;gap:0.8rem;">
                             <button type="button" onclick="changeBags(-1)" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);font-size:1.4rem;font-weight:700;color:var(--primary-blue);display:flex;align-items:center;justify-content:center;transition:all 0.2s;background:#fff;cursor:pointer;">−</button>
                             <input type="number" id="lug-bags" value="1" min="1" max="20" style="text-align:center;font-size:1.4rem;font-weight:900;color:var(--primary-blue);width:70px;border:2px solid var(--border);border-radius:12px;padding:0.5rem;" oninput="recalcLug()">
@@ -535,17 +580,17 @@
 
                     <div class="form-row">
                         <div class="f-group">
-                            <label><i class="fa-solid fa-arrow-right-to-bracket" style="color:var(--primary-teal);margin-right:0.3rem;"></i> Check-in (lascia i bagagli)</label>
+                            <label><i class="fa-solid fa-arrow-right-to-bracket" style="color:var(--primary-teal);margin-right:0.3rem;"></i> <span data-i18n="ts.lug.checkin">Check-in (lascia i bagagli)</span></label>
                             <input type="datetime-local" id="lug-checkin" required oninput="recalcLug()">
                         </div>
                         <div class="f-group">
-                            <label><i class="fa-solid fa-arrow-right-from-bracket" style="color:var(--accent-green);margin-right:0.3rem;"></i> Ritiro previsto</label>
+                            <label><i class="fa-solid fa-arrow-right-from-bracket" style="color:var(--accent-green);margin-right:0.3rem;"></i> <span data-i18n="ts.lug.checkout">Ritiro previsto</span></label>
                             <input type="datetime-local" id="lug-checkout" required oninput="recalcLug()">
                         </div>
                     </div>
 
                     <div class="f-group" style="margin-bottom:1.5rem;">
-                        <label>Note (facoltative)</label>
+                        <label data-i18n="ts.lug.notes">Note (facoltative)</label>
                         <textarea id="lug-notes" rows="2" placeholder="Bagagli fragili, richieste particolari..."></textarea>
                     </div>
 
@@ -553,9 +598,9 @@
                     <div style="background:linear-gradient(135deg,rgba(0,160,160,0.07),rgba(0,78,146,0.05));border:1.5px solid rgba(0,160,160,0.25);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:0.8rem;">
                         <span style="font-size:1.5rem;flex-shrink:0;">📍</span>
                         <div>
-                            <div style="font-size:0.85rem;font-weight:800;color:var(--primary-blue);margin-bottom:0.3rem;">Dove consegnare i bagagli</div>
+                            <div style="font-size:0.85rem;font-weight:800;color:var(--primary-blue);margin-bottom:0.3rem;" data-i18n="ts.lug.where">Dove consegnare i bagagli</div>
                             <a href="https://maps.app.goo.gl/EN8XDhEJVaJGKXFb6?g_st=ic" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem;font-weight:700;color:var(--primary-teal);text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;margin-bottom:0.15rem;">LocalPoint — Via Tenente Brigiano 6, Milazzo <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.7rem;opacity:0.7;"></i></a>
-                            <div style="font-size:0.8rem;color:var(--text-mut);line-height:1.4;">Presentati con il codice di prenotazione che riceverai via email. Il nostro staff ti aspetta.</div>
+                            <div style="font-size:0.8rem;color:var(--text-mut);line-height:1.4;" data-i18n="ts.lug.info">Presentati con il codice di prenotazione che riceverai via email. Il nostro staff ti aspetta.</div>
                         </div>
                     </div>
 
@@ -563,34 +608,34 @@
                     <div style="background:linear-gradient(135deg,rgba(0,78,146,0.06),rgba(0,160,160,0.06));border:1.5px solid rgba(0,78,146,0.15);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:0.8rem;">
                         <span style="font-size:1.5rem;flex-shrink:0;">🧳</span>
                         <div>
-                            <div style="font-size:0.85rem;font-weight:800;color:var(--primary-blue);margin-bottom:0.2rem;">Tariffa: €4,00 per bagaglio / giorno</div>
+                            <div style="font-size:0.85rem;font-weight:800;color:var(--primary-blue);margin-bottom:0.2rem;" data-i18n="ts.lug.rate">Tariffa: €4,00 per bagaglio / giorno</div>
                             <div style="font-size:0.8rem;color:var(--text-mut);line-height:1.4;">Minimo 1 giorno. Oltre la data prevista: supplemento di €1 ogni 6 ore per bagaglio. Il prezzo viene calcolato automaticamente.</div>
                         </div>
                     </div>
 
                     <!-- Live price summary -->
                     <div id="lug-summary" style="background:#f0f9ff;border:2px solid var(--border);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1.2rem;display:none;">
-                        <div style="font-size:0.8rem;font-weight:700;color:var(--text-mut);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;">Riepilogo Preventivo</div>
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--text-mut);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.4rem;" data-i18n="ts.lug.summary">Riepilogo Preventivo</div>
                         <div id="lug-calc-text" style="font-size:0.95rem;color:var(--primary-blue);font-weight:700;"></div>
                         <div style="margin-top:0.6rem;font-size:1.3rem;font-weight:900;color:var(--primary-blue);" id="lug-total-display"></div>
                     </div>
 
                     <button type="submit" class="btn-submit" id="lug-submit-btn">
-                        <i class="fa-solid fa-calendar-check"></i> Prenota — Pagamento in ufficio
+                        <i class="fa-solid fa-calendar-check"></i> <span data-i18n="ts.lug.btn">Prenota — Pagamento in ufficio</span>
                     </button>
                 </form>
 
                 <!-- Success panel (hidden by default) -->
                 <div id="lug-success" style="display:none;text-align:center;padding:1.5rem 0;">
                     <div style="font-size:3.5rem;margin-bottom:0.8rem;">✅</div>
-                    <div style="font-size:1.3rem;font-weight:900;color:var(--primary-blue);margin-bottom:0.5rem;">Prenotazione Confermata!</div>
+                    <div style="font-size:1.3rem;font-weight:900;color:var(--primary-blue);margin-bottom:0.5rem;" data-i18n="ts.lug.success">✅ Prenotazione Confermata!</div>
                     <div id="lug-success-code" style="display:inline-block;background:linear-gradient(135deg,var(--primary-blue),var(--primary-teal));color:white;font-size:1.5rem;font-weight:900;font-family:monospace;letter-spacing:0.1em;padding:0.6rem 1.4rem;border-radius:12px;margin-bottom:1rem;"></div>
                     <div id="lug-success-details" style="font-size:0.95rem;color:var(--text-mut);line-height:1.7;margin-bottom:1.5rem;"></div>
                     <div style="font-size:0.85rem;background:#f0f9ff;border-radius:12px;padding:0.8rem 1rem;color:var(--primary-blue);">
-                        Presenta il codice al momento del check-in.<br>
+                        <span data-i18n="ts.lug.success.notice">Presenta il codice al momento del check-in.</span><br>
                         <a href="https://maps.app.goo.gl/EN8XDhEJVaJGKXFb6?g_st=ic" target="_blank" rel="noopener noreferrer" style="color:var(--primary-blue);font-weight:700;text-decoration:underline;">📍 Via Tenente Brigiano 6, Milazzo</a>
                     </div>
-                    <button onclick="closeLuggageModal()" style="margin-top:1.2rem;padding:0.7rem 2rem;background:var(--primary-blue);color:white;border:none;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;">Chiudi</button>
+                    <button onclick="closeLuggageModal()" style="margin-top:1.2rem;padding:0.7rem 2rem;background:var(--primary-blue);color:white;border:none;border-radius:50px;font-weight:700;font-size:0.95rem;cursor:pointer;" data-i18n="ts.lug.close">Chiudi</button>
                 </div>
             </div>
         </div>
@@ -614,46 +659,46 @@
             <div class="modal-body">
                 <div class="ref-box" id="mod-ref">
                     <i class="fa-solid fa-circle-check" style="color:#10b981;font-size:1.2rem;"></i>
-                    Tariffa convenzionata partner applicata
+                    <span data-i18n="ts.book.ref">Tariffa convenzionata partner applicata</span>
                 </div>
 
                 <form id="book-form" data-track="reservation_submit">
                     <input type="hidden" id="in-svc">
 
                     <div class="f-group" style="margin-bottom:1.2rem;">
-                        <label>Nome e Cognome</label>
+                        <label data-i18n="ts.book.name">Nome e Cognome</label>
                         <input type="text" id="in-name" placeholder="es. Giulia Ferrari" required>
                     </div>
 
                     <div class="form-row">
                         <div class="f-group">
-                            <label>Data Preferita</label>
+                            <label data-i18n="ts.book.date">Data Preferita</label>
                             <input type="date" id="in-date" required>
                         </div>
                         <div class="f-group">
-                            <label>N° Persone / Qtà</label>
+                            <label data-i18n="ts.book.pax">N° Persone / Qtà</label>
                             <input type="number" id="in-pax" value="2" min="1" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="f-group">
-                            <label>Telefono / WhatsApp</label>
+                            <label data-i18n="ts.lug.phone">Telefono / WhatsApp</label>
                             <input type="tel" id="in-phone" placeholder="+39 3..." required>
                         </div>
                         <div class="f-group">
-                            <label>Email</label>
+                            <label data-i18n="ts.lug.email">Email</label>
                             <input type="email" id="in-email" placeholder="mail@esempio.it" required>
                         </div>
                     </div>
 
                     <div class="f-group">
-                        <label>Note Aggiuntive</label>
+                        <label data-i18n="ts.book.notes">Note Aggiuntive</label>
                         <textarea id="in-notes" rows="2" placeholder="Orari desiderati, richieste speciali..."></textarea>
                     </div>
 
                     <button type="submit" class="btn-submit" id="btn-submit">
-                        <i class="fa-solid fa-paper-plane"></i> Invia Richiesta di Prenotazione
+                        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="ts.book.submit">Invia Richiesta di Prenotazione</span>
                     </button>
                 </form>
             </div>
@@ -663,6 +708,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="module">
         import { supabase } from '/src/supabaseClient.js';
+        import { setLanguage } from '/src/translations.js';
         let CATALOG_DATA = {};
 
         // EmailJS — unico template universale per tutte le email
@@ -671,33 +717,124 @@
         emailjs.init('0nPf665f0pWsHFx1j');
 
         // ===================================================================
+        // I18N — MULTILINGUA
+        // ===================================================================
+        const DEPT_I18N = {
+            it: [
+                { title:'Escursioni & Tour', chip:'🏝️ Natura & Avventura', desc:'Tour alle Isole Eolie, immersioni in Area Marina Protetta, trekking ed esperienze culturali.' },
+                { title:'Noleggi', chip:'🚗 Mobilità', desc:'Scooter, auto moderne e barche di lusso a noleggio per la tua totale libertà.' },
+                { title:'Transfer & NCC', chip:'✈️ Trasferimenti', desc:'Transfer professionali per Catania e Palermo, e limousine per eventi esclusivi.' },
+                { title:'Parcheggio Porto', chip:'🅿️ Sosta Sicura', desc:'Parcheggio custodito e videosorvegliato a 5 minuti dagli imbarchi per le Eolie.' },
+                { title:'Deposito Bagagli', chip:'🎒 Viaggia Leggero', desc:'Custodia sicura dei tuoi bagagli in ufficio mentre esplori Milazzo libero.' }
+            ],
+            en: [
+                { title:'Excursions & Tours', chip:'🏝️ Nature & Adventure', desc:'Tours to the Aeolian Islands, diving in the Marine Protected Area, trekking and cultural experiences.' },
+                { title:'Rentals', chip:'🚗 Mobility', desc:'Scooters, modern cars and luxury boats for hire for your total freedom.' },
+                { title:'Transfer & NCC', chip:'✈️ Transfers', desc:'Professional transfers to Catania and Palermo, and limousines for exclusive events.' },
+                { title:'Port Parking', chip:'🅿️ Safe Parking', desc:'Guarded, video-surveilled parking 5 minutes from the Aeolian Islands ferries.' },
+                { title:'Luggage Storage', chip:'🎒 Travel Light', desc:'Safe storage of your luggage in our office while you explore Milazzo hands-free.' }
+            ],
+            fr: [
+                { title:'Excursions & Tours', chip:'🏝️ Nature & Aventure', desc:'Tours aux Îles Éoliennes, plongée en zone marine protégée, randonnées et expériences culturelles.' },
+                { title:'Locations', chip:'🚗 Mobilité', desc:'Scooters, voitures modernes et bateaux de luxe en location pour votre totale liberté.' },
+                { title:'Transfer & NCC', chip:'✈️ Transferts', desc:'Transferts professionnels vers Catane et Palerme, et limousines pour des événements exclusifs.' },
+                { title:'Parking du Port', chip:'🅿️ Stationnement Sécurisé', desc:'Parking gardé et vidéosurveillé à 5 minutes des départs pour les Éoliennes.' },
+                { title:'Consigne Bagages', chip:'🎒 Voyagez Léger', desc:'Garde sécurisée de vos bagages dans notre bureau pendant que vous explorez Milazzo librement.' }
+            ],
+            es: [
+                { title:'Excursiones & Tours', chip:'🏝️ Naturaleza & Aventura', desc:'Tours a las Islas Eolias, buceo en Zona Marina Protegida, senderismo y experiencias culturales.' },
+                { title:'Alquileres', chip:'🚗 Movilidad', desc:'Scooters, coches modernos y barcos de lujo de alquiler para tu total libertad.' },
+                { title:'Transfer & NCC', chip:'✈️ Traslados', desc:'Traslados profesionales a Catania y Palermo, y limusinas para eventos exclusivos.' },
+                { title:'Aparcamiento Puerto', chip:'🅿️ Aparcamiento Seguro', desc:'Aparcamiento vigilado y videovigilado a 5 minutos de los embarques a las Eolias.' },
+                { title:'Consigna de Equipaje', chip:'🎒 Viaja Ligero', desc:'Custodia segura de tu equipaje en nuestra oficina mientras exploras Milazzo sin carga.' }
+            ],
+            de: [
+                { title:'Ausflüge & Touren', chip:'🏝️ Natur & Abenteuer', desc:'Touren zu den Äolischen Inseln, Tauchen im Meeresschutzgebiet, Wandern und Kulturerlebnisse.' },
+                { title:'Vermietungen', chip:'🚗 Mobilität', desc:'Roller, moderne Autos und Luxusboote zum Mieten für Ihre totale Freiheit.' },
+                { title:'Transfer & NCC', chip:'✈️ Transfers', desc:'Professionelle Transfers nach Catania und Palermo sowie Limousinen für exklusive Events.' },
+                { title:'Hafenparkplatz', chip:'🅿️ Sicheres Parken', desc:'Bewachter, videoüberwachter Parkplatz 5 Minuten von den Äolischen Insel-Fähren.' },
+                { title:'Gepäckaufbewahrung', chip:'🎒 Leicht Reisen', desc:'Sichere Aufbewahrung Ihres Gepäcks in unserem Büro, während Sie Milazzo unbeschwert erkunden.' }
+            ]
+        };
+        const UI_STR = {
+            it: { proposte:'proposte disponibili', viewDetails:'Vedi Dettagli', bookNow:'Prenota Ora', esperienze:'esperienze disponibili', cta:'Scegli e prenota in 2 minuti' },
+            en: { proposte:'options available', viewDetails:'View Details', bookNow:'Book Now', esperienze:'experiences available', cta:'Choose and book in 2 minutes' },
+            fr: { proposte:'options disponibles', viewDetails:'Voir Détails', bookNow:'Réserver', esperienze:'expériences disponibles', cta:'Choisissez et réservez en 2 minutes' },
+            es: { proposte:'opciones disponibles', viewDetails:'Ver Detalles', bookNow:'Reservar', esperienze:'experiencias disponibles', cta:'Elige y reserva en 2 minutos' },
+            de: { proposte:'Angebote verfügbar', viewDetails:'Details anzeigen', bookNow:'Jetzt buchen', esperienze:'Erlebnisse verfügbar', cta:'Wählen und in 2 Minuten buchen' }
+        };
+        function getLang() {
+            const s = localStorage.getItem('localpoint-lang');
+            if (s) return s;
+            const b = (navigator.language || 'it').split('-')[0].toLowerCase();
+            return ['it','en','fr','es','de'].includes(b) ? b : 'it';
+        }
+        const LANG_FLAG_CODES = { it:'it', en:'gb', fr:'fr', es:'es', de:'de' };
+
+        function updateLangUI(l) {
+            const flagCode = LANG_FLAG_CODES[l] || 'it';
+            const currentFlag = document.getElementById('lp-current-flag');
+            if (currentFlag) { currentFlag.src = `https://flagcdn.com/w40/${flagCode}.png`; currentFlag.alt = l.toUpperCase(); }
+            document.querySelectorAll('.lp-lang-opt').forEach(b => b.classList.toggle('lp-active', b.dataset.lang === l));
+            document.querySelectorAll('.lp-lang-sel').forEach(s => s.classList.remove('open'));
+        }
+
+        window.lpLangToggle = function(e) {
+            e.stopPropagation();
+            document.getElementById('lp-lang-sel').classList.toggle('open');
+        };
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.lp-lang-sel')) {
+                document.querySelectorAll('.lp-lang-sel').forEach(s => s.classList.remove('open'));
+            }
+        });
+
+        window.setLang = function(l) {
+            setLanguage(l); // handles localStorage, doc.lang, all [data-i18n] elements
+            updateLangUI(l);
+            renderCats();
+            const catParam = new URLSearchParams(window.location.search).get('cat');
+            if (catParam && document.getElementById('view-services').style.display !== 'none') openCat(catParam);
+        };
+        function t(obj, field) {
+            const l = getLang();
+            if (l === 'it') return obj[field] || '';
+            return obj[`${field}_${l}`] || obj[field] || '';
+        }
+
+        // ===================================================================
         // DEPARTMENTS — big category cards
         // ===================================================================
         const DEPARTMENTS = [
-            { id:'escursioni', title:'Escursioni & Tour', chip:'🏝️ Natura & Avventura', desc:'Tour alle Isole Eolie, immersioni in Area Marina Protetta, trekking ed esperienze culturali.', img:'https://i.postimg.cc/VNVFRm49/gpt-image-1-5-high-fidelity-a-mi-serve-solo-l-imma.png' },
-            { id:'noleggi', title:'Noleggi', chip:'🚗 Mobilità', desc:'Scooter, auto moderne e barche di lusso a noleggio per la tua totale libertà.', img:'https://i.postimg.cc/4dPkx8Gk/immagine.png' },
-            { id:'transfer', title:'Transfer & NCC', chip:'✈️ Trasferimenti', desc:'Transfer professionali per Catania e Palermo, e limousine per eventi esclusivi.', img:'https://i.postimg.cc/Qdybgc8K/immagine.png' },
-            { id:'parcheggio', title:'Parcheggio Porto', chip:'🅿️ Sosta Sicura', desc:'Parcheggio custodito e videosorvegliato a 5 minuti dagli imbarchi per le Eolie.', img:'https://i.postimg.cc/vmm5KTm3/immagine.png' },
-            { id:'bagagli', title:'Deposito Bagagli', chip:'🎒 Viaggia Leggero', desc:'Custodia sicura dei tuoi bagagli in ufficio mentre esplori Milazzo libero.', img:'https://i.postimg.cc/cLX7xwgf/immagine.png' }
+            { id:'escursioni', title:'Escursioni & Tour', chip:'🏝️ Natura & Avventura', desc:'Tour alle Isole Eolie, immersioni in Area Marina Protetta, trekking ed esperienze culturali.', img:'/images/tourist-services/cat-escursioni.png' },
+            { id:'noleggi', title:'Noleggi', chip:'🚗 Mobilità', desc:'Scooter, auto moderne e barche di lusso a noleggio per la tua totale libertà.', img:'/images/tourist-services/cat-noleggi.png' },
+            { id:'transfer', title:'Transfer & NCC', chip:'✈️ Trasferimenti', desc:'Transfer professionali per Catania e Palermo, e limousine per eventi esclusivi.', img:'/images/tourist-services/cat-transfer.png' },
+            { id:'parcheggio', title:'Parcheggio Porto', chip:'🅿️ Sosta Sicura', desc:'Parcheggio custodito e videosorvegliato a 5 minuti dagli imbarchi per le Eolie.', img:'/images/tourist-services/cat-parcheggio.png' },
+            { id:'bagagli', title:'Deposito Bagagli', chip:'🎒 Viaggia Leggero', desc:'Custodia sicura dei tuoi bagagli in ufficio mentre esplori Milazzo libero.', img:'/images/tourist-services/cat-bagagli.png' }
         ];
 
         // ===================================================================
         // RENDER CATEGORIES BENTO
         // ===================================================================
         function renderCats() {
+            const lang = getLang();
+            const labels = DEPT_I18N[lang] || DEPT_I18N.it;
+            const ui = UI_STR[lang] || UI_STR.it;
             const grid = document.getElementById('cat-grid');
             grid.innerHTML = DEPARTMENTS.map((c, idx) => {
                 const count = (CATALOG_DATA[c.id] || []).length;
+                const lbl = labels[idx] || { title: c.title, chip: c.chip, desc: c.desc };
                 return `
                 <div class="cat-card" style="animation-delay:${0.05 + idx * 0.07}s;" onclick="openCat('${c.id}')">
-                    <img src="${c.img}" class="cat-img" alt="${c.title}" loading="lazy">
+                    <img src="${c.img}" class="cat-img" alt="${lbl.title}" loading="lazy">
                     <div class="cat-overlay"></div>
                     <div class="cat-content">
-                        <div class="cat-chip">${c.chip}</div>
-                        <h3 class="cat-title">${c.title}</h3>
-                        <p class="cat-desc">${c.desc}</p>
+                        <div class="cat-chip">${lbl.chip}</div>
+                        <h3 class="cat-title">${lbl.title}</h3>
+                        <p class="cat-desc">${lbl.desc}</p>
                         <div class="cat-footer">
-                            <span class="cat-count">${count} proposte disponibili</span>
+                            <span class="cat-count">${count} ${ui.proposte}</span>
                             <div class="cat-arrow"><i class="fa-solid fa-arrow-right" style="font-size:0.9rem;"></i></div>
                         </div>
                     </div>
@@ -710,11 +847,21 @@
         // ===================================================================
         window.openCat = (catId) => {
             const cat = DEPARTMENTS.find(x => x.id === catId);
+            const catIdx = DEPARTMENTS.findIndex(x => x.id === catId);
             const items = CATALOG_DATA[catId] || [];
+            const lang = getLang();
+            const labels = DEPT_I18N[lang] || DEPT_I18N.it;
+            const ui = UI_STR[lang] || UI_STR.it;
+            const catLabel = (labels[catIdx] || {}).title || cat?.title || catId;
+            window.trackEvent?.('category_view', {
+                category_id: catId,
+                category_name: cat?.title || catId,
+                items_count: items.length
+            });
 
-            document.getElementById('crumb-curr').textContent = cat.title;
-            document.getElementById('srv-title').textContent = cat.title;
-            document.getElementById('srv-sub').textContent = `${items.length} esperienze disponibili — Scegli e prenota in 2 minuti`;
+            document.getElementById('crumb-curr').textContent = catLabel;
+            document.getElementById('srv-title').textContent = catLabel;
+            document.getElementById('srv-sub').textContent = `${items.length} ${ui.esperienze} — ${ui.cta}`;
 
             const grid = document.getElementById('items-grid');
             grid.style.opacity = '0';
@@ -726,6 +873,8 @@
                     const imgUrl = (i.images && i.images.length > 0) ? i.images[0] : 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80';
                     const dotCount = i.images ? Math.min(i.images.length, 5) : 0;
                     const dotsHtml = dotCount > 1 ? `<div class="img-dot-strip">${[...Array(dotCount)].map((_,di) => `<div class="img-dot ${di===0?'on':''}"></div>`).join('')}</div>` : '';
+                    const iTitle = t(i, 'title');
+                    const iPreview = t(i, 'preview');
                     return `
                     <article class="item-card" style="animation-delay:${idx * 0.06}s;">
                         <div class="item-img-wrap">
@@ -735,13 +884,13 @@
                         </div>
                         <div class="item-body">
                             <div class="item-top">
-                                <h3 class="item-title">${i.emoji ? i.emoji : ''} ${i.title}</h3>
-                                <div class="price-pill">${i.price}</div>
+                                <h3 class="item-title">${i.emoji ? i.emoji : ''} ${iTitle}</h3>
+                                <div class="price-pill">${t(i,'price')}</div>
                             </div>
-                            ${i.preview ? `<p class="item-desc">${i.preview}</p>` : ''}
+                            ${iPreview ? `<p class="item-desc">${iPreview}</p>` : ''}
                             ${i.priceNote ? `<span class="item-meta">${i.priceNote}</span>` : ''}
                             <button class="item-cta" onclick="${catId === 'bagagli' ? 'openLuggageMod()' : `window.location.href='/service-details.html?cat=${catId}&id=${i.slug_id || i.id}'`}">
-                                <i class="fa-solid ${catId === 'bagagli' ? 'fa-calendar-check' : 'fa-circle-info'}"></i> ${catId === 'bagagli' ? 'Prenota Ora' : 'Vedi Dettagli'}
+                                <i class="fa-solid ${catId === 'bagagli' ? 'fa-calendar-check' : 'fa-circle-info'}"></i> ${catId === 'bagagli' ? ui.bookNow : ui.viewDetails}
                             </button>
                         </div>
                     </article>`;
@@ -861,8 +1010,20 @@
                 expected_end:   checkout ? new Date(checkout).toISOString() : null,
                 status:         'pending',
                 payment_method: 'online',
-                affiliate_id:   affData?.id || null
+                affiliate_id:   affData?.id || null,
+                partner_status: affData?.id ? 'pending' : null
             };
+
+            // Lingua cliente — definita prima dell'insert così è accessibile ovunque
+            const lang = getLang();
+            const UI_STRINGS = {
+                it: { bags:'bagagli', days:'giorno/i', total:'💶 Totale', emailNote:'📧 Ti verrà inviata una mail di conferma con tutti i dettagli.', btn:'Prenota Deposito' },
+                en: { bags:'bags',    days:'day(s)',   total:'💶 Total',   emailNote:'📧 A confirmation email with all details will be sent to you.',     btn:'Book Storage' },
+                fr: { bags:'bagages', days:'jour(s)',  total:'💶 Total',   emailNote:'📧 Un e-mail de confirmation avec tous les détails vous sera envoyé.', btn:'Réserver' },
+                es: { bags:'maletas', days:'día(s)',   total:'💶 Total',   emailNote:'📧 Recibirás un email de confirmación con todos los detalles.',       btn:'Reservar' },
+                de: { bags:'Gepäckstücke', days:'Tag(e)', total:'💶 Gesamt', emailNote:'📧 Du erhältst eine Bestätigungsmail mit allen Details.',         btn:'Buchen' },
+            };
+            const ui = UI_STRINGS[lang] || UI_STRINGS.it;
 
             const { error } = await supabase.from('luggage_tickets').insert([payload]);
 
@@ -870,13 +1031,96 @@
                 alert('Errore: ' + error.message);
             } else {
 
+
                 // Email al admin e al cliente (best-effort)
                 try {
-                    const fmtDate = v => v ? new Date(v).toLocaleString('it-IT', {dateStyle:'short',timeStyle:'short'}) : '—';
-                    const checkinFmt  = fmtDate(checkin);
-                    const checkoutFmt = fmtDate(checkout);
-                    const totalFmt    = `€ ${total.toFixed(2).replace('.',',')}`;
-                    const provenienza = affData?.name || 'Prenotazione diretta';
+                    const clientLocale = { it:'it-IT', en:'en-GB', fr:'fr-FR', es:'es-ES', de:'de-DE' }[lang] || 'it-IT';
+                    const fmtDate = (v, loc) => v ? new Date(v).toLocaleString(loc, {dateStyle:'short',timeStyle:'short'}) : '—';
+                    const checkinFmt   = fmtDate(checkin, 'it-IT');
+                    const checkoutFmt  = fmtDate(checkout, 'it-IT');
+                    const checkinFmtC  = fmtDate(checkin, clientLocale);
+                    const checkoutFmtC = fmtDate(checkout, clientLocale);
+                    const totalFmt     = `€ ${total.toFixed(2).replace('.',',')}`;
+                    const provenienza  = affData?.name || 'Prenotazione diretta';
+
+                    const EMAIL_STRINGS = {
+                        it: {
+                            subject:    `Conferma prenotazione bagagli #${shortId} — LocalPoint Milazzo`,
+                            greeting:   'Gentile',
+                            confirmed:  'La tua prenotazione deposito bagagli è confermata!',
+                            codeLabel:  'Codice Prenotazione',
+                            bags:       '🧳 Bagagli',
+                            checkin:    '📅 Check-in',
+                            checkout:   '📅 Ritiro previsto',
+                            total:      '💵 Totale',
+                            notice:     'Presenta questo codice al momento del check-in. Il pagamento avverrà in ufficio.',
+                            whereTitle: '📍 Dove venire',
+                            hours:      'Lun–Sab 09:00–13:30 / 15:30–19:00',
+                            thanks:     'Grazie per aver scelto LocalPoint!',
+                            team:       'Il Team LocalPoint — Milazzo',
+                        },
+                        en: {
+                            subject:    `Luggage storage confirmation #${shortId} — LocalPoint Milazzo`,
+                            greeting:   'Dear',
+                            confirmed:  'Your luggage storage booking is confirmed!',
+                            codeLabel:  'Booking Code',
+                            bags:       '🧳 Luggage',
+                            checkin:    '📅 Check-in',
+                            checkout:   '📅 Estimated pick-up',
+                            total:      '💵 Total',
+                            notice:     'Show this code at check-in. Payment will be made at our office.',
+                            whereTitle: '📍 Where to find us',
+                            hours:      'Mon–Sat 09:00–13:30 / 15:30–19:00',
+                            thanks:     'Thank you for choosing LocalPoint!',
+                            team:       'The LocalPoint Team — Milazzo',
+                        },
+                        fr: {
+                            subject:    `Confirmation consigne bagages #${shortId} — LocalPoint Milazzo`,
+                            greeting:   'Cher/Chère',
+                            confirmed:  'Votre réservation de consigne à bagages est confirmée !',
+                            codeLabel:  'Code de réservation',
+                            bags:       '🧳 Bagages',
+                            checkin:    '📅 Check-in',
+                            checkout:   '📅 Récupération prévue',
+                            total:      '💵 Total',
+                            notice:     'Présentez ce code lors du check-in. Le paiement s\'effectue en agence.',
+                            whereTitle: '📍 Où nous trouver',
+                            hours:      'Lun–Sam 09:00–13:30 / 15:30–19:00',
+                            thanks:     'Merci d\'avoir choisi LocalPoint !',
+                            team:       'L\'équipe LocalPoint — Milazzo',
+                        },
+                        es: {
+                            subject:    `Confirmación reserva de equipaje #${shortId} — LocalPoint Milazzo`,
+                            greeting:   'Estimado/a',
+                            confirmed:  '¡Tu reserva de consigna de equipaje está confirmada!',
+                            codeLabel:  'Código de reserva',
+                            bags:       '🧳 Equipaje',
+                            checkin:    '📅 Check-in',
+                            checkout:   '📅 Recogida prevista',
+                            total:      '💵 Total',
+                            notice:     'Presenta este código en el check-in. El pago se realizará en nuestra oficina.',
+                            whereTitle: '📍 Dónde encontrarnos',
+                            hours:      'Lun–Sáb 09:00–13:30 / 15:30–19:00',
+                            thanks:     '¡Gracias por elegir LocalPoint!',
+                            team:       'El equipo LocalPoint — Milazzo',
+                        },
+                        de: {
+                            subject:    `Buchungsbestätigung Gepäck #${shortId} — LocalPoint Milazzo`,
+                            greeting:   'Sehr geehrte/r',
+                            confirmed:  'Ihre Gepäckaufbewahrungsbuchung ist bestätigt!',
+                            codeLabel:  'Buchungscode',
+                            bags:       '🧳 Gepäck',
+                            checkin:    '📅 Check-in',
+                            checkout:   '📅 Voraussichtliche Abholung',
+                            total:      '💵 Gesamt',
+                            notice:     'Zeigen Sie diesen Code beim Check-in vor. Die Bezahlung erfolgt vor Ort.',
+                            whereTitle: '📍 Wo Sie uns finden',
+                            hours:      'Mo–Sa 09:00–13:30 / 15:30–19:00',
+                            thanks:     'Danke, dass Sie LocalPoint gewählt haben!',
+                            team:       'Das LocalPoint-Team — Milazzo',
+                        },
+                    };
+                    const s = EMAIL_STRINGS[lang] || EMAIL_STRINGS.it;
 
                     // — Email admin —
                     const adminHtml = `
@@ -898,6 +1142,7 @@
         <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">👤 Cliente</td><td style="padding:9px 0;text-align:right;font-weight:700;color:#1B3A5C;font-size:14px;">${payload.customer_name}</td></tr>
         <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📧 Email</td><td style="padding:9px 0;text-align:right;color:#1B3A5C;font-size:13px;">${payload.customer_email}</td></tr>
         <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📞 Telefono</td><td style="padding:9px 0;text-align:right;color:#1B3A5C;font-size:13px;">${payload.customer_phone}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">🌐 Lingua</td><td style="padding:9px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:13px;">${lang.toUpperCase()}</td></tr>
         <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">🧳 Bagagli</td><td style="padding:9px 0;text-align:right;font-weight:700;color:#1B3A5C;font-size:15px;">${payload.bag_count}</td></tr>
         <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📅 Check-in</td><td style="padding:9px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:13px;">${checkinFmt}</td></tr>
         <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">📅 Ritiro previsto</td><td style="padding:9px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:13px;">${checkoutFmt}</td></tr>
@@ -918,7 +1163,7 @@
                         message:  adminHtml
                     });
 
-                    // — Email cliente —
+                    // — Email cliente (nella lingua del cliente) —
                     if (payload.customer_email) {
                         const clientHtml = `
 <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:520px;margin:0 auto;background:#f0f4f3;padding:20px;">
@@ -929,37 +1174,37 @@
       <p style="color:#2A9D8F;margin:8px 0 0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Milazzo</p>
     </div>
     <div style="padding:24px;">
-      <p style="color:#1B3A5C;font-size:16px;margin:0 0 6px;">Gentile <strong>${payload.customer_name}</strong>,</p>
-      <p style="color:#4a5568;font-size:14px;line-height:1.5;margin:0 0 20px;">La tua prenotazione deposito bagagli è confermata!</p>
+      <p style="color:#1B3A5C;font-size:16px;margin:0 0 6px;">${s.greeting} <strong>${payload.customer_name}</strong>,</p>
+      <p style="color:#4a5568;font-size:14px;line-height:1.5;margin:0 0 20px;">${s.confirmed}</p>
       <div style="background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:2px solid #2A9D8F;border-radius:14px;padding:20px;text-align:center;margin:0 0 20px;">
-        <p style="color:#2A9D8F;font-size:11px;margin:0 0 6px;text-transform:uppercase;font-weight:600;letter-spacing:1px;">Codice Prenotazione</p>
+        <p style="color:#2A9D8F;font-size:11px;margin:0 0 6px;text-transform:uppercase;font-weight:600;letter-spacing:1px;">${s.codeLabel}</p>
         <p style="color:#1B3A5C;font-size:34px;font-weight:900;font-family:'Courier New',monospace;letter-spacing:4px;margin:0;">#${shortId}</p>
       </div>
       <table style="width:100%;border-collapse:collapse;margin:0 0 20px;">
-        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">🧳 Bagagli</td><td style="padding:10px 0;text-align:right;font-weight:700;color:#1B3A5C;font-size:15px;">${payload.bag_count}</td></tr>
-        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">📅 Check-in</td><td style="padding:10px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:14px;">${checkinFmt}</td></tr>
-        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">📅 Ritiro previsto</td><td style="padding:10px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:14px;">${checkoutFmt}</td></tr>
-        <tr><td style="padding:12px 0;color:#6b7280;font-size:13px;">💵 Totale</td><td style="padding:12px 0;text-align:right;font-weight:800;color:#7BC142;font-size:20px;">${totalFmt}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">${s.bags}</td><td style="padding:10px 0;text-align:right;font-weight:700;color:#1B3A5C;font-size:15px;">${payload.bag_count}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">${s.checkin}</td><td style="padding:10px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:14px;">${checkinFmtC}</td></tr>
+        <tr style="border-bottom:1px solid #e8eeec;"><td style="padding:10px 0;color:#6b7280;font-size:13px;">${s.checkout}</td><td style="padding:10px 0;text-align:right;font-weight:600;color:#1B3A5C;font-size:14px;">${checkoutFmtC}</td></tr>
+        <tr><td style="padding:12px 0;color:#6b7280;font-size:13px;">${s.total}</td><td style="padding:12px 0;text-align:right;font-weight:800;color:#7BC142;font-size:20px;">${totalFmt}</td></tr>
       </table>
       <div style="background:#fef9e7;border-left:4px solid #2A9D8F;border-radius:0 8px 8px 0;padding:12px 16px;margin:0 0 16px;">
-        <p style="color:#1B3A5C;font-size:13px;margin:0;">ℹ️ Presenta questo codice al momento del check-in. Il pagamento avverrà in ufficio.</p>
+        <p style="color:#1B3A5C;font-size:13px;margin:0;">ℹ️ ${s.notice}</p>
       </div>
       <div style="background:#e6f7f4;border-radius:12px;padding:14px 16px;text-align:center;">
-        <p style="color:#1B3A5C;font-size:13px;font-weight:700;margin:0 0 4px;">📍 Dove venire</p>
+        <p style="color:#1B3A5C;font-size:13px;font-weight:700;margin:0 0 4px;">${s.whereTitle}</p>
         <p style="color:#2A9D8F;font-size:14px;font-weight:700;margin:0 0 2px;">LocalPoint — Via Tenente Brigiano 6, Milazzo</p>
-        <p style="color:#6b7280;font-size:12px;margin:0;">Lun–Sab 09:00–13:30 / 15:30–19:00</p>
+        <p style="color:#6b7280;font-size:12px;margin:0;">${s.hours}</p>
       </div>
     </div>
     <div style="border-top:3px solid #7BC142;background:#f7faf8;padding:18px 24px;text-align:center;">
-      <p style="color:#1B3A5C;font-size:13px;margin:0 0 4px;font-weight:700;">Grazie per aver scelto LocalPoint!</p>
-      <p style="color:#2A9D8F;font-size:12px;margin:0 0 6px;">Il Team LocalPoint — Milazzo</p>
+      <p style="color:#1B3A5C;font-size:13px;margin:0 0 4px;font-weight:700;">${s.thanks}</p>
+      <p style="color:#2A9D8F;font-size:12px;margin:0 0 6px;">${s.team}</p>
       <p style="color:#a0aec0;font-size:11px;margin:0;">www.local-point.it</p>
     </div>
   </div>
 </div>`;
                         await emailjs.send(EMAIL_SVC, EMAIL_TPL, {
                             to_email: payload.customer_email,
-                            subject:  `Conferma prenotazione bagagli #${shortId} — LocalPoint Milazzo`,
+                            subject:  s.subject,
                             message:  clientHtml
                         });
                     }
@@ -970,12 +1215,12 @@
                 document.getElementById('luggage-form-public').style.display = 'none';
                 document.getElementById('lug-success-code').textContent = `#${shortId}`;
                 document.getElementById('lug-success-details').innerHTML =
-                    `🧳 ${bags} bagagli &nbsp;·&nbsp; ${days} giorno/i<br>💶 Totale: <strong>€${total.toFixed(2).replace('.',',')}</strong><br><span style="font-size:0.85rem;color:var(--text-mut);">📧 Ti verrà inviata una mail di conferma con tutti i dettagli.</span>`;
+                    `🧳 ${bags} ${ui.bags} &nbsp;·&nbsp; ${days} ${ui.days}<br>${ui.total}: <strong>€${total.toFixed(2).replace('.',',')}</strong><br><span style="font-size:0.85rem;color:var(--text-mut);">${ui.emailNote}</span>`;
                 document.getElementById('lug-success').style.display = 'block';
             }
 
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Prenota Deposito';
+            btn.innerHTML = `<i class="fa-solid fa-calendar-check"></i> ${ui.btn}`;
         });
 
         // ===================================================================
@@ -1023,6 +1268,11 @@
                 banner.classList.add('active');
                 document.getElementById('ref-name').textContent = data.name;
                 document.getElementById('hero-wrap').classList.add('has-ref');
+                window.trackEvent?.('referral_visit', {
+                    partner_code: code,
+                    partner_name: data.name,
+                    partner_type: data.type || 'unknown'
+                });
             }
         }
 
@@ -1101,7 +1351,11 @@
             });
         }
 
-        initCatalog();
+        initCatalog().then(() => {
+            const l = getLang();
+            setLanguage(l); // applies all [data-i18n] elements + sets doc.lang
+            updateLangUI(l);
+        });
 
         // COUNT-UP ANIMATION
         const countEls = document.querySelectorAll('.val[data-count]');
