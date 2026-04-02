@@ -86,5 +86,68 @@ create policy "Admin access shipments" on shipments
   for all using (auth.role() = 'authenticated');
 
 
+-- 6. Tabella Fornitori (Suppliers)
+create table suppliers (
+  id uuid default uuid_generate_v4() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  name text not null,
+  category text default 'altro' check (category in ('cibo', 'materiali', 'trasporti', 'servizi', 'tecnologia', 'altro')),
+  contact_name text,
+  phone text,
+  email text,
+  website text,
+  address text,
+  notes text,
+  active boolean default true
+);
+
+alter table suppliers enable row level security;
+
+create policy "Admin access suppliers" on suppliers
+  for all using (auth.role() = 'authenticated');
+
+-- 7. Pagamenti ai Partner
+create table if not exists partner_payments (
+  id uuid default uuid_generate_v4() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  affiliate_id uuid references affiliates(id) on delete cascade not null,
+  amount decimal(10,2) not null,
+  payment_date date not null,
+  method text default 'transfer' check (method in ('transfer', 'cash', 'other')),
+  notes text
+);
+
+alter table partner_payments enable row level security;
+
+create policy "Admin access partner_payments" on partner_payments
+  for all using (auth.role() = 'authenticated');
+
 -- MIGRATION COMMANDS (Run manuali se le tabelle esistono già)
+-- Commissioni per-partner per categoria:
+-- alter table affiliates add column if not exists commission_rate_luggage decimal(5,2) default 10;
+-- alter table affiliates add column if not exists commission_rate_other decimal(5,2) default 7.5;
+-- Dati anagrafici estesi:
+-- alter table affiliates add column if not exists vat_number text;
+-- alter table affiliates add column if not exists address text;
+-- alter table affiliates add column if not exists website text;
+-- alter table affiliates add column if not exists notes text;
+-- Collegamento ticket bagagli → partner + stato transazione:
+-- alter table luggage_tickets add column if not exists affiliate_id uuid references affiliates(id);
+-- alter table luggage_tickets add column if not exists partner_status text default 'active' check (partner_status in ('active','noshow','excluded'));
+-- alter table reservations add column if not exists partner_status text default 'active' check (partner_status in ('active','noshow','excluded'));
+
+
 -- alter table transactions add column payment_method text default 'cash' check (payment_method in ('cash', 'card', 'transfer', 'other'));
+
+-- MIGRATION: Add 'pending' to partner_status + add exclusion note columns
+-- Run these on Supabase SQL Editor:
+--
+-- Step 1: Drop old check constraints (they don't allow 'pending')
+-- ALTER TABLE reservations DROP CONSTRAINT IF EXISTS reservations_partner_status_check;
+-- ALTER TABLE luggage_tickets DROP CONSTRAINT IF EXISTS luggage_tickets_partner_status_check;
+-- Step 2: Re-add with 'pending' included
+-- ALTER TABLE reservations ADD CONSTRAINT reservations_partner_status_check CHECK (partner_status IN ('active','pending','noshow','excluded'));
+-- ALTER TABLE luggage_tickets ADD CONSTRAINT luggage_tickets_partner_status_check CHECK (partner_status IN ('active','pending','noshow','excluded'));
+-- Step 3: Add exclusion note columns
+-- ALTER TABLE reservations ADD COLUMN IF NOT EXISTS partner_status_note text;
+-- ALTER TABLE luggage_tickets ADD COLUMN IF NOT EXISTS partner_status_note text;

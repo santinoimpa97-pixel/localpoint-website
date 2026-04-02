@@ -689,7 +689,237 @@ export const translations = {
     de: "Sprache",
     es: "Idioma",
     fr: "Langue"
-  }
+  },
+
+  // ── TOURIST SERVICES PAGE ──────────────────────────────────────────────────
+  "ts.hero.eyebrow": {
+    it: "Milazzo, Sicilia",
+    en: "Milazzo, Sicily",
+    de: "Milazzo, Sizilien",
+    es: "Milazzo, Sicilia",
+    fr: "Milazzo, Sicile"
+  },
+  "ts.hero.title": {
+    it: "Vivi la tua <em>migliore</em> vacanza",
+    en: "Live your <em>best</em> holiday",
+    de: "Erlebe deinen <em>besten</em> Urlaub",
+    es: "Vive tus <em>mejores</em> vacaciones",
+    fr: "Vivez vos <em>meilleures</em> vacances"
+  },
+  "ts.hero.subtitle": {
+    it: "Escursioni, noleggi, transfer e tutti i servizi locali selezionati da LocalPoint.",
+    en: "Excursions, rentals, transfers and all local services selected by LocalPoint.",
+    de: "Ausflüge, Vermietungen, Transfers und alle lokalen Dienste, ausgewählt von LocalPoint.",
+    es: "Excursiones, alquileres, traslados y todos los servicios locales seleccionados por LocalPoint.",
+    fr: "Excursions, locations, transferts et tous les services locaux sélectionnés par LocalPoint."
+  },
+  "ts.hero.btn": {
+    it: "Esplora i Servizi",
+    en: "Explore Services",
+    de: "Angebote entdecken",
+    es: "Explorar Servicios",
+    fr: "Explorer les Services"
+  },
+  "ts.hero.stat.categories": {
+    it: "categorie",
+    en: "categories",
+    de: "Kategorien",
+    es: "categorías",
+    fr: "catégories"
+  },
+  "ts.hero.stat.experiences": {
+    it: "esperienze",
+    en: "experiences",
+    de: "Erlebnisse",
+    es: "experiencias",
+    fr: "expériences"
+  },
+  "ts.hero.stat.guaranteed": {
+    it: "garantiti",
+    en: "guaranteed",
+    de: "garantiert",
+    es: "garantizados",
+    fr: "garantis"
+  },
+  "ts.cats.label": {
+    it: "Cosa vuoi fare?",
+    en: "What do you want to do?",
+    de: "Was möchtest du tun?",
+    es: "¿Qué quieres hacer?",
+    fr: "Que voulez-vous faire ?"
+  },
+  "ts.cats.title": {
+    it: "Scegli la tua categoria",
+    en: "Choose your category",
+    de: "Wähle deine Kategorie",
+    es: "Elige tu categoría",
+    fr: "Choisissez votre catégorie"
+  },
+  "ts.cats.subtitle": {
+    it: "Ogni esperienza è pensata per renderti il soggiorno indimenticabile.",
+    en: "Every experience is designed to make your stay unforgettable.",
+    de: "Jedes Erlebnis ist darauf ausgelegt, deinen Aufenthalt unvergesslich zu machen.",
+    es: "Cada experiencia está pensada para hacer tu estancia inolvidable.",
+    fr: "Chaque expérience est conçue pour rendre votre séjour inoubliable."
+  },
+  "ts.support.badge": {
+    it: "💬 Assistenza Personale",
+    en: "💬 Personal Assistance",
+    de: "💬 Persönlicher Support",
+    es: "💬 Asistencia Personal",
+    fr: "💬 Assistance Personnelle"
+  },
+  "ts.support.title": {
+    it: "Non trovi il servizio che cerchi?",
+    en: "Can't find the service you're looking for?",
+    de: "Findest du den gewünschten Service nicht?",
+    es: "¿No encuentras el servicio que buscas?",
+    fr: "Vous ne trouvez pas le service que vous cherchez ?"
+  },
+  "ts.support.desc": {
+    it: "Contattaci! Organizziamo soluzioni personalizzate per la tua vacanza a Milazzo.",
+    en: "Contact us! We organise personalised solutions for your holiday in Milazzo.",
+    de: "Kontaktiere uns! Wir organisieren individuelle Lösungen für deinen Urlaub in Milazzo.",
+    es: "¡Contáctanos! Organizamos soluciones personalizadas para tus vacaciones en Milazzo.",
+    fr: "Contactez-nous ! Nous organisons des solutions personnalisées pour vos vacances à Milazzo."
+  },
+  "ts.support.btn": {
+    it: "Contattaci",
+    en: "Contact us",
+    de: "Kontakt",
+    es: "Contáctanos",
+    fr: "Nous contacter"
+  },
+  "ts.support.address": {
+    it: "📍 Via Tenente Brigiano 6, Milazzo · Lun–Sab 09:00–13:30 / 15:30–19:00",
+    en: "📍 Via Tenente Brigiano 6, Milazzo · Mon–Sat 09:00–13:30 / 15:30–19:00",
+    de: "📍 Via Tenente Brigiano 6, Milazzo · Mo–Sa 09:00–13:30 / 15:30–19:00",
+    es: "📍 Via Tenente Brigiano 6, Milazzo · Lun–Sáb 09:00–13:30 / 15:30–19:00",
+    fr: "📍 Via Tenente Brigiano 6, Milazzo · Lun–Sam 09:00–13:30 / 15:30–19:00"
+  },
+  "ts.back": {
+    it: "Tutte le categorie",
+    en: "All categories",
+    de: "Alle Kategorien",
+    es: "Todas las categorías",
+    fr: "Toutes les catégories"
+  },
+  "ts.items.proposals": {
+    it: "proposte disponibili",
+    en: "options available",
+    de: "Angebote verfügbar",
+    es: "opciones disponibles",
+    fr: "options disponibles"
+  },
+  "ts.items.viewDetails": {
+    it: "Vedi Dettagli",
+    en: "View Details",
+    de: "Details anzeigen",
+    es: "Ver Detalles",
+    fr: "Voir Détails"
+  },
+  "ts.items.bookNow": {
+    it: "Prenota Ora",
+    en: "Book Now",
+    de: "Jetzt buchen",
+    es: "Reservar",
+    fr: "Réserver"
+  },
+  "ts.items.available": {
+    it: "esperienze disponibili",
+    en: "experiences available",
+    de: "Erlebnisse verfügbar",
+    es: "experiencias disponibles",
+    fr: "expériences disponibles"
+  },
+  "ts.items.cta": {
+    it: "Scegli e prenota in 2 minuti",
+    en: "Choose and book in 2 minutes",
+    de: "Wählen und in 2 Minuten buchen",
+    es: "Elige y reserva en 2 minutos",
+    fr: "Choisissez et réservez en 2 minutes"
+  },
+  "ts.lug.title": {
+    it: "🎒 Deposito Bagagli",
+    en: "🎒 Luggage Storage",
+    de: "🎒 Gepäckaufbewahrung",
+    es: "🎒 Consigna de Equipaje",
+    fr: "🎒 Consigne Bagages"
+  },
+  "ts.lug.subtitle": {
+    it: "Prenota il tuo spazio",
+    en: "Book your space",
+    de: "Platz reservieren",
+    es: "Reserva tu espacio",
+    fr: "Réservez votre espace"
+  },
+  "ts.lug.name": { it: "Nome e Cognome", en: "Full Name", de: "Vollständiger Name", es: "Nombre y Apellido", fr: "Nom et Prénom" },
+  "ts.lug.email": { it: "Email", en: "Email", de: "E-Mail", es: "Email", fr: "Email" },
+  "ts.lug.phone": { it: "Telefono / WhatsApp", en: "Phone / WhatsApp", de: "Telefon / WhatsApp", es: "Teléfono / WhatsApp", fr: "Téléphone / WhatsApp" },
+  "ts.lug.bags": { it: "Numero di Bagagli", en: "Number of Bags", de: "Anzahl der Gepäckstücke", es: "Número de Maletas", fr: "Nombre de Bagages" },
+  "ts.lug.checkin": { it: "Check-in (lascia i bagagli)", en: "Check-in (drop off luggage)", de: "Check-in (Gepäck abgeben)", es: "Check-in (dejar el equipaje)", fr: "Check-in (déposer les bagages)" },
+  "ts.lug.checkout": { it: "Ritiro previsto", en: "Expected pick-up", de: "Voraussichtliche Abholung", es: "Recogida prevista", fr: "Retrait prévu" },
+  "ts.lug.notes": { it: "Note (facoltative)", en: "Notes (optional)", de: "Anmerkungen (optional)", es: "Notas (opcionales)", fr: "Notes (facultatives)" },
+  "ts.lug.where": { it: "Dove consegnare i bagagli", en: "Where to drop off luggage", de: "Wo Gepäck abgeben", es: "Dónde dejar el equipaje", fr: "Où déposer les bagages" },
+  "ts.lug.info": { it: "Presentati con il codice di prenotazione che riceverai via email. Il nostro staff ti aspetta.", en: "Present the booking code you'll receive by email. Our staff is waiting for you.", de: "Zeige den Buchungscode, den du per E-Mail erhältst. Unser Team erwartet dich.", es: "Preséntate con el código de reserva que recibirás por email. Nuestro equipo te espera.", fr: "Présentez le code de réservation reçu par email. Notre équipe vous attend." },
+  "ts.lug.rate": { it: "Tariffa: €4,00 per bagaglio / giorno", en: "Rate: €4.00 per bag / day", de: "Tarif: 4,00 € pro Gepäckstück / Tag", es: "Tarifa: €4,00 por maleta / día", fr: "Tarif : 4,00 € par bagage / jour" },
+  "ts.lug.summary": { it: "Riepilogo Preventivo", en: "Price Summary", de: "Preisübersicht", es: "Resumen del Precio", fr: "Récapitulatif du Prix" },
+  "ts.lug.btn": { it: "Prenota — Pagamento in ufficio", en: "Book — Pay in store", de: "Buchen — Zahlung im Geschäft", es: "Reservar — Pago en oficina", fr: "Réserver — Paiement en boutique" },
+  "ts.lug.success": { it: "✅ Prenotazione Confermata!", en: "✅ Booking Confirmed!", de: "✅ Buchung bestätigt!", es: "✅ ¡Reserva Confirmada!", fr: "✅ Réservation Confirmée !" },
+  "ts.ref.banner": { it: "Tariffe convenzionate attive per te", en: "Discounted rates active for you", de: "Rabattpreise aktiv für dich", es: "Tarifas especiales activas para ti", fr: "Tarifs conventionnés actifs pour vous" },
+  "ts.lug.close": { it: "Chiudi", en: "Close", de: "Schließen", es: "Cerrar", fr: "Fermer" },
+  "ts.lug.success.notice": { it: "Presenta il codice al momento del check-in.", en: "Show this code at check-in.", de: "Zeige diesen Code beim Check-in vor.", es: "Presenta este código en el check-in.", fr: "Présentez ce code lors du check-in." },
+  "ts.book.ref": { it: "Tariffa convenzionata partner applicata", en: "Discounted partner rate applied", de: "Vergünstigter Partnertarif angewandt", es: "Tarifa de socio aplicada", fr: "Tarif partenaire conventionné appliqué" },
+  "ts.book.name": { it: "Nome e Cognome", en: "Full Name", de: "Vollständiger Name", es: "Nombre y Apellido", fr: "Nom et Prénom" },
+  "ts.book.date": { it: "Data Preferita", en: "Preferred Date", de: "Gewünschtes Datum", es: "Fecha Preferida", fr: "Date Souhaitée" },
+  "ts.book.pax": { it: "N° Persone / Qtà", en: "No. of People / Qty", de: "Personen / Menge", es: "N° Personas / Cant.", fr: "Nbre Personnes / Qté" },
+  "ts.book.notes": { it: "Note Aggiuntive", en: "Additional Notes", de: "Zusätzliche Anmerkungen", es: "Notas Adicionales", fr: "Notes Supplémentaires" },
+  "ts.book.submit": { it: "Invia Richiesta di Prenotazione", en: "Send Booking Request", de: "Buchungsanfrage senden", es: "Enviar Solicitud de Reserva", fr: "Envoyer la Demande de Réservation" },
+
+  // ── SERVICE DETAILS PAGE ───────────────────────────────────────────────────
+  "sd.badge": {
+    it: "LocalPoint Certified – Milazzo",
+    en: "LocalPoint Certified – Milazzo",
+    de: "LocalPoint Zertifiziert – Milazzo",
+    es: "LocalPoint Certificado – Milazzo",
+    fr: "LocalPoint Certifié – Milazzo"
+  },
+  "sd.location": { it: "Sicilia, Italia", en: "Sicily, Italy", de: "Sizilien, Italien", es: "Sicilia, Italia", fr: "Sicile, Italie" },
+  "sd.share": { it: "Condividi", en: "Share", de: "Teilen", es: "Compartir", fr: "Partager" },
+  "sd.share.copied": { it: "Link copiato!", en: "Link copied!", de: "Link kopiert!", es: "¡Enlace copiado!", fr: "Lien copié !" },
+  "sd.gallery.showAll": { it: "Guarda Galleria", en: "View Gallery", de: "Galerie ansehen", es: "Ver Galería", fr: "Voir la Galerie" },
+  "sd.desc.title": { it: "Descrizione completa dell'attività", en: "Full activity description", de: "Vollständige Aktivitätsbeschreibung", es: "Descripción completa de la actividad", fr: "Description complète de l'activité" },
+  "sd.info.title": { it: "Informazioni su questa attività", en: "Information about this activity", de: "Informationen zu dieser Aktivität", es: "Información sobre esta actividad", fr: "Informations sur cette activité" },
+  "sd.cancel.title": { it: "Cancellazione flessibile", en: "Flexible cancellation", de: "Flexible Stornierung", es: "Cancelación flexible", fr: "Annulation flexible" },
+  "sd.cancel.desc": { it: "Cancella fino a 24 ore prima per ricevere un rimborso completo o riprogrammare l'esperienza nella massima facilità.", en: "Cancel up to 24 hours before for a full refund or reschedule the experience with ease.", de: "Bis 24 Stunden vorher stornieren für volle Rückerstattung oder einfaches Umbuchen.", es: "Cancela hasta 24 horas antes para recibir un reembolso completo o reprogramar la experiencia fácilmente.", fr: "Annulez jusqu'à 24h avant pour un remboursement complet ou reprogrammer facilement." },
+  "sd.booknow.title": { it: "Prenota ora e paga sul posto", en: "Book now, pay on site", de: "Jetzt buchen, vor Ort zahlen", es: "Reserva ahora y paga in situ", fr: "Réservez maintenant, payez sur place" },
+  "sd.booknow.desc": { it: "Mantieni i tuoi piani di viaggio flessibili: blocca la disponibilità online e paga direttamente il giorno dell'erogazione del servizio.", en: "Keep your travel plans flexible: lock in availability online and pay on the day of the service.", de: "Halte deine Reisepläne flexibel: sichere dir die Verfügbarkeit online und zahle am Tag der Leistung.", es: "Mantén tus planes de viaje flexibles: bloquea la disponibilidad online y paga el día del servicio.", fr: "Gardez vos plans de voyage flexibles : bloquez la disponibilité en ligne et payez le jour du service." },
+  "sd.hours.title": { it: "Orari Personalizzati", en: "Customised Hours", de: "Individuelle Zeiten", es: "Horarios Personalizados", fr: "Horaires Personnalisés" },
+  "sd.hours.desc": { it: "Contattaci per valutare gli orari di partenza e adattare l'esperienza alle tue esigenze di viaggio.", en: "Contact us to discuss departure times and tailor the experience to your travel needs.", de: "Kontaktiere uns, um Abfahrtszeiten zu besprechen und das Erlebnis an deine Reisebedürfnisse anzupassen.", es: "Contáctanos para valorar los horarios de salida y adaptar la experiencia a tus necesidades.", fr: "Contactez-nous pour discuter des horaires de départ et adapter l'expérience à vos besoins." },
+  "sd.assist.title": { it: "Assistenza Locale Multilingua VIP", en: "VIP Multilingual Local Assistance", de: "VIP Mehrsprachiger Vor-Ort-Support", es: "Asistencia Local Multilingüe VIP", fr: "Assistance Locale Multilingue VIP" },
+  "sd.assist.desc": { it: "Supporto garantito e costante via WhatsApp in Italiano e Inglese direttamente dal nostro ufficio di Via Tenente Brigiano.", en: "Guaranteed and constant WhatsApp support in Italian and English directly from our office in Via Tenente Brigiano.", de: "Garantierter und kontinuierlicher WhatsApp-Support auf Italienisch und Englisch direkt aus unserem Büro in der Via Tenente Brigiano.", es: "Soporte garantizado y constante por WhatsApp en Italiano e Inglés directamente desde nuestra oficina de Via Tenente Brigiano.", fr: "Support WhatsApp garanti et constant en italien et anglais directement depuis notre bureau de Via Tenente Brigiano." },
+  "sd.exp.title": { it: "L'esperienza LocalPoint", en: "The LocalPoint Experience", de: "Das LocalPoint-Erlebnis", es: "La experiencia LocalPoint", fr: "L'expérience LocalPoint" },
+  "sd.highlights.title": { it: "⭐ Perché sceglierla", en: "⭐ Why choose it", de: "⭐ Warum es wählen", es: "⭐ Por qué elegirla", fr: "⭐ Pourquoi la choisir" },
+  "sd.highlights.1": { it: "Goditi un'esperienza premium senza stress organizzativo alcuno", en: "Enjoy a premium experience with zero organisational stress", de: "Genieße ein Premium-Erlebnis ohne jeglichen Organisationsstress", es: "Disfruta de una experiencia premium sin estrés organizativo", fr: "Profitez d'une expérience premium sans aucun stress organisationnel" },
+  "sd.highlights.2": { it: "Affidati ai migliori partner locali, selezionati dal nostro team di Concierge", en: "Trust the best local partners, selected by our Concierge team", de: "Vertraue den besten lokalen Partnern, ausgewählt von unserem Concierge-Team", es: "Confía en los mejores socios locales, seleccionados por nuestro equipo de Conserje", fr: "Faites confiance aux meilleurs partenaires locaux, sélectionnés par notre équipe Concierge" },
+  "sd.highlights.3": { it: "Scegli l'affidabilità di LocalPoint, il modo più sicuro di vivere Milazzo", en: "Choose the reliability of LocalPoint, the safest way to experience Milazzo", de: "Wähle die Zuverlässigkeit von LocalPoint, den sichersten Weg, Milazzo zu erleben", es: "Elige la fiabilidad de LocalPoint, la forma más segura de vivir Milazzo", fr: "Choisissez la fiabilité de LocalPoint, la façon la plus sûre de vivre Milazzo" },
+  "sd.price.from": { it: "Prezzo a partire da", en: "Price from", de: "Preis ab", es: "Precio desde", fr: "Prix à partir de" },
+  "sd.book.title": { it: "Prenota in modo semplice", en: "Book easily", de: "Einfach buchen", es: "Reserva fácilmente", fr: "Réservez facilement" },
+  "sd.book.desc": { it: "Inviaci un rapido messaggio su WhatsApp spiegandoci i tuoi piani. Ti confermeremo all'istante l'effettiva disponibilità!", en: "Send us a quick WhatsApp message explaining your plans. We'll instantly confirm availability!", de: "Schick uns eine kurze WhatsApp-Nachricht mit deinen Plänen. Wir bestätigen dir sofort die Verfügbarkeit!", es: "Envíanos un mensaje rápido por WhatsApp explicando tus planes. ¡Te confirmaremos la disponibilidad al instante!", fr: "Envoyez-nous un message WhatsApp rapide avec vos plans. Nous confirmerons immédiatement la disponibilité !" },
+  "sd.wa.btn": { it: "Scrivici su WhatsApp", en: "Write us on WhatsApp", de: "Schreib uns auf WhatsApp", es: "Escríbenos por WhatsApp", fr: "Écrivez-nous sur WhatsApp" },
+  "sd.rapid": { it: "🔥 Risposta rapida da team locale", en: "🔥 Fast reply from local team", de: "🔥 Schnelle Antwort vom lokalen Team", es: "🔥 Respuesta rápida del equipo local", fr: "🔥 Réponse rapide de l'équipe locale" },
+  "sd.error.title": { it: "Esperienza non trovata", en: "Experience not found", de: "Erlebnis nicht gefunden", es: "Experiencia no encontrada", fr: "Expérience introuvable" },
+  "sd.error.back": { it: "Torna alla ricerca", en: "Back to search", de: "Zurück zur Suche", es: "Volver a la búsqueda", fr: "Retour à la recherche" },
+
+  // ── SHARED FOOTER ─────────────────────────────────────────────────────────
+  "footer.tagline": { it: "Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.", en: "Your reference point in Milazzo,<br>a few steps from the port.", de: "Dein Anlaufpunkt in Milazzo,<br>nur wenige Schritte vom Hafen.", es: "Tu punto de referencia en Milazzo,<br>a pocos pasos del puerto.", fr: "Votre point de référence à Milazzo,<br>à quelques pas du port." },
+  "footer.links.title": { it: "Link Utili", en: "Useful Links", de: "Nützliche Links", es: "Enlaces Útiles", fr: "Liens Utiles" },
+  "footer.contacts.title": { it: "Contatti & Orari", en: "Contacts & Hours", de: "Kontakt & Öffnungszeiten", es: "Contactos y Horarios", fr: "Contacts & Horaires" },
+  "footer.links.tourist": { it: "Servizi Turistici", en: "Tourist Services", de: "Touristendienstleistungen", es: "Servicios Turísticos", fr: "Services Touristiques" },
+  "footer.links.shipping": { it: "Spedizioni", en: "Shipping", de: "Versand", es: "Envíos", fr: "Expéditions" },
+  "footer.links.luggage": { it: "Deposito Bagagli", en: "Luggage Storage", de: "Gepäckaufbewahrung", es: "Consigna de Equipajes", fr: "Consigne à Bagages" },
+  "footer.links.partner": { it: "Diventa Partner", en: "Become a Partner", de: "Partner werden", es: "Hazte socio", fr: "Devenir Partenaire" },
+  "footer.hours": { it: "Lun – Sab: 09:00–13:30 / 15:30–19:00", en: "Mon – Sat: 09:00–13:30 / 15:30–19:00", de: "Mo – Sa: 09:00–13:30 / 15:30–19:00", es: "Lun – Sáb: 09:00–13:30 / 15:30–19:00", fr: "Lun – Sam : 09:00–13:30 / 15:30–19:00" }
 };
 
 // Language names and flags

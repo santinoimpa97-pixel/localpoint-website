@@ -56,6 +56,16 @@ const langSelector = document.getElementById('language-selector');
 const langToggle = document.getElementById('lang-toggle');
 const langDropdown = document.getElementById('lang-dropdown');
 const langOptions = document.querySelectorAll('.lang-option');
+const currentLangImg = document.getElementById('current-lang');
+
+const LANG_FLAG_CODES = { it:'it', en:'gb', fr:'fr', es:'es', de:'de' };
+
+function updateCurrentFlag(lang) {
+  if (currentLangImg) {
+    currentLangImg.src = `https://flagcdn.com/w40/${LANG_FLAG_CODES[lang] || 'it'}.png`;
+    currentLangImg.alt = lang.toUpperCase();
+  }
+}
 
 // Toggle dropdown
 langToggle.addEventListener('click', (e) => {
@@ -75,6 +85,7 @@ langOptions.forEach(option => {
   option.addEventListener('click', () => {
     const lang = option.getAttribute('data-lang');
     setLanguage(lang);
+    updateCurrentFlag(lang);
     langSelector.classList.remove('active');
 
     // Update active state
@@ -87,6 +98,7 @@ langOptions.forEach(option => {
 document.addEventListener('DOMContentLoaded', () => {
   const currentLang = getCurrentLanguage();
   setLanguage(currentLang);
+  updateCurrentFlag(currentLang);
 
   // Set active class on current language option
   langOptions.forEach(opt => {

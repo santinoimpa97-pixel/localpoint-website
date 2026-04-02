@@ -55,7 +55,11 @@ html { background: #f0f9ff; }
 }
 
 #current-lang {
-  font-size: 1.3rem;
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
 }
 
 .lang-dropdown {
@@ -70,7 +74,7 @@ html { background: #f0f9ff; }
   visibility: hidden;
   transform: translateY(-10px);
   transition: all 0.3s ease;
-  min-width: 150px;
+  min-width: 60px;
   z-index: 1001;
 }
 
@@ -81,17 +85,23 @@ html { background: #f0f9ff; }
 }
 
 .lang-option {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 12px 18px;
+  padding: 10px 14px;
   border: none;
   background: none;
-  text-align: left;
-  font-size: 1rem;
-  font-family: var(--font-main);
-  color: var(--text-color);
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.lang-option img {
+  width: 28px;
+  height: 21px;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
 }
 
 .lang-option:hover {
@@ -119,7 +129,8 @@ html { background: #f0f9ff; }
   }
 
   #current-lang {
-    font-size: 1.1rem;
+    width: 20px;
+    height: 15px;
   }
 
   .lang-toggle i {
