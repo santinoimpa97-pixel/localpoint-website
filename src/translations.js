@@ -919,7 +919,8 @@ export const translations = {
   "footer.links.shipping": { it: "Spedizioni", en: "Shipping", de: "Versand", es: "Envíos", fr: "Expéditions" },
   "footer.links.luggage": { it: "Deposito Bagagli", en: "Luggage Storage", de: "Gepäckaufbewahrung", es: "Consigna de Equipajes", fr: "Consigne à Bagages" },
   "footer.links.partner": { it: "Diventa Partner", en: "Become a Partner", de: "Partner werden", es: "Hazte socio", fr: "Devenir Partenaire" },
-  "footer.hours": { it: "Lun – Sab: 09:00–13:30 / 15:30–19:00", en: "Mon – Sat: 09:00–13:30 / 15:30–19:00", de: "Mo – Sa: 09:00–13:30 / 15:30–19:00", es: "Lun – Sáb: 09:00–13:30 / 15:30–19:00", fr: "Lun – Sam : 09:00–13:30 / 15:30–19:00" }
+  "footer.hours": { it: "Lun – Sab: 09:00–13:30 / 15:30–19:00", en: "Mon – Sat: 09:00–13:30 / 15:30–19:00", de: "Mo – Sa: 09:00–13:30 / 15:30–19:00", es: "Lun – Sáb: 09:00–13:30 / 15:30–19:00", fr: "Lun – Sam : 09:00–13:30 / 15:30–19:00" },
+  "luggage.cta": { it: "Prenota Ora", en: "Book Now", de: "Jetzt buchen", es: "Reserva Ahora", fr: "Réserver Maintenant" }
 };
 
 // Language names and flags
