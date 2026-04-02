@@ -12,6 +12,59 @@ emailjs.init(EMAILJS_PUBLIC_KEY)
 // --- GOOGLE REVIEW LINK ---
 const GOOGLE_REVIEW_URL = 'https://g.page/r/CQSpCw3gaeKjEAE/review'
 
+// --- AUTO-TRANSLATE (Google Translate — no API key, no CORS issues) ---
+async function _translate(text, tl) {
+    if (!text) return ''
+    const langMap = { 'EN-GB': 'en', 'FR': 'fr', 'ES': 'es', 'DE': 'de' }
+    const target = langMap[tl] || tl.toLowerCase()
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=it&tl=${target}&dt=t&q=${encodeURIComponent(text)}`
+    const r = await fetch(url)
+    if (!r.ok) throw new Error(`Google Translate HTTP ${r.status}`)
+    const json = await r.json()
+    return json[0].map(c => c[0]).join('')
+}
+
+async function autoTranslateExperience(id, p) {
+    const LANGS = [{ c: 'EN-GB', s: 'en' }, { c: 'FR', s: 'fr' }, { c: 'ES', s: 'es' }, { c: 'DE', s: 'de' }]
+    try {
+        const updates = {}
+        for (const lang of LANGS) {
+            updates[`title_${lang.s}`]      = await _translate(p.title, lang.c)
+            updates[`preview_${lang.s}`]    = await _translate(p.preview, lang.c)
+            updates[`price_${lang.s}`]      = await _translate(p.price, lang.c)
+            updates[`price_note_${lang.s}`] = await _translate(p.price_note, lang.c)
+            if (p.description)
+                updates[`description_${lang.s}`] = await _translate(p.description, lang.c)
+        }
+        const { error: upErr } = await supabase.from('experiences').update(updates).eq('id', id)
+        if (upErr) throw new Error('Supabase: ' + upErr.message)
+        showNotification('🌍 Traduzioni aggiornate (EN · FR · ES · DE) ✓')
+    } catch (err) {
+        console.error('Translate:', err)
+        alert('Errore traduzioni: ' + err.message)
+    }
+}
+
+window.translateAllExperiences = async function() {
+    const btn = document.getElementById('btn-translate-all')
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Traduzione in corso...' }
+    try {
+        const { data, error } = await supabase.from('experiences').select('id,title,preview,price,price_note,description')
+        if (error) throw error
+        let done = 0
+        for (const exp of (data || [])) {
+            await autoTranslateExperience(exp.id, exp)
+            done++
+            if (btn) btn.textContent = `⏳ ${done}/${data.length}...`
+        }
+        showNotification(`🌍 Tradotte ${done} esperienze ✓`)
+    } catch (err) {
+        alert('Errore batch translate: ' + err.message)
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🌍 Traduci tutto' }
+    }
+}
+
 // --- AUTH & INIT ---
 async function checkAuth() {
     const { data: { session } } = await supabase.auth.getSession()
@@ -30,7 +83,8 @@ const views = {
     reservations: document.getElementById('view-reservations'),
     shipping: document.getElementById('view-shipping'),
     experiences: document.getElementById('view-experiences'),
-    partners: document.getElementById('view-partners')
+    partners: document.getElementById('view-partners'),
+    suppliers: document.getElementById('view-suppliers')
 }
 
 const navBtns = {
@@ -40,7 +94,8 @@ const navBtns = {
     reservations: document.getElementById('nav-reservations'),
     shipping: document.getElementById('nav-shipping'),
     experiences: document.getElementById('nav-experiences'),
-    partners: document.getElementById('nav-partners')
+    partners: document.getElementById('nav-partners'),
+    suppliers: document.getElementById('nav-suppliers')
 }
 
 // Global Shipping Refs
@@ -86,6 +141,9 @@ function switchView(viewName) {
     if (viewName === 'partners') {
         loadPartners()
     }
+    if (viewName === 'suppliers') {
+        loadSuppliers()
+    }
 }
 
 // Bind clicks
@@ -113,6 +171,31 @@ function askConfirm(msg) {
         }
         document.getElementById('confirm-yes').addEventListener('click', () => close(true))
         document.getElementById('confirm-no').addEventListener('click', () => close(false))
+    })
+}
+
+// Returns string | null (cancelled)
+function askInput(msg, placeholder = '') {
+    return new Promise(resolve => {
+        const modal = document.getElementById('input-modal')
+        document.getElementById('input-modal-msg').textContent = msg
+        const inp = document.getElementById('input-modal-field')
+        inp.value = ''
+        inp.placeholder = placeholder
+        modal.classList.remove('hidden')
+        modal.classList.add('flex')
+        const yes = document.getElementById('input-modal-ok')
+        const no  = document.getElementById('input-modal-cancel')
+        const close = (result) => {
+            modal.classList.add('hidden')
+            modal.classList.remove('flex')
+            yes.replaceWith(yes.cloneNode(true))
+            no.replaceWith(no.cloneNode(true))
+            resolve(result)
+        }
+        document.getElementById('input-modal-ok').addEventListener('click', () => close(inp.value.trim() || null))
+        document.getElementById('input-modal-cancel').addEventListener('click', () => close(false))
+        setTimeout(() => inp.focus(), 80)
     })
 }
 
@@ -281,8 +364,8 @@ async function loadLuggage() {
         return
     }
 
-    // Pre-fetch affiliates to map names without relying on SQL explicit foreign keys
-    const { data: affData } = await supabase.from('affiliates').select('id, name')
+    // Pre-fetch affiliates to map names + populate partner dropdown
+    const { data: affData } = await supabase.from('affiliates').select('id, name, referral_code').eq('status', 'active').order('name')
     if (affData) {
         const affMap = {}
         affData.forEach(a => affMap[a.id] = a.name)
@@ -291,6 +374,13 @@ async function loadLuggage() {
                 t.affiliates = { name: affMap[t.affiliate_id] }
             }
         })
+        // Populate partner selector in luggage form
+        const affSelect = document.getElementById('luggage-affiliate')
+        if (affSelect) {
+            const currentVal = affSelect.value
+            affSelect.innerHTML = '<option value="">— Nessun partner —</option>' +
+                affData.map(a => `<option value="${a.id}"${currentVal === a.id ? ' selected' : ''}>${a.name} (${a.referral_code})</option>`).join('')
+        }
     }
 
     allLuggageTickets = data || []
@@ -469,10 +559,13 @@ window.confirmOnlineLuggage = async (id) => {
     const ticket = allLuggageTickets.find(t => t.id === id)
     if (!ticket) return
 
-    // 1. Update ticket status
+    // 1. Update ticket status — if partner was pending, confirm them automatically
+    const updatePayload = { status: 'stored', created_at: new Date().toISOString() }
+    if (ticket.affiliate_id) updatePayload.partner_status = 'active'
+
     const { error: updErr } = await supabase
         .from('luggage_tickets')
-        .update({ status: 'stored', created_at: new Date().toISOString() }) // reset timer to actual drop-off time
+        .update(updatePayload)
         .eq('id', id)
 
     if (updErr) {
@@ -495,10 +588,73 @@ window.confirmOnlineLuggage = async (id) => {
     }])
 
     loadLuggage()
+
+    // Partner earnings email
+    if (ticket.affiliate_id) {
+        sendPartnerEarningsEmail({ affiliateId: ticket.affiliate_id, type: 'luggage', shortId, customerName: ticket.customer_name, amount: ticket.price })
+    }
     
     // Refresh transactions list if loaded in background
     if (typeof loadTransactions === 'function' && typeof allTransactions !== 'undefined' && allTransactions.length > 0) {
         setTimeout(loadTransactions, 1000)
+    }
+}
+
+
+// Send partner commission-earned email
+async function sendPartnerEarningsEmail({ affiliateId, type, shortId, customerName, amount }) {
+    try {
+        const { data: aff } = await supabase
+            .from('affiliates')
+            .select('name, email, commission_rate_luggage, commission_rate_other')
+            .eq('id', affiliateId)
+            .single()
+        if (!aff?.email) return
+
+        const rate = type === 'luggage' ? (aff.commission_rate_luggage ?? 10) : (aff.commission_rate_other ?? 7.5)
+        const commission = parseFloat((amount * rate / 100).toFixed(2))
+        const typeLabel = type === 'luggage' ? 'Deposito Bagagli' : 'Prenotazione Servizio'
+
+        const msgHtml =
+            '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:520px;margin:0 auto;background:#f0f4f3;padding:20px;">' +
+            '<div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(27,58,92,0.12);">' +
+            '<div style="background:linear-gradient(90deg,#004e92,#00a0a0);height:6px;"></div>' +
+            '<div style="background:#fff;padding:28px 24px;text-align:center;border-bottom:1px solid #eef2f0;">' +
+            '<img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width:160px;height:auto;">' +
+            '<p style="color:#2A9D8F;margin:8px 0 0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Milazzo</p>' +
+            '</div>' +
+            '<div style="padding:24px;">' +
+            '<div style="background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:2px solid #00a0a0;border-radius:14px;padding:20px;text-align:center;margin:0 0 20px;">' +
+            '<p style="color:#004e92;font-size:13px;margin:0 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Commissione Guadagnata</p>' +
+            '<p style="color:#00a0a0;font-size:38px;font-weight:900;font-family:monospace;margin:0;">€ ' + commission.toFixed(2) + '</p>' +
+            '<p style="color:#6b7280;font-size:12px;margin:6px 0 0;">' + rate + '% su € ' + parseFloat(amount).toFixed(2) + '</p>' +
+            '</div>' +
+            '<p style="color:#1B3A5C;font-size:15px;margin:0 0 6px;">Ciao <strong>' + aff.name + '</strong>,</p>' +
+            '<p style="color:#4a5568;font-size:13px;line-height:1.5;margin:0 0 20px;">Un tuo cliente è stato confermato da LocalPoint. Ecco il riepilogo della commissione maturata.</p>' +
+            '<table style="width:100%;border-collapse:collapse;margin:0 0 20px;">' +
+            '<tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">Tipo</td><td style="padding:9px 0;text-align:right;font-weight:600;color:#1B3A5C;">' + typeLabel + '</td></tr>' +
+            '<tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">Codice</td><td style="padding:9px 0;text-align:right;font-weight:700;color:#004e92;">#' + shortId + '</td></tr>' +
+            '<tr style="border-bottom:1px solid #e8eeec;"><td style="padding:9px 0;color:#6b7280;font-size:13px;">Cliente</td><td style="padding:9px 0;text-align:right;font-weight:600;color:#1B3A5C;">' + customerName + '</td></tr>' +
+            '<tr><td style="padding:9px 0;color:#6b7280;font-size:13px;">Importo servizio</td><td style="padding:9px 0;text-align:right;font-weight:800;color:#8cc63f;font-size:17px;">€ ' + parseFloat(amount).toFixed(2) + '</td></tr>' +
+            '</table>' +
+            '<div style="background:#e6f7f4;border-radius:12px;padding:16px;text-align:center;margin:0 0 4px;">' +
+            '<p style="color:#1B3A5C;font-size:13px;font-weight:700;margin:0 0 6px;">Lascia una recensione su Google ⭐</p>' +
+            '<p style="color:#4a5568;font-size:12px;margin:0 0 12px;">Aiuta i tuoi clienti a trovare LocalPoint e supporta la nostra collaborazione!</p>' +
+            '<a href="' + GOOGLE_REVIEW_URL + '" style="display:inline-block;background:linear-gradient(135deg,#004e92,#00a0a0);color:white;padding:10px 24px;border-radius:50px;font-size:13px;font-weight:700;text-decoration:none;">Scrivi una recensione</a>' +
+            '</div>' +
+            '</div>' +
+            '<div style="border-top:3px solid #8cc63f;background:#f7faf8;padding:18px 24px;text-align:center;">' +
+            '<p style="color:#1B3A5C;font-size:12px;margin:0 0 4px;font-weight:700;">Grazie per la tua collaborazione!</p>' +
+            '<p style="color:#2A9D8F;font-size:12px;margin:0;">Il Team LocalPoint — Milazzo · www.local-point.it</p>' +
+            '</div></div></div>'
+
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_email: aff.email,
+            subject:  '[LocalPoint] Commissione guadagnata — ' + typeLabel + ' #' + shortId,
+            message:  msgHtml
+        })
+    } catch (err) {
+        console.warn('Email partner earnings non inviata:', err)
     }
 }
 
@@ -699,12 +855,24 @@ window.deleteLuggage = async (id) => {
     else { loadReturnedLuggage() }
 }
 
-// Soft-delete active luggage (move to trash)
+// Soft-delete active luggage — with no-show partner notification for online bookings
 window.deleteActiveLuggage = async (id) => {
-    if (!await askConfirm('⚠️ Spostare questo deposito nel cestino?')) return
-    const { error } = await supabase.from('luggage_tickets').update({ status: 'deleted' }).eq('id', id)
-    if (error) alert('Errore: ' + error.message)
-    else { loadLuggage() }
+    const ticket = allLuggageTickets.find(t => t.id === id)
+    const isOnline = ticket?.status === 'pending'
+    const hasPartner = !!ticket?.affiliate_id
+
+    const confirmMsg = isOnline
+        ? 'Annullare la prenotazione online e segnare come No-show?'
+        : 'Spostare questo deposito nel cestino?'
+    if (!await askConfirm(confirmMsg)) return
+
+    const updatePayload = { status: 'deleted' }
+    if (isOnline && hasPartner) updatePayload.partner_status = 'noshow'
+
+    const { error } = await supabase.from('luggage_tickets').update(updatePayload).eq('id', id)
+    if (error) { alert('Errore: ' + error.message); return }
+
+    loadLuggage()
 }
 
 
@@ -727,6 +895,7 @@ if (luggageForm) {
         const startDate = document.getElementById('luggage-datetime')?.value || null
         const endDate = document.getElementById('luggage-datetime-end')?.value || null
         const paymentMethod = document.getElementById('luggage-payment-method')?.value || 'cash'
+        const affiliateId = document.getElementById('luggage-affiliate')?.value || null
 
         const { data, error } = await supabase
             .from('luggage_tickets')
@@ -740,7 +909,11 @@ if (luggageForm) {
                     notes: notes,
                     expected_end: endDate ? new Date(endDate).toISOString() : null,
                     status: 'stored',
-                    payment_method: paymentMethod
+                    payment_method: paymentMethod,
+                    affiliate_id: affiliateId || null,
+                    // Direct registration = client already in office = active immediately
+                    // Online bookings arrive via separate flow and are set to 'pending' there
+                    ...(affiliateId ? { partner_status: 'active' } : {})
                 }
             ])
             .select()
@@ -781,9 +954,15 @@ if (luggageForm) {
                 status: 'active'
             }])
 
+            // Note: partner commission for luggage is created when admin confirms from partner scheda
+            // (partner_status transitions from 'pending' → 'active')
+
             luggageForm.reset()
             setDefaultDatetime()
             loadLuggage()
+            if (affiliateId) {
+                sendPartnerEarningsEmail({ affiliateId, type: 'luggage', shortId, customerName, amount: price })
+            }
             const doPrint = await askConfirm(`Deposito registrato!\nCODICE PRENOTAZIONE: #${shortId}${customerEmail ? '\n📧 Email di conferma inviata!' : ''}\n\nVuoi stampare le etichette per i bagagli?`)
             if (doPrint) {
                 printLuggageLabels(customerName, shortId, bagCount, dateStr)
@@ -1959,7 +2138,12 @@ function renderTransactionList() {
       <td class="px-4 py-3">
         <input type="checkbox" class="acc-row-check rounded border-gray-300 text-blue-600 cursor-pointer" data-id="${tx.id}">
       </td>
-      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${tx.date ? new Date(tx.date).toLocaleDateString('it-IT') : '-'}</td>
+      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${
+        tx.date
+          ? new Date(tx.date + 'T12:00:00').toLocaleDateString('it-IT') +
+            (tx.created_at ? ', ' + new Date(tx.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '')
+          : '-'
+      }</td>
       <td class="px-4 py-3 whitespace-nowrap">
         <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${isIncome ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
           ${isIncome ? '💵 Entrata' : '💸 Uscita'}
@@ -2209,7 +2393,8 @@ async function loadReservations() {
             *,
             affiliates (
                 name,
-                commission_rate
+                commission_rate_luggage,
+                commission_rate_other
             )
         `)
         .neq('status', 'deleted')
@@ -2226,6 +2411,28 @@ async function loadReservations() {
 
     allReservations = data || []
     applyResFilters()
+
+    // Populate partner dropdown in new-reservation form
+    const resAffSelect = document.getElementById('res-affiliate')
+    if (resAffSelect) {
+        const { data: affData } = await supabase.from('affiliates').select('id, name, referral_code, commission_rate_other').eq('status', 'active').order('name')
+        if (affData) {
+            const currentVal = resAffSelect.value
+            resAffSelect.innerHTML = '<option value="">— Nessun partner —</option>' +
+                affData.map(a => `<option value="${a.id}" data-rate="${a.commission_rate_other ?? 7.5}"${currentVal === a.id ? ' selected' : ''}>${a.name} (${a.referral_code})</option>`).join('')
+        }
+    }
+
+    // Populate supplier dropdown in new-reservation form
+    const resSupplierSelect = document.getElementById('res-supplier')
+    if (resSupplierSelect) {
+        const { data: supData } = await supabase.from('suppliers').select('id, name, category').eq('active', true).order('name')
+        if (supData) {
+            const currentVal = resSupplierSelect.value
+            resSupplierSelect.innerHTML = '<option value="">— Nessun fornitore —</option>' +
+                supData.map(s => `<option${currentVal === s.name ? ' selected' : ''}>${s.name}</option>`).join('')
+        }
+    }
 }
 
 // --- Apply filters ---
@@ -2438,7 +2645,7 @@ window.completeReservation = async (id) => {
     // Fetch reservation data with affiliate info
     const { data: res, error: fetchErr } = await supabase
         .from('reservations')
-        .select('*, affiliates(name, commission_rate)')
+        .select('*, affiliates(name, commission_rate_luggage, commission_rate_other)')
         .eq('id', id)
         .single()
     if (fetchErr || !res) {
@@ -2446,7 +2653,14 @@ window.completeReservation = async (id) => {
         return
     }
 
-    const { error } = await supabase.from('reservations').update({ status: 'completed' }).eq('id', id)
+    // If partner was pending, move to active when completing (commission tracked in scheda, not auto-created)
+    const updatePayload = { status: 'completed' }
+    if (res.affiliate_id && res.partner_status === 'pending') {
+        updatePayload.partner_status = 'active'
+        sendPartnerEarningsEmail({ affiliateId: res.affiliate_id, type: 'reservation', shortId: id.slice(0, 8).toUpperCase(), customerName: res.customer_name, amount: res.total_price })
+    }
+
+    const { error } = await supabase.from('reservations').update(updatePayload).eq('id', id)
     if (error) {
         alert('Errore: ' + error.message)
         return
@@ -2464,7 +2678,7 @@ window.completeReservation = async (id) => {
         else if (['tour_isole', 'escursione_vulcano', 'escursione'].includes(res.service_type)) category = 'Tour/Escursioni'
         else if (res.service_type === 'deposito_bagagli') category = 'Deposito Bagagli'
         else if (res.service_type === 'spedizioni') category = 'Spedizioni'
-        else if (res.service_type === 'transfer') category = 'Noleggio' // Or Altro? Grouping transfer with Noleggio/Transport for now
+        else if (res.service_type === 'transfer') category = 'Noleggio'
 
         await supabase.from('transactions').insert([{
             type: 'income',
@@ -2477,22 +2691,7 @@ window.completeReservation = async (id) => {
         }])
     }
 
-    // 2. Auto-create COMMISSION expense if affiliate exists
-    if (res.affiliate_id && res.total_price > 0) {
-        const rate = res.affiliates?.commission_rate || 10
-        const commissionAmount = (res.total_price * rate) / 100
-        const partnerName = res.affiliates?.name || 'Partner'
-
-        await supabase.from('transactions').insert([{
-            type: 'expense',
-            category: 'Provvigione Partner',
-            amount: parseFloat(commissionAmount),
-            description: `PROVVIGIONE (${rate}%): ${res.customer_name} — Rif: ${partnerName}`,
-            date: new Date().toISOString().slice(0, 10),
-            payment_method: 'cash', // Commissions are usually virtual or cash for shop accounting
-            status: 'active'
-        }])
-    }
+    // Commission is NOT auto-created — it's tracked and paid manually from the partner scheda
 
     loadReservations()
     if (typeof loadAccounting === 'function') loadAccounting()
@@ -2501,6 +2700,16 @@ window.completeReservation = async (id) => {
 // --- Form Submit ---
 resForm?.addEventListener('submit', async (e) => {
     e.preventDefault()
+
+    const resAffEl = document.getElementById('res-affiliate')
+    const affiliateId = resAffEl?.value || null
+    const affiliateCommRate = affiliateId
+        ? parseFloat(resAffEl.options[resAffEl.selectedIndex]?.dataset.rate || '7.5')
+        : null
+
+    const bookingStatus = document.getElementById('res-status')?.value || 'confirmed'
+    // partner_status: 'active' only if booking is confirmed from the start; otherwise 'pending'
+    const initialPartnerStatus = affiliateId ? (bookingStatus === 'confirmed' ? 'active' : 'pending') : null
 
     const data = {
         service_type: document.getElementById('res-service-type').value,
@@ -2514,9 +2723,10 @@ resForm?.addEventListener('submit', async (e) => {
         total_price: parseFloat(document.getElementById('res-total').value),
         supplier_name: document.getElementById('res-supplier')?.value || null,
         notes: document.getElementById('res-notes')?.value || null,
-        status: document.getElementById('res-status')?.value || 'confirmed',
-        status: document.getElementById('res-status')?.value || 'confirmed',
-        payment_method: document.getElementById('res-deposit-payment-method')?.value || document.getElementById('res-payment-method')?.value || 'cash'
+        status: bookingStatus,
+        payment_method: document.getElementById('res-deposit-payment-method')?.value || document.getElementById('res-payment-method')?.value || 'cash',
+        affiliate_id: affiliateId || null,
+        ...(initialPartnerStatus ? { partner_status: initialPartnerStatus } : {})
     }
     console.log('📦 SUBMIT RESERVATION DATA:', data)
 
@@ -2524,6 +2734,12 @@ resForm?.addEventListener('submit', async (e) => {
     if (error) {
         alert('Errore salvataggio: ' + error.message)
     } else {
+        // Partner earnings email when reservation confirmed immediately with partner
+        if (affiliateId && initialPartnerStatus === 'active') {
+            const _newShortId = (newRes && newRes[0]) ? newRes[0].id.slice(0, 8).toUpperCase() : '???'
+            sendPartnerEarningsEmail({ affiliateId, type: 'reservation', shortId: _newShortId, customerName: data.customer_name, amount: data.total_price })
+        }
+
         // 1. Send confirmation email if email is provided
         if (data.customer_email) {
             const lang = document.getElementById('res-lang')?.value || 'it'
@@ -2569,11 +2785,16 @@ resForm?.addEventListener('submit', async (e) => {
             }])
         }
 
+        // Commission is NOT auto-created in transactions — it's recorded only when admin pays from partner scheda
+
         resForm.reset()
         if (document.getElementById('res-people')) document.getElementById('res-people').value = 1
         if (document.getElementById('res-deposit')) document.getElementById('res-deposit').value = 0
         loadReservations()
-        alert('Prenotazione salvata! ' + (data.deposit > 0 ? 'Transazione acconto creata.' : ''))
+        const commMsg = affiliateId
+            ? (bookingStatus === 'confirmed' ? ' Partner associato (provvigione da liquidare in scheda).' : ' Partner in attesa di conferma.')
+            : ''
+        alert('Prenotazione salvata! ' + (data.deposit > 0 ? 'Transazione acconto creata.' : '') + commMsg)
     }
 })
 
@@ -3625,23 +3846,26 @@ expForm?.addEventListener('submit', async (e) => {
     btn.disabled = true
     
     let error = null
+    let savedId = id
     if (id) {
         const res = await supabase.from('experiences').update(payload).eq('id', id)
         error = res.error
     } else {
-        const res = await supabase.from('experiences').insert([payload])
+        const res = await supabase.from('experiences').insert([payload]).select('id').single()
         error = res.error
+        savedId = res.data?.id
     }
-    
+
     btn.innerHTML = originalText
     btn.disabled = false
-    
+
     if (error) {
         alert('Errore durante i salvataggio: ' + error.message)
     } else {
         window.closeExpModal()
         loadExperiences()
         showNotification('Esperienza salvata con successo ✓')
+        if (savedId) autoTranslateExperience(savedId, payload)
     }
 })
 
@@ -3659,7 +3883,7 @@ async function loadPartners() {
 
     const { data, error } = await supabase
         .from('affiliates')
-        .select(`*, reservations(*)`)
+        .select(`*, reservations(*), luggage_tickets(*), partner_payments(*)`)
         .order('created_at', { ascending: false })
 
     if (error) {
@@ -3670,10 +3894,16 @@ async function loadPartners() {
 
     allPartners = (data || []).map(p => {
         let filteredRes = p.reservations || []
+        let filteredLug = p.luggage_tickets || []
+
         if (partnerDateFilter === 'month') {
             const now = new Date()
             filteredRes = filteredRes.filter(r => {
                 const d = new Date(r.reservation_date)
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+            })
+            filteredLug = filteredLug.filter(t => {
+                const d = new Date(t.created_at)
                 return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
             })
         } else if (partnerDateFilter === 'prev') {
@@ -3684,14 +3914,40 @@ async function loadPartners() {
                 const d = new Date(r.reservation_date)
                 return d.getMonth() === prevMonth && d.getFullYear() === prevYear
             })
+            filteredLug = filteredLug.filter(t => {
+                const d = new Date(t.created_at)
+                return d.getMonth() === prevMonth && d.getFullYear() === prevYear
+            })
         }
-        const totalVolume = filteredRes.reduce((sum, r) => sum + (r.total_price || 0), 0)
-        const commissionRate = p.commission_rate || 10
-        const totalComm = (totalVolume * commissionRate) / 100
-        return { ...p, totalVolume, totalComm, resCount: filteredRes.length }
+
+        const rateL = p.commission_rate_luggage ?? 10
+        const rateO = p.commission_rate_other ?? 7.5
+
+        // Only active partner_status items count for commissions
+        const activeLug = filteredLug.filter(t => (t.partner_status || 'active') === 'active')
+        const activeRes = filteredRes.filter(r => (r.partner_status || 'active') === 'active')
+
+        const lugVolume = activeLug.reduce((sum, t) => sum + (t.price || 0), 0)
+        const resVolume = activeRes.reduce((sum, r) => sum + (r.total_price || 0), 0)
+        const commLug = (lugVolume * rateL) / 100
+        const commOther = (resVolume * rateO) / 100
+        const totalComm = commLug + commOther
+        const totalPaid = (p.partner_payments || []).reduce((sum, pay) => sum + (pay.amount || 0), 0)
+        return {
+            ...p,
+            rateL, rateO,
+            lugVolume, resVolume,
+            totalVolume: lugVolume + resVolume,
+            commLug, commOther,
+            totalComm,
+            totalPaid,
+            balance: totalComm - totalPaid,
+            resCount: filteredRes.length,
+            lugCount: filteredLug.length
+        }
     })
 
-    renderPartners(allPartners)
+    applyPartnerFilters()
 }
 
 function renderPartners(partners) {
@@ -3701,56 +3957,109 @@ function renderPartners(partners) {
     countEl && (countEl.textContent = partners.length)
 
     if (partners.length === 0) {
-        listEl.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500">Nessun partner trovato.</td></tr>'
+        listEl.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">Nessun partner trovato.</td></tr>'
         return
     }
 
     listEl.innerHTML = partners.map(p => {
-        const adminUrl = `${window.location.origin}/admin/partner-portal.html?key=${p.secret_token}`
+        const adminUrl   = `${window.location.origin}/admin/partner-portal.html?key=${p.secret_token}`
         const printKitUrl = `${window.location.origin}/admin/print-kit.html?ref=${p.referral_code}&name=${encodeURIComponent(p.name)}`
+        const totalAct   = p.lugCount + p.resCount
+        const balPos     = p.balance > 0.01
+        const balHigh    = p.balance > 50
+        const balColor   = balPos ? (balHigh ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700') : 'bg-green-100 text-green-700'
+        const balIcon    = balHigh ? '🔴' : balPos ? '🟡' : '🟢'
+
         return `
-        <tr class="hover:bg-gray-50">
+        <tr class="hover:bg-blue-50/40 cursor-pointer transition-colors" onclick="window.openPartnerScheda('${p.id}')">
             <td class="px-4 py-3">
-                <div class="text-sm font-bold text-gray-900">${p.name}</div>
-                <div class="text-xs text-gray-500 capitalize">${p.business_type || ''}</div>
-            </td>
-            <td class="px-4 py-3 text-xs">
-                <div class="text-gray-600"><i class="fa-solid fa-envelope mr-1"></i>${p.email || '-'}</div>
-                <div class="text-gray-600"><i class="fa-solid fa-phone mr-1"></i>${p.phone || '-'}</div>
+                <div class="font-semibold text-sm text-gray-900 leading-tight">${p.name}</div>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs text-gray-400 capitalize">${p.business_type || '—'}</span>
+                    <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-mono font-bold">${p.referral_code}</span>
+                </div>
             </td>
             <td class="px-4 py-3">
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-mono font-bold">${p.referral_code}</span>
+                ${p.email ? `<div class="text-xs text-gray-600 truncate max-w-[160px]"><i class="fa-solid fa-envelope mr-1 text-gray-400"></i>${p.email}</div>` : ''}
+                ${p.phone ? `<div class="text-xs text-gray-500 mt-0.5"><i class="fa-solid fa-phone mr-1 text-gray-400"></i>${p.phone}</div>` : ''}
+                ${!p.email && !p.phone ? `<span class="text-xs text-gray-400">—</span>` : ''}
             </td>
-            <td class="px-4 py-3 text-sm text-gray-500">${p.commission_rate || 10}%</td>
-            <td class="px-4 py-3 text-sm font-bold text-gray-700">${p.resCount}</td>
-            <td class="px-4 py-3 text-sm font-bold text-gray-900">€ ${p.totalVolume.toFixed(2)}</td>
-            <td class="px-4 py-3 text-sm font-bold text-blue-600">€ ${p.totalComm.toFixed(2)}</td>
-            <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
-                <button onclick="window.viewPartnerBookings('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="bg-green-100 text-green-700 hover:bg-green-200 p-2 rounded text-xs" title="Vedi prenotazioni">
-                    <i class="fa-solid fa-list"></i>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-xs text-gray-600">🧳 <span class="font-semibold">${p.rateL}%</span></div>
+                <div class="text-xs text-gray-600 mt-0.5">📋 <span class="font-semibold">${p.rateO}%</span></div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-sm font-semibold text-gray-800">${totalAct} <span class="text-xs font-normal text-gray-400">trans.</span></div>
+                <div class="text-xs text-gray-400 mt-0.5">Vol. € ${p.totalVolume.toFixed(2)}</div>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-sm font-semibold text-blue-600">€ ${p.totalComm.toFixed(2)}</div>
+                <div class="mt-1">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${balColor}">
+                        ${balIcon} ${balPos ? `Dovuto € ${p.balance.toFixed(2)}` : 'In pari'}
+                    </span>
+                </div>
+            </td>
+            <td class="px-4 py-3 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                <button onclick="window.openPartnerScheda('${p.id}')"
+                    class="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+                    <i class="fa-solid fa-folder-open mr-1"></i>Scheda
                 </button>
-                <a href="${printKitUrl}" target="_blank" class="bg-orange-100 text-orange-700 hover:bg-orange-200 p-2 rounded inline-block text-xs" title="Stampa Locandina">
+                <button onclick="window.printPartnerReportById('${p.id}')"
+                    class="bg-gray-100 text-gray-600 hover:bg-gray-200 p-1.5 rounded-lg inline-flex items-center text-xs ml-1 transition-colors" title="Stampa report">
                     <i class="fa-solid fa-print"></i>
-                </a>
-                <button onclick="window.copyPartnerLink('${adminUrl}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded text-xs" title="Copia link accesso">
-                    <i class="fa-solid fa-key"></i>
                 </button>
-                <button onclick="window.deletePartner('${p.id}')" class="bg-red-100 text-red-600 hover:bg-red-200 p-2 rounded text-xs" title="Elimina">
-                    <i class="fa-solid fa-trash"></i>
+                <button onclick="window.copyPartnerLink('${adminUrl}')"
+                    class="bg-gray-100 text-gray-600 hover:bg-gray-200 p-1.5 rounded-lg text-xs ml-1 transition-colors" title="Copia link">
+                    <i class="fa-solid fa-key"></i>
                 </button>
             </td>
         </tr>`
     }).join('')
 }
 
-document.getElementById('partner-search')?.addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase()
-    renderPartners(allPartners.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.referral_code.toLowerCase().includes(q) ||
-        (p.email && p.email.toLowerCase().includes(q))
-    ))
-})
+function applyPartnerFilters() {
+    const q       = (document.getElementById('partner-search')?.value || '').toLowerCase().trim()
+    const type    = document.getElementById('partner-filter-type')?.value || ''
+    const balance = document.getElementById('partner-filter-balance')?.value || ''
+    const sort    = document.getElementById('partner-sort')?.value || 'balance_desc'
+
+    let list = allPartners.filter(p => {
+        const matchQ = !q ||
+            p.name.toLowerCase().includes(q) ||
+            p.referral_code.toLowerCase().includes(q) ||
+            (p.email || '').toLowerCase().includes(q)
+        const matchType    = !type || p.business_type === type
+        const matchBalance = !balance ||
+            (balance === 'debt' && p.balance > 0.01) ||
+            (balance === 'paid' && p.balance <= 0.01)
+        return matchQ && matchType && matchBalance
+    })
+
+    const sortFns = {
+        balance_desc:  (a, b) => b.balance - a.balance,
+        comm_desc:     (a, b) => b.totalComm - a.totalComm,
+        volume_desc:   (a, b) => b.totalVolume - a.totalVolume,
+        activity_desc: (a, b) => (b.lugCount + b.resCount) - (a.lugCount + a.resCount),
+        name_asc:      (a, b) => a.name.localeCompare(b.name, 'it')
+    }
+    list.sort(sortFns[sort] || sortFns.balance_desc)
+
+    // Aggiorna stats aggregate
+    const totalEarned  = list.reduce((s, p) => s + p.totalComm, 0)
+    const totalBalance = list.reduce((s, p) => s + Math.max(0, p.balance), 0)
+    const earnedEl  = document.getElementById('partner-stats-earned')
+    const balanceEl = document.getElementById('partner-stats-balance')
+    if (earnedEl)  earnedEl.textContent  = `€ ${totalEarned.toFixed(2)}`
+    if (balanceEl) balanceEl.textContent = `€ ${totalBalance.toFixed(2)}`
+
+    renderPartners(list)
+}
+
+document.getElementById('partner-search')?.addEventListener('input', applyPartnerFilters)
+document.getElementById('partner-filter-type')?.addEventListener('change', applyPartnerFilters)
+document.getElementById('partner-filter-balance')?.addEventListener('change', applyPartnerFilters)
+document.getElementById('partner-sort')?.addEventListener('change', applyPartnerFilters)
 
 document.getElementById('partner-filter-date')?.addEventListener('change', (e) => {
     partnerDateFilter = e.target.value
@@ -3769,12 +4078,16 @@ document.getElementById('partner-form')?.addEventListener('submit', async (e) =>
     const email = document.getElementById('partner-email').value
     const phone = document.getElementById('partner-phone').value
     const ref = document.getElementById('partner-ref').value
-    const rate = document.getElementById('partner-rate').value
+    const rateLuggage = parseFloat(document.getElementById('partner-rate-luggage').value) || 10
+    const rateOther = parseFloat(document.getElementById('partner-rate-other').value) || 7.5
     const secretToken = crypto.randomUUID()
 
     const { data, error } = await supabase.from('affiliates').insert([{
         name, business_type: type, email, phone,
-        referral_code: ref, commission_rate: parseInt(rate), secret_token: secretToken
+        referral_code: ref,
+        commission_rate_luggage: rateLuggage,
+        commission_rate_other: rateOther,
+        secret_token: secretToken
     }]).select()
 
     if (error) {
@@ -3816,33 +4129,644 @@ window.deletePartner = async (id) => {
     else loadPartners()
 }
 
-window.viewPartnerBookings = async (partnerId, partnerName) => {
-    const { data, error } = await supabase
-        .from('reservations')
-        .select('*')
-        .eq('affiliate_id', partnerId)
-        .order('reservation_date', { ascending: false })
+// ─────────────────────────────────────────────
+// SCHEDA PARTNER
+// ─────────────────────────────────────────────
 
-    if (error) { alert('Errore: ' + error.message); return }
+let _schedaPartnerId = null
+let _schedaPeriod = 'all'
+let _schedaData = null
+let _schedaReservations = []
+let _schedaLuggage = []
+let _schedaRateL = 10
+let _schedaRateO = 7.5
 
-    document.getElementById('partner-modal-title').textContent = `Prenotazioni: ${partnerName}`
-    const list = document.getElementById('partner-modal-list')
+window.openPartnerScheda = async function (partnerId) {
+    _schedaPartnerId = partnerId
+    _schedaPeriod = 'all'
 
-    if (!data || data.length === 0) {
-        list.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Nessuna prenotazione trovata.</td></tr>'
-    } else {
-        list.innerHTML = data.map(r => `
-            <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm text-gray-900">${new Date(r.reservation_date).toLocaleDateString('it-IT')}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">${r.customer_name}</td>
-                <td class="px-4 py-3 text-sm text-gray-500">${r.service_type}</td>
-                <td class="px-4 py-3 text-sm text-right font-bold text-blue-600">€ ${(r.total_price || 0).toFixed(2)}</td>
-            </tr>`).join('')
+    const partner = allPartners.find(p => p.id === partnerId)
+    if (!partner) return
+
+    document.getElementById('scheda-partner-name').textContent = partner.name
+    document.getElementById('scheda-partner-meta').textContent =
+        [partner.business_type, partner.email, partner.phone].filter(Boolean).join(' · ')
+    // Rate
+    document.getElementById('scheda-rate-luggage').value = partner.rateL
+    document.getElementById('scheda-rate-other').value = partner.rateO
+    // Dati anagrafici
+    document.getElementById('scheda-edit-name').value    = partner.name || ''
+    document.getElementById('scheda-edit-type').value    = partner.business_type || 'hotel'
+    document.getElementById('scheda-edit-ref').value     = partner.referral_code || ''
+    document.getElementById('scheda-edit-email').value   = partner.email || ''
+    document.getElementById('scheda-edit-phone').value   = partner.phone || ''
+    document.getElementById('scheda-edit-vat').value     = partner.vat_number || ''
+    document.getElementById('scheda-edit-website').value = partner.website || ''
+    document.getElementById('scheda-edit-address').value = partner.address || ''
+    document.getElementById('scheda-edit-notes').value   = partner.notes || ''
+    document.getElementById('payment-affiliate-id').value = partnerId
+    document.getElementById('payment-date').value = new Date().toISOString().slice(0, 10)
+    document.getElementById('scheda-filter-period').value = 'all'
+    document.getElementById('scheda-filter-type').value   = 'all'
+    document.getElementById('scheda-filter-status').value = 'all'
+    document.getElementById('scheda-delete-btn').onclick = () => {
+        window.closePartnerScheda()
+        window.deletePartner(partnerId)
     }
 
-    document.getElementById('partner-bookings-modal').classList.remove('hidden')
+    _switchSchedaTab('transactions')
+
+    const modal = document.getElementById('partner-scheda-modal')
+    modal.classList.remove('hidden')
+    modal.classList.add('flex')
+
+    await _refreshSchedaData()
 }
 
-window.closePartnerModal = () => {
-    document.getElementById('partner-bookings-modal').classList.add('hidden')
+window.closePartnerScheda = function () {
+    const modal = document.getElementById('partner-scheda-modal')
+    modal.classList.add('hidden')
+    modal.classList.remove('flex')
+    _schedaPartnerId = null
 }
+
+function _switchSchedaTab(tabName) {
+    document.querySelectorAll('.scheda-tab-btn').forEach(btn => {
+        const active = btn.dataset.schedaTab === tabName
+        btn.classList.toggle('border-blue-600', active)
+        btn.classList.toggle('text-blue-700', active)
+        btn.classList.toggle('bg-blue-50', active)
+        btn.classList.toggle('border-transparent', !active)
+        btn.classList.toggle('text-gray-500', !active)
+        btn.classList.remove('bg-blue-50')
+        if (active) btn.classList.add('bg-blue-50')
+    })
+    ;['transactions', 'payments', 'settings'].forEach(t => {
+        document.getElementById(`scheda-tab-${t}`)?.classList.toggle('hidden', t !== tabName)
+    })
+}
+
+document.querySelectorAll('.scheda-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => _switchSchedaTab(btn.dataset.schedaTab))
+})
+
+document.getElementById('scheda-filter-period')?.addEventListener('change', e => {
+    _schedaPeriod = e.target.value
+    _refreshSchedaData()
+})
+document.getElementById('scheda-filter-type')?.addEventListener('change', () => _applySchedaTxFilters())
+document.getElementById('scheda-filter-status')?.addEventListener('change', () => _applySchedaTxFilters())
+
+async function _refreshSchedaData() {
+    if (!_schedaPartnerId) return
+
+    const [resR, lugR, payR] = await Promise.all([
+        supabase.from('reservations').select('*').eq('affiliate_id', _schedaPartnerId).order('reservation_date', { ascending: false }),
+        supabase.from('luggage_tickets').select('*').eq('affiliate_id', _schedaPartnerId).order('created_at', { ascending: false }),
+        supabase.from('partner_payments').select('*').eq('affiliate_id', _schedaPartnerId).order('payment_date', { ascending: false })
+    ])
+
+    const partner = allPartners.find(p => p.id === _schedaPartnerId)
+    const rateL = partner?.commission_rate_luggage ?? 10
+    const rateO = partner?.commission_rate_other ?? 7.5
+
+    let reservations = _filterByPeriod(resR.data || [], 'reservation_date', _schedaPeriod)
+    let luggage = _filterByPeriod(lugR.data || [], 'created_at', _schedaPeriod)
+    const payments = payR.data || []
+
+    const activeLug = luggage.filter(t => (t.partner_status || 'active') === 'active')
+    const activeRes = reservations.filter(r => (r.partner_status || 'active') === 'active')
+    const lugVolume = activeLug.reduce((s, t) => s + (t.price || 0), 0)
+    const resVolume = activeRes.reduce((s, r) => s + (r.total_price || 0), 0)
+    const totalEarned = (lugVolume * rateL / 100) + (resVolume * rateO / 100)
+    const totalPaid = payments.reduce((s, p) => s + parseFloat(p.amount || 0), 0)
+    const balance = totalEarned - totalPaid
+
+    document.getElementById('scheda-kpi-volume').textContent = `€ ${(lugVolume + resVolume).toFixed(2)}`
+    document.getElementById('scheda-kpi-earned').textContent = `€ ${totalEarned.toFixed(2)}`
+    document.getElementById('scheda-kpi-paid').textContent = `€ ${totalPaid.toFixed(2)}`
+    const balEl = document.getElementById('scheda-kpi-balance')
+    balEl.textContent = `€ ${balance.toFixed(2)}`
+    balEl.className = `text-2xl font-bold ${balance > 0.01 ? 'text-orange-600' : 'text-green-600'}`
+
+    _schedaReservations = reservations
+    _schedaLuggage = luggage
+    _schedaRateL = rateL
+    _schedaRateO = rateO
+    _applySchedaTxFilters()
+    _renderSchedaPayments(payments)
+
+    _schedaData = { partner, reservations, luggage, payments, rateL, rateO, totalEarned, totalPaid, balance, lugVolume, resVolume }
+}
+
+function _filterByPeriod(arr, field, period) {
+    if (period === 'all') return arr
+    const now = new Date()
+    return arr.filter(item => {
+        const d = new Date(item[field])
+        if (period === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+        if (period === 'prev') {
+            const pm = now.getMonth() === 0 ? 11 : now.getMonth() - 1
+            const py = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear()
+            return d.getMonth() === pm && d.getFullYear() === py
+        }
+        if (period === 'year') return d.getFullYear() === now.getFullYear()
+        return true
+    })
+}
+
+const _statusBadge = {
+    active:   { label: 'Attiva',      cls: 'bg-green-100 text-green-700' },
+    pending:  { label: '⏳ In attesa', cls: 'bg-blue-100 text-blue-700' },
+    noshow:   { label: 'No-show',     cls: 'bg-yellow-100 text-yellow-700' },
+    excluded: { label: 'Esclusa',     cls: 'bg-gray-100 text-gray-500' }
+}
+
+function _applySchedaTxFilters() {
+    const typeF   = document.getElementById('scheda-filter-type')?.value   || 'all'
+    const statusF = document.getElementById('scheda-filter-status')?.value || 'all'
+
+    let res = _schedaReservations
+    let lug = _schedaLuggage
+
+    if (typeF === 'luggage')     res = []
+    if (typeF === 'reservation') lug = []
+
+    if (statusF !== 'all') {
+        res = res.filter(r => (r.partner_status || 'active') === statusF)
+        lug = lug.filter(t => (t.partner_status || 'active') === statusF)
+    }
+
+    _renderSchedaTransactions(res, lug, _schedaRateL, _schedaRateO)
+}
+
+function _renderSchedaTransactions(reservations, luggage, rateL, rateO) {
+    const list = document.getElementById('scheda-transactions-list')
+
+    const allTx = [
+        ...luggage.map(t => ({
+            id: t.id, tableType: 'luggage_tickets',
+            date: t.created_at,
+            label: `🧳 Deposito (${t.bag_count} bag.)`,
+            customer: t.customer_name,
+            amount: t.price || 0,
+            rate: rateL,
+            status: t.partner_status || 'active',
+            note: t.partner_status_note || null
+        })),
+        ...reservations.map(r => ({
+            id: r.id, tableType: 'reservations',
+            date: r.created_at,
+            label: `📋 ${r.service_type}`,
+            customer: r.customer_name,
+            amount: r.total_price || 0,
+            rate: rateO,
+            status: r.partner_status || 'active',
+            note: r.partner_status_note || null
+        }))
+    ].sort((a, b) => new Date(b.date) - new Date(a.date))
+
+    if (!allTx.length) {
+        list.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-sm text-gray-400">Nessuna transazione nel periodo selezionato.</td></tr>'
+        return
+    }
+
+    list.innerHTML = allTx.map(tx => {
+        const isActive = tx.status === 'active'
+        const isPending = tx.status === 'pending'
+        const countsForComm = isActive
+        const comm = countsForComm ? (tx.amount * tx.rate / 100) : 0
+        const badge = _statusBadge[tx.status] || _statusBadge.active
+        const noteHtml = tx.note ? `<div class="text-[10px] text-gray-400 italic mt-0.5">📝 ${tx.note}</div>` : ''
+
+        let actionBtns = ''
+        if (isPending) {
+            actionBtns = `<button onclick="window.setTxStatus('${tx.tableType}','${tx.id}','active')" class="text-xs text-green-600 hover:text-green-800 font-semibold mr-2">✅ Conferma</button>
+                          <button onclick="window.excludeWithNote('${tx.tableType}','${tx.id}')" class="text-xs text-gray-400 hover:text-gray-600 mr-2">⛔ Escludi</button>`
+        } else if (isActive) {
+            actionBtns = `<button onclick="window.setTxStatus('${tx.tableType}','${tx.id}','noshow')" class="text-xs text-yellow-600 hover:text-yellow-800 mr-2">🚫 No-show</button>
+                          <button onclick="window.excludeWithNote('${tx.tableType}','${tx.id}')" class="text-xs text-gray-400 hover:text-gray-600 mr-2">⛔ Escludi</button>`
+        } else {
+            actionBtns = `<button onclick="window.setTxStatus('${tx.tableType}','${tx.id}','active')" class="text-xs text-green-600 hover:text-green-800 mr-2">↩ Ripristina</button>`
+        }
+
+        return `<tr class="hover:bg-gray-50 ${(!countsForComm && !isPending) ? 'opacity-60' : isPending ? 'bg-blue-50/30' : ''}">
+            <td class="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">${new Date(tx.date).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+            <td class="px-3 py-2.5 text-xs text-gray-700">${tx.label}</td>
+            <td class="px-3 py-2.5 text-xs text-gray-700">${tx.customer}</td>
+            <td class="px-3 py-2.5 text-xs text-right font-medium ${countsForComm ? 'text-gray-900' : 'text-gray-400 line-through'}">€ ${tx.amount.toFixed(2)}</td>
+            <td class="px-3 py-2.5 text-xs text-right font-bold ${countsForComm ? 'text-blue-600' : 'text-gray-400'}">
+                ${countsForComm ? `€ ${comm.toFixed(2)} <span class="text-gray-400 font-normal">(${tx.rate}%)</span>` : isPending ? '<span class="text-blue-400">— in attesa</span>' : '€ 0,00'}
+            </td>
+            <td class="px-3 py-2.5 text-center">
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${badge.cls}">${badge.label}</span>
+                ${noteHtml}
+            </td>
+            <td class="px-3 py-2.5 text-right whitespace-nowrap">
+                ${actionBtns}
+                <button onclick="window.removeTxFromPartner('${tx.tableType}','${tx.id}')" class="text-xs text-red-400 hover:text-red-600" title="Rimuovi dalla lista del partner">🗑️</button>
+            </td>
+        </tr>`
+    }).join('')
+}
+
+function _renderSchedaPayments(payments) {
+    const list = document.getElementById('scheda-payments-list')
+    if (!payments.length) {
+        list.innerHTML = '<p class="text-sm text-gray-400 py-4 text-center">Nessun pagamento registrato.</p>'
+        return
+    }
+    const methods = { transfer: '🏦 Bonifico', cash: '💵 Contanti', other: '📌 Altro' }
+    list.innerHTML = payments.map(p => `
+        <div class="flex items-center justify-between px-4 py-3 bg-white rounded-lg border border-gray-200">
+            <div>
+                <p class="text-sm font-bold text-gray-900">€ ${parseFloat(p.amount).toFixed(2)}</p>
+                <p class="text-xs text-gray-500">${new Date(p.payment_date).toLocaleDateString('it-IT')} · ${methods[p.method] || p.method}${p.notes ? ` · ${p.notes}` : ''}</p>
+            </div>
+            <button onclick="window.deletePartnerPayment('${p.id}')" class="text-red-400 hover:text-red-600 ml-3 p-1 rounded hover:bg-red-50" title="Elimina">
+                <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+        </div>`).join('')
+}
+
+window.setTxStatus = async (table, id, newStatus, note = null) => {
+    const updateData = { partner_status: newStatus }
+    if (note !== null) updateData.partner_status_note = note
+    if (newStatus !== 'excluded') updateData.partner_status_note = null // clear note when restoring/confirming
+
+    const { error } = await supabase.from(table).update(updateData).eq('id', id)
+    if (error) { showNotification('Errore: ' + error.message); return }
+
+    // Partner earnings email when confirming a pending transaction
+    if (newStatus === 'active') {
+        const allSchedaTx = [...(_schedaLuggage || []), ...(_schedaReservations || [])]
+        const tx = allSchedaTx.find(t => t.id === id)
+        if (tx?.partner_status === 'pending') {
+            const isLuggage = table === 'luggage_tickets'
+            sendPartnerEarningsEmail({
+                affiliateId: _schedaPartnerId,
+                type: isLuggage ? 'luggage' : 'reservation',
+                shortId: id.slice(0, 8).toUpperCase(),
+                customerName: tx.customer_name,
+                amount: isLuggage ? (tx.price || 0) : (tx.total_price || 0)
+            })
+        }
+    }
+
+    const msg = { active: 'Transazione confermata ✓', pending: '⏳ Rimessa in attesa', noshow: 'Segnato come no-show ✓', excluded: 'Transazione esclusa ✓' }
+    showNotification(msg[newStatus] || 'Aggiornato ✓')
+    await _refreshSchedaData()
+    loadPartners()
+}
+
+window.excludeWithNote = async (table, id) => {
+    const note = await askInput('Motivo di esclusione (opzionale):', 'Es. cliente non si è presentato...')
+    if (note === false) return // cancelled
+    await window.setTxStatus(table, id, 'excluded', note)
+}
+
+window.removeTxFromPartner = async (table, id) => {
+    if (!await askConfirm('Rimuovere questa voce dalla lista del partner? La prenotazione resta nel sistema ma non sarà più associata a questo partner.')) return
+    const { error } = await supabase.from(table).update({ affiliate_id: null, partner_status: 'active' }).eq('id', id)
+    if (error) { showNotification('Errore: ' + error.message); return }
+    showNotification('Voce rimossa dal partner ✓')
+    await _refreshSchedaData()
+    loadPartners()
+}
+
+document.getElementById('partner-payment-form')?.addEventListener('submit', async e => {
+    e.preventDefault()
+    const affiliateId = document.getElementById('payment-affiliate-id').value
+    const amount = parseFloat(document.getElementById('payment-amount').value)
+    const date = document.getElementById('payment-date').value
+    const method = document.getElementById('payment-method').value
+    const notes = document.getElementById('payment-notes').value.trim()
+
+    const { error } = await supabase.from('partner_payments').insert([{
+        affiliate_id: affiliateId, amount, payment_date: date, method, notes: notes || null
+    }])
+    if (error) { showNotification('Errore: ' + error.message); return }
+
+    const partner = allPartners.find(p => p.id === affiliateId)
+    await supabase.from('transactions').insert([{
+        type: 'expense',
+        category: 'Pagamento Provvigione',
+        amount,
+        description: `Pagamento provvigione ${partner?.name || 'Partner'} — ${new Date(date).toLocaleDateString('it-IT')}${notes ? ` — ${notes}` : ''}`,
+        date,
+        payment_method: method === 'transfer' ? 'transfer' : 'cash',
+        status: 'active'
+    }])
+
+    e.target.reset()
+    document.getElementById('payment-date').value = new Date().toISOString().slice(0, 10)
+    document.getElementById('payment-affiliate-id').value = affiliateId
+    showNotification('Pagamento registrato ✓')
+    await _refreshSchedaData()
+    loadPartners()
+})
+
+window.deletePartnerPayment = async id => {
+    if (!await askConfirm('Eliminare questo pagamento?')) return
+    const { error } = await supabase.from('partner_payments').delete().eq('id', id)
+    if (error) { showNotification('Errore: ' + error.message); return }
+    showNotification('Pagamento eliminato.')
+    await _refreshSchedaData()
+    loadPartners()
+}
+
+window.savePartnerRates = async () => {
+    const rateL = parseFloat(document.getElementById('scheda-rate-luggage').value)
+    const rateO = parseFloat(document.getElementById('scheda-rate-other').value)
+    if (isNaN(rateL) || isNaN(rateO)) { showNotification('Inserisci valori validi.'); return }
+    const { error } = await supabase.from('affiliates')
+        .update({ commission_rate_luggage: rateL, commission_rate_other: rateO })
+        .eq('id', _schedaPartnerId)
+    if (error) { showNotification('Errore: ' + error.message); return }
+    showNotification('Rate aggiornate ✓')
+    await loadPartners()
+    await _refreshSchedaData()
+}
+
+window.savePartnerInfo = async () => {
+    const name    = document.getElementById('scheda-edit-name').value.trim()
+    if (!name) { showNotification('Il nome è obbligatorio.'); return }
+    const payload = {
+        name,
+        business_type: document.getElementById('scheda-edit-type').value,
+        referral_code: document.getElementById('scheda-edit-ref').value.trim(),
+        email:         document.getElementById('scheda-edit-email').value.trim() || null,
+        phone:         document.getElementById('scheda-edit-phone').value.trim() || null,
+        vat_number:    document.getElementById('scheda-edit-vat').value.trim() || null,
+        website:       document.getElementById('scheda-edit-website').value.trim() || null,
+        address:       document.getElementById('scheda-edit-address').value.trim() || null,
+        notes:         document.getElementById('scheda-edit-notes').value.trim() || null,
+    }
+    const { error } = await supabase.from('affiliates').update(payload).eq('id', _schedaPartnerId)
+    if (error) { showNotification('Errore: ' + error.message); return }
+    // Aggiorna header scheda
+    document.getElementById('scheda-partner-name').textContent = name
+    document.getElementById('scheda-partner-meta').textContent =
+        [payload.business_type, payload.email, payload.phone].filter(Boolean).join(' · ')
+    showNotification('Dati aggiornati ✓')
+    await loadPartners()
+}
+
+window.printPartnerReportById = async (partnerId) => {
+    const partner = allPartners.find(p => p.id === partnerId)
+    if (!partner) { showNotification('Partner non trovato'); return }
+
+    const [resR, lugR, payR] = await Promise.all([
+        supabase.from('reservations').select('*').eq('affiliate_id', partnerId).order('reservation_date', { ascending: false }),
+        supabase.from('luggage_tickets').select('*').eq('affiliate_id', partnerId).order('created_at', { ascending: false }),
+        supabase.from('partner_payments').select('*').eq('affiliate_id', partnerId).order('payment_date', { ascending: false })
+    ])
+
+    const rateL = partner.commission_rate_luggage ?? 10
+    const rateO = partner.commission_rate_other ?? 7.5
+    const reservations = resR.data || []
+    const luggage = lugR.data || []
+    const payments = payR.data || []
+    const activeLug = luggage.filter(t => (t.partner_status || 'active') === 'active')
+    const activeRes = reservations.filter(r => (r.partner_status || 'active') === 'active')
+    const lugVolume = activeLug.reduce((s, t) => s + (t.price || 0), 0)
+    const resVolume = activeRes.reduce((s, r) => s + (r.total_price || 0), 0)
+    const totalEarned = (lugVolume * rateL / 100) + (resVolume * rateO / 100)
+    const totalPaid = payments.reduce((s, p) => s + parseFloat(p.amount || 0), 0)
+    const balance = totalEarned - totalPaid
+
+    const d = { partner, reservations, luggage, payments, rateL, rateO, totalEarned, totalPaid, balance, lugVolume, resVolume }
+    _renderPartnerPrintWindow(d, 'Tutto lo storico')
+}
+
+function _renderPartnerPrintWindow(d, periodLabel) {
+    const { partner, reservations, luggage, payments, rateL, rateO, totalEarned, totalPaid, balance, lugVolume, resVolume } = d
+    const activeLug  = luggage.filter(t => (t.partner_status || 'active') === 'active')
+    const activeRes  = reservations.filter(r => (r.partner_status || 'active') === 'active')
+    const noshowAll  = [...luggage.filter(t => t.partner_status === 'noshow'), ...reservations.filter(r => r.partner_status === 'noshow')]
+    const excludeAll = [...luggage.filter(t => t.partner_status === 'excluded'), ...reservations.filter(r => r.partner_status === 'excluded')]
+    const LP = { name: 'LocalPoint Milazzo', address: 'Via Tenente Brigiano, 6 — 98057 Milazzo (ME)', phone: '+39 379 3283803', email: 'localpointmilazzo@gmail.com' }
+    const fmt = v => '€ ' + parseFloat(v || 0).toFixed(2)
+    const fmtDt = s => s ? new Date(s).toLocaleString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—'
+    const txRow = (item, isLug) => {
+        const date = item.created_at
+        const label = isLug ? 'Deposito Bagagli (' + item.bag_count + ' bag.)' : item.service_type
+        const amount = isLug ? (item.price || 0) : (item.total_price || 0)
+        const rate = isLug ? rateL : rateO
+        const comm = (amount * rate / 100)
+        const contact = [item.customer_phone, item.customer_email].filter(Boolean).join(' · ')
+        const noteStr = item.partner_status_note ? '<br><span class="note">📝 ' + item.partner_status_note + '</span>' : ''
+        return '<tr><td>' + fmtDt(date) + '</td><td>' + label + '</td><td>' + item.customer_name + (contact ? '<br><span class="sub">' + contact + '</span>' : '') + noteStr + '</td><td class="r">' + fmt(amount) + '</td><td class="r b">' + fmt(comm) + '</td></tr>'
+    }
+    const partnerContact = [partner.phone, partner.email].filter(Boolean).join(' · ')
+    const partnerAddr = [partner.address, partner.vat_number ? 'P.IVA ' + partner.vat_number : ''].filter(Boolean).join(' · ')
+    const w = window.open('', '_blank')
+    w.document.write('<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Riepilogo — ' + partner.name + '</title><style>' +
+'*{box-sizing:border-box}body{font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:32px;color:#111}' +
+'.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1B3A5C;padding-bottom:16px;margin-bottom:20px}' +
+'.lp-name{font-size:18px;font-weight:700;color:#1B3A5C}.lp-info{font-size:11px;color:#555;line-height:1.6;margin-top:3px}' +
+'.partner-box{text-align:right}.partner-box h2{font-size:15px;font-weight:700;color:#1B3A5C;margin:0 0 3px}' +
+'.partner-box .sub2{font-size:11px;color:#666;line-height:1.5}' +
+'.doc-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:16px}' +
+'.period{font-size:11px;color:#666;margin-bottom:20px}' +
+'.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}' +
+'.kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center}' +
+'.kpi label{font-size:10px;color:#888;text-transform:uppercase;display:block;margin-bottom:4px}' +
+'.kpi span{font-size:18px;font-weight:700;color:#1B3A5C}.kpi.red span{color:#c2410c}.kpi.grn span{color:#16a34a}' +
+'h3{font-size:11px;text-transform:uppercase;color:#1B3A5C;margin:20px 0 6px;letter-spacing:.05em;border-bottom:1px solid #e2e8f0;padding-bottom:4px}' +
+'table{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:8px}' +
+'th{background:#1B3A5C;color:#fff;padding:7px 8px;text-align:left;font-size:10px;letter-spacing:.03em}' +
+'td{padding:6px 8px;border-bottom:1px solid #f0f0f0;vertical-align:top}.r{text-align:right}.b{font-weight:700}' +
+'.sub{font-size:10px;color:#999;display:block;margin-top:1px}.note{font-size:10px;color:#e67e22;display:block;margin-top:1px;font-style:italic}' +
+'tr.total td{font-weight:700;border-top:2px solid #1B3A5C;background:#f0f6ff}' +
+'.noshow td,.excl td{color:#bbb}' +
+'.footer{margin-top:32px;padding-top:12px;border-top:2px solid #1B3A5C;display:flex;justify-content:space-between;align-items:center}' +
+'.footer .info{font-size:10px;color:#888;line-height:1.6}.footer .saldo{font-size:20px;font-weight:700}' +
+'@media print{body{padding:16px}}' +
+'</style></head><body>' +
+'<div class="header"><div><div class="lp-name">' + LP.name + '</div><div class="lp-info">' + LP.address + '<br>' + LP.phone + ' · ' + LP.email + '</div></div>' +
+'<div class="partner-box"><h2>' + partner.name + '</h2><div class="sub2">' + (partnerContact ? partnerContact + '<br>' : '') + (partnerAddr ? partnerAddr : '') + '</div></div></div>' +
+'<div class="doc-title">Riepilogo Commissioni</div>' +
+'<div class="period">Codice referral: <strong>' + partner.referral_code + '</strong> &nbsp;·&nbsp; Periodo: <strong>' + periodLabel + '</strong> &nbsp;·&nbsp; Generato il ' + new Date().toLocaleDateString('it-IT') + '</div>' +
+'<div class="kpis">' +
+'<div class="kpi"><label>Volume</label><span>' + fmt(lugVolume + resVolume) + '</span></div>' +
+'<div class="kpi"><label>Provv. Maturate</label><span>' + fmt(totalEarned) + '</span></div>' +
+'<div class="kpi"><label>Già Pagate</label><span>' + fmt(totalPaid) + '</span></div>' +
+'<div class="kpi ' + (balance > 0.01 ? 'red' : 'grn') + '"><label>Saldo Dovuto</label><span>' + fmt(balance) + '</span></div>' +
+'</div>' +
+(activeLug.length + activeRes.length ? '<h3>Transazioni Valide</h3><table><thead><tr><th>Data / Ora</th><th>Servizio</th><th>Cliente</th><th class="r">Importo</th><th class="r">Commissione</th></tr></thead><tbody>' + activeLug.map(t => txRow(t, true)).join('') + activeRes.map(r => txRow(r, false)).join('') + '<tr class="total"><td colspan="4">Totale commissioni</td><td class="r">' + fmt(totalEarned) + '</td></tr></tbody></table>' : '') +
+(noshowAll.length ? '<h3>No-show</h3><table><thead><tr><th>Data / Ora</th><th>Servizio</th><th>Cliente</th><th class="r">Importo</th><th class="r">Commissione</th></tr></thead><tbody class="noshow">' + noshowAll.map(x => x.bag_count !== undefined ? txRow(x,true) : txRow(x,false)).join('') + '</tbody></table>' : '') +
+(excludeAll.length ? '<h3>Escluse</h3><table><thead><tr><th>Data / Ora</th><th>Servizio</th><th>Cliente</th><th class="r">Importo</th><th class="r">Commissione</th></tr></thead><tbody class="excl">' + excludeAll.map(x => x.bag_count !== undefined ? txRow(x,true) : txRow(x,false)).join('') + '</tbody></table>' : '') +
+(payments.length ? '<h3>Pagamenti Registrati</h3><table><thead><tr><th>Data</th><th>Metodo</th><th>Note</th><th class="r">Importo</th></tr></thead><tbody>' + payments.map(p=>'<tr><td>' + new Date(p.payment_date + 'T12:00:00').toLocaleDateString('it-IT') + '</td><td>' + ({transfer:'Bonifico',cash:'Contanti',other:'Altro'}[p.method]||p.method) + '</td><td>' + (p.notes||'—') + '</td><td class="r">' + fmt(p.amount) + '</td></tr>').join('') + '<tr class="total"><td colspan="3">Totale pagato</td><td class="r">' + fmt(totalPaid) + '</td></tr></tbody></table>' : '') +
+'<div class="footer"><div class="info">' + LP.name + ' · ' + LP.address + '<br>' + LP.phone + ' · ' + LP.email + '</div><div class="saldo" style="color:' + (balance>0.01?'#c2410c':'#16a34a') + '">SALDO: ' + fmt(balance) + '</div></div>' +
+'<script>window.onload=()=>window.print()</scr' + 'ipt></body></html>')
+    w.document.close()
+}
+
+window.printPartnerReport = () => {
+    const d = _schedaData
+    if (!d) return
+    const periodLabel = { all: 'Tutto lo storico', month: 'Questo mese', prev: 'Mese scorso', year: "Quest'anno" }[_schedaPeriod] || ''
+    _renderPartnerPrintWindow(d, periodLabel)
+}
+
+// ─────────────────────────────────────────────
+// FORNITORI
+// ─────────────────────────────────────────────
+
+let allSuppliers = []
+
+const CATEGORY_LABELS = {
+    cibo: 'Cibo & Bevande',
+    materiali: 'Materiali & Forniture',
+    trasporti: 'Trasporti & Logistica',
+    servizi: 'Servizi Professionali',
+    tecnologia: 'Tecnologia & Software',
+    altro: 'Altro'
+}
+
+async function loadSuppliers() {
+    const { data, error } = await supabase
+        .from('suppliers')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+    if (error) {
+        console.error('Errore caricamento fornitori:', error)
+        document.getElementById('suppliers-list').innerHTML =
+            `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-red-500">Errore nel caricamento.</td></tr>`
+        return
+    }
+
+    allSuppliers = data || []
+    applySupplierFilters()
+}
+
+function applySupplierFilters() {
+    const q = (document.getElementById('supplier-search')?.value || '').toLowerCase()
+    const cat = document.getElementById('supplier-filter-category')?.value || ''
+    const status = document.getElementById('supplier-filter-status')?.value
+
+    const filtered = allSuppliers.filter(s => {
+        const matchSearch = !q ||
+            (s.name || '').toLowerCase().includes(q) ||
+            (s.contact_name || '').toLowerCase().includes(q) ||
+            (s.category || '').toLowerCase().includes(q)
+        const matchCat = !cat || s.category === cat
+        const matchStatus = status === '' ? true : String(s.active) === status
+        return matchSearch && matchCat && matchStatus
+    })
+
+    renderSuppliers(filtered)
+}
+
+function renderSuppliers(suppliers) {
+    const list = document.getElementById('suppliers-list')
+
+    // KPI
+    document.getElementById('sup-kpi-total').textContent = allSuppliers.length
+    document.getElementById('sup-kpi-active').textContent = allSuppliers.filter(s => s.active !== false).length
+    document.getElementById('sup-kpi-inactive').textContent = allSuppliers.filter(s => s.active === false).length
+    const cats = new Set(allSuppliers.map(s => s.category).filter(Boolean))
+    document.getElementById('sup-kpi-cats').textContent = cats.size
+
+    if (!suppliers.length) {
+        list.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">Nessun fornitore trovato.</td></tr>`
+        return
+    }
+
+    list.innerHTML = suppliers.map(s => {
+        const active = s.active !== false
+        const catLabel = CATEGORY_LABELS[s.category] || s.category || '—'
+        const phone = s.phone ? `<a href="tel:${s.phone}" class="text-blue-600 hover:underline block">${s.phone}</a>` : ''
+        const email = s.email ? `<a href="mailto:${s.email}" class="text-blue-600 hover:underline block text-xs">${s.email}</a>` : ''
+        const contacts = phone || email ? `${phone}${email}` : '<span class="text-gray-400">—</span>'
+
+        return `<tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3">
+                <p class="font-semibold text-sm text-gray-900">${s.name}</p>
+                ${s.address ? `<p class="text-xs text-gray-400">${s.address}</p>` : ''}
+            </td>
+            <td class="px-4 py-3">
+                <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium">${catLabel}</span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-700">${s.contact_name || '<span class="text-gray-400">—</span>'}</td>
+            <td class="px-4 py-3 text-sm">${contacts}</td>
+            <td class="px-4 py-3">
+                <span class="px-2 py-1 rounded text-xs font-semibold ${active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">
+                    ${active ? 'Attivo' : 'Non Attivo'}
+                </span>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-right text-sm space-x-2">
+                <button onclick="window.editSupplier('${s.id}')" class="text-blue-600 hover:text-blue-800 font-medium">✏️ Modifica</button>
+                <button onclick="window.deleteSupplier('${s.id}')" class="text-red-500 hover:text-red-700 font-medium">🗑️ Elimina</button>
+            </td>
+        </tr>`
+    }).join('')
+}
+
+window.openSupplierModal = function (supplier = null) {
+    document.getElementById('supplier-id').value = supplier?.id || ''
+    document.getElementById('supplier-name').value = supplier?.name || ''
+    document.getElementById('supplier-category').value = supplier?.category || 'cibo'
+    document.getElementById('supplier-contact').value = supplier?.contact_name || ''
+    document.getElementById('supplier-phone').value = supplier?.phone || ''
+    document.getElementById('supplier-email').value = supplier?.email || ''
+    document.getElementById('supplier-website').value = supplier?.website || ''
+    document.getElementById('supplier-address').value = supplier?.address || ''
+    document.getElementById('supplier-notes').value = supplier?.notes || ''
+    document.getElementById('supplier-active').checked = supplier ? (supplier.active !== false) : true
+    document.getElementById('supplier-modal-title').textContent = supplier ? 'Modifica Fornitore' : 'Aggiungi Fornitore'
+    document.getElementById('modal-supplier').classList.remove('hidden')
+}
+
+window.closeSupplierModal = function () {
+    document.getElementById('modal-supplier').classList.add('hidden')
+}
+
+window.editSupplier = function (id) {
+    const s = allSuppliers.find(x => x.id === id)
+    if (s) window.openSupplierModal(s)
+}
+
+window.deleteSupplier = async function (id) {
+    if (!await askConfirm('Sicuro di voler eliminare questo fornitore?')) return
+    const { error } = await supabase.from('suppliers').delete().eq('id', id)
+    if (error) { showNotification('Errore: ' + error.message); return }
+    showNotification('Fornitore eliminato.')
+    loadSuppliers()
+}
+
+document.getElementById('supplier-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const id = document.getElementById('supplier-id').value
+    const payload = {
+        name: document.getElementById('supplier-name').value.trim(),
+        category: document.getElementById('supplier-category').value,
+        contact_name: document.getElementById('supplier-contact').value.trim() || null,
+        phone: document.getElementById('supplier-phone').value.trim() || null,
+        email: document.getElementById('supplier-email').value.trim() || null,
+        website: document.getElementById('supplier-website').value.trim() || null,
+        address: document.getElementById('supplier-address').value.trim() || null,
+        notes: document.getElementById('supplier-notes').value.trim() || null,
+        active: document.getElementById('supplier-active').checked
+    }
+
+    let error
+    if (id) {
+        ;({ error } = await supabase.from('suppliers').update(payload).eq('id', id))
+    } else {
+        ;({ error } = await supabase.from('suppliers').insert([payload]))
+    }
+
+    if (error) { showNotification('Errore: ' + error.message); return }
+
+    window.closeSupplierModal()
+    showNotification(id ? 'Fornitore aggiornato ✓' : 'Fornitore aggiunto ✓')
+    loadSuppliers()
+})
+
+// Supplier filters listeners
+document.getElementById('supplier-search')?.addEventListener('input', applySupplierFilters)
+document.getElementById('supplier-filter-category')?.addEventListener('change', applySupplierFilters)
+document.getElementById('supplier-filter-status')?.addEventListener('change', applySupplierFilters)

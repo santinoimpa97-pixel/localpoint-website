@@ -242,6 +242,11 @@
                     <i data-lucide="handshake" class="w-5 h-5"></i>
                     <span class="font-medium">Partner</span>
                 </button>
+                <button id="nav-suppliers"
+                    class="w-full flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                    <span class="font-medium">Fornitori</span>
+                </button>
             </nav>
 
             <div class="p-4 border-t">
@@ -438,6 +443,13 @@
                                     <textarea id="luggage-notes" rows="2"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
                                         placeholder="es. valigia rossa, zaino nero..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Partner Referente <span class="text-gray-400 font-normal">(Opzionale)</span></label>
+                                    <select id="luggage-affiliate"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                                        <option value="">— Nessun partner —</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Pagamento</label>
@@ -925,9 +937,10 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Fornitore</label>
-                                    <input type="text" id="res-supplier"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
-                                        placeholder="Opzionale">
+                                    <select id="res-supplier"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="">— Nessun fornitore —</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <button type="submit"
@@ -936,7 +949,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Note</label>
                                     <input type="text" id="res-notes"
@@ -968,6 +981,13 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                                         <option value="cash">💵 Contanti</option>
                                         <option value="card">💳 Carta / POS</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">🤝 Partner Referral</label>
+                                    <select id="res-affiliate"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                                        <option value="">— Nessun partner —</option>
                                     </select>
                                 </div>
                             </div>
@@ -1076,9 +1096,14 @@
                 <div id="view-experiences" class="hidden space-y-6">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-semibold text-gray-800">Catalogo Esperienze</h2>
-                        <button onclick="openExpModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2 transition-colors">
-                            <i data-lucide="plus" class="w-5 h-5"></i> Aggiungi Esperienza
-                        </button>
+                        <div class="flex gap-2">
+                            <button id="btn-translate-all" onclick="translateAllExperiences()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2 transition-colors text-sm">
+                                🌍 Traduci tutto
+                            </button>
+                            <button onclick="openExpModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2 transition-colors">
+                                <i data-lucide="plus" class="w-5 h-5"></i> Aggiungi Esperienza
+                            </button>
+                        </div>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -1124,7 +1149,7 @@
                     <!-- Form Aggiunta Partner -->
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 class="font-semibold text-lg mb-4 text-blue-700">Aggiungi Nuovo Partner</h3>
-                        <form id="partner-form" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 items-end">
+                        <form id="partner-form" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-8 gap-4 items-end">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Nome Struttura</label>
                                 <input type="text" id="partner-name" required class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="es. Hotel Flora">
@@ -1151,8 +1176,12 @@
                                 <input type="text" id="partner-ref" required class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="flora10">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Provvigione %</label>
-                                <input type="number" id="partner-rate" required class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" value="10" min="0" max="100">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">🧳 % Bagagli</label>
+                                <input type="number" id="partner-rate-luggage" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" value="10" min="0" max="100" step="0.5" title="Commissione su depositi bagagli">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">📋 % Altro</label>
+                                <input type="number" id="partner-rate-other" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" value="7.5" min="0" max="100" step="0.5" title="Commissione su prenotazioni e altri servizi">
                             </div>
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition h-[38px] text-sm">
                                 <i class="fa-solid fa-plus mr-1"></i> Registra
@@ -1162,22 +1191,49 @@
 
                     <!-- Lista Partner -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row items-start md:items-center gap-4">
-                            <div class="relative flex-1">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                                </span>
-                                <input type="text" id="partner-search" class="pl-9 w-full rounded-lg border-gray-300 shadow-sm p-2 border text-sm" placeholder="Cerca per nome o codice...">
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <select id="partner-filter-date" class="rounded-lg border-gray-300 shadow-sm p-2 border text-sm bg-white">
-                                    <option value="all">Sempre</option>
-                                    <option value="month">Questo Mese</option>
-                                    <option value="prev">Mese Scorso</option>
-                                </select>
-                                <div class="text-sm text-gray-500">
-                                    Totale: <span id="partner-count" class="font-bold">0</span>
+                        <div class="p-4 border-b border-gray-100 bg-gray-50 space-y-3">
+                            <!-- Riga 1: ricerca + filtri -->
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <div class="relative flex-1 min-w-[180px]">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
+                                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                    </span>
+                                    <input type="text" id="partner-search"
+                                        class="pl-8 w-full rounded-lg border-gray-300 shadow-sm py-1.5 px-3 border text-sm"
+                                        placeholder="Cerca nome, codice, email...">
                                 </div>
+                                <select id="partner-filter-date" class="rounded-lg border-gray-300 shadow-sm py-1.5 px-2 border text-sm bg-white">
+                                    <option value="all">📅 Sempre</option>
+                                    <option value="month">Questo mese</option>
+                                    <option value="prev">Mese scorso</option>
+                                    <option value="year">Quest'anno</option>
+                                </select>
+                                <select id="partner-filter-type" class="rounded-lg border-gray-300 shadow-sm py-1.5 px-2 border text-sm bg-white">
+                                    <option value="">🏢 Tutti i tipi</option>
+                                    <option value="hotel">Hotel / B&B</option>
+                                    <option value="bar">Bar / Caffè</option>
+                                    <option value="restaurant">Ristorante</option>
+                                    <option value="tour_operator">Agenzia Viaggi</option>
+                                    <option value="other">Altro</option>
+                                </select>
+                                <select id="partner-filter-balance" class="rounded-lg border-gray-300 shadow-sm py-1.5 px-2 border text-sm bg-white">
+                                    <option value="">💰 Tutti i saldi</option>
+                                    <option value="debt">Solo con saldo dovuto</option>
+                                    <option value="paid">In pari</option>
+                                </select>
+                                <select id="partner-sort" class="rounded-lg border-gray-300 shadow-sm py-1.5 px-2 border text-sm bg-white">
+                                    <option value="balance_desc">↓ Saldo dovuto</option>
+                                    <option value="comm_desc">↓ Commissioni</option>
+                                    <option value="volume_desc">↓ Volume</option>
+                                    <option value="activity_desc">↓ Attività</option>
+                                    <option value="name_asc">A→Z Nome</option>
+                                </select>
+                            </div>
+                            <!-- Riga 2: stats aggregate -->
+                            <div class="flex flex-wrap gap-4 text-xs text-gray-500">
+                                <span>Visibili: <strong id="partner-count" class="text-gray-800">0</strong></span>
+                                <span>Tot. commissioni maturate: <strong id="partner-stats-earned" class="text-blue-600">€ 0</strong></span>
+                                <span>Tot. saldo dovuto: <strong id="partner-stats-balance" class="text-orange-600">€ 0</strong></span>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -1186,17 +1242,95 @@
                                     <tr>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partner</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contatti</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codice Ref</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% Prov.</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prenotazioni</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provv. Dovute</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attività</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provv. / Saldo</th>
                                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody id="partners-list" class="bg-white divide-y divide-gray-200">
                                     <tr>
-                                        <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-500">Caricamento partner...</td>
+                                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">Caricamento partner...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Suppliers -->
+                <div id="view-suppliers" class="hidden space-y-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-800">📦 Gestione Fornitori</h2>
+                        <button onclick="window.openSupplierModal()"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2 transition-colors text-sm">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Aggiungi Fornitore
+                        </button>
+                    </div>
+
+                    <!-- KPI -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-blue-500">
+                            <p class="text-xs text-gray-500 font-medium">Totale Fornitori</p>
+                            <p id="sup-kpi-total" class="text-2xl font-bold text-blue-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-green-500">
+                            <p class="text-xs text-gray-500 font-medium">Attivi</p>
+                            <p id="sup-kpi-active" class="text-2xl font-bold text-green-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-500">
+                            <p class="text-xs text-gray-500 font-medium">Categorie</p>
+                            <p id="sup-kpi-cats" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-4 border-l-4 border-orange-400">
+                            <p class="text-xs text-gray-500 font-medium">Non Attivi</p>
+                            <p id="sup-kpi-inactive" class="text-2xl font-bold text-orange-500 mt-1">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Lista Fornitori -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row items-start md:items-center gap-4">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                                </span>
+                                <input type="text" id="supplier-search"
+                                    class="pl-9 w-full rounded-lg border-gray-300 shadow-sm p-2 border text-sm"
+                                    placeholder="Cerca per nome, categoria o referente...">
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <select id="supplier-filter-category" class="rounded-lg border-gray-300 shadow-sm p-2 border text-sm bg-white">
+                                    <option value="">Tutte le categorie</option>
+                                    <option value="cibo">Cibo & Bevande</option>
+                                    <option value="materiali">Materiali & Forniture</option>
+                                    <option value="trasporti">Trasporti & Logistica</option>
+                                    <option value="servizi">Servizi Professionali</option>
+                                    <option value="tecnologia">Tecnologia & Software</option>
+                                    <option value="altro">Altro</option>
+                                </select>
+                                <select id="supplier-filter-status" class="rounded-lg border-gray-300 shadow-sm p-2 border text-sm bg-white">
+                                    <option value="">Tutti</option>
+                                    <option value="true">Attivi</option>
+                                    <option value="false">Non Attivi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto min-h-[300px]">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fornitore</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referente</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contatti</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stato</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliers-list" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">Caricamento fornitori...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1581,28 +1715,249 @@
         </div>
     </div>
 
-    <!-- Modal Prenotazioni Partner -->
-    <div id="partner-bookings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] px-4">
-        <div class="bg-white rounded-xl max-w-4xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto my-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-900" id="partner-modal-title">Prenotazioni Partner</h3>
-                <button onclick="window.closePartnerModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+    <!-- Scheda Partner -->
+    <div id="partner-scheda-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-start justify-center z-[100] px-4 py-6 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-5xl w-full shadow-2xl my-4">
+
+            <!-- Header -->
+            <div class="flex justify-between items-start p-6 border-b">
+                <div>
+                    <h3 id="scheda-partner-name" class="text-xl font-bold text-gray-900">—</h3>
+                    <p id="scheda-partner-meta" class="text-sm text-gray-500 mt-0.5"></p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.printPartnerReport()" class="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg text-sm font-semibold transition">
+                        <i class="fa-solid fa-print text-xs"></i> Stampa
+                    </button>
+                    <button onclick="window.closePartnerScheda()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
             </div>
-            <div class="overflow-hidden border border-gray-200 rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Servizio</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Totale</th>
-                        </tr>
-                    </thead>
-                    <tbody id="partner-modal-list" class="bg-white divide-y divide-gray-200"></tbody>
-                </table>
+
+            <!-- KPI Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 border-b bg-gray-50">
+                <div class="p-5 text-center">
+                    <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide mb-1">Volume</p>
+                    <p id="scheda-kpi-volume" class="text-2xl font-bold text-gray-900">€ 0</p>
+                </div>
+                <div class="p-5 text-center">
+                    <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide mb-1">Provv. Maturate</p>
+                    <p id="scheda-kpi-earned" class="text-2xl font-bold text-blue-600">€ 0</p>
+                </div>
+                <div class="p-5 text-center">
+                    <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide mb-1">Già Pagate</p>
+                    <p id="scheda-kpi-paid" class="text-2xl font-bold text-green-600">€ 0</p>
+                </div>
+                <div class="p-5 text-center">
+                    <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide mb-1">Saldo Dovuto</p>
+                    <p id="scheda-kpi-balance" class="text-2xl font-bold text-orange-600">€ 0</p>
+                </div>
             </div>
-            <div class="mt-4 text-right">
-                <button onclick="window.closePartnerModal()" class="bg-gray-100 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-200 font-medium transition">Chiudi</button>
+
+            <!-- Tab Bar + Filtro -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-6 pt-4 pb-0 gap-3 border-b">
+                <div class="flex gap-1">
+                    <button data-scheda-tab="transactions" class="scheda-tab-btn px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 border-blue-600 text-blue-700 bg-blue-50">📋 Transazioni</button>
+                    <button data-scheda-tab="payments" class="scheda-tab-btn px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">💶 Pagamenti</button>
+                    <button data-scheda-tab="settings" class="scheda-tab-btn px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">⚙️ Impostazioni</button>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center pb-3">
+                    <select id="scheda-filter-period" class="rounded-lg border-gray-300 shadow-sm px-2 py-1.5 border text-sm bg-white">
+                        <option value="all">📅 Tutto lo storico</option>
+                        <option value="month">Questo mese</option>
+                        <option value="prev">Mese scorso</option>
+                        <option value="year">Quest'anno</option>
+                    </select>
+                    <select id="scheda-filter-type" class="rounded-lg border-gray-300 shadow-sm px-2 py-1.5 border text-sm bg-white">
+                        <option value="all">🔀 Tutti i tipi</option>
+                        <option value="luggage">🧳 Solo bagagli</option>
+                        <option value="reservation">📋 Solo prenotazioni</option>
+                    </select>
+                    <select id="scheda-filter-status" class="rounded-lg border-gray-300 shadow-sm px-2 py-1.5 border text-sm bg-white">
+                        <option value="all">✅ Tutti gli stati</option>
+                        <option value="active">Solo attive</option>
+                        <option value="noshow">Solo no-show</option>
+                        <option value="pending">Solo in attesa</option>
+                        <option value="excluded">Solo escluse</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tab: Transazioni -->
+            <div id="scheda-tab-transactions" class="p-6">
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Servizio</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase">Importo</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase">Commissione</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase">Stato</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase">Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheda-transactions-list" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Pagamenti -->
+            <div id="scheda-tab-payments" class="p-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                        <h4 class="font-semibold text-gray-800 mb-4 text-sm">Registra Pagamento</h4>
+                        <form id="partner-payment-form" class="space-y-3">
+                            <input type="hidden" id="payment-affiliate-id">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Importo (€) *</label>
+                                <input type="number" id="payment-amount" min="0.01" step="0.01" required
+                                    class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="0.00">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Data *</label>
+                                <input type="date" id="payment-date" required
+                                    class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Metodo</label>
+                                <select id="payment-method" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                                    <option value="transfer">🏦 Bonifico</option>
+                                    <option value="cash">💵 Contanti</option>
+                                    <option value="other">📌 Altro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Note</label>
+                                <input type="text" id="payment-notes" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="es. Bonifico marzo 2025">
+                            </div>
+                            <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-semibold text-sm transition">✓ Registra Pagamento</button>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2">
+                        <h4 class="font-semibold text-gray-800 mb-3 text-sm">Storico Pagamenti</h4>
+                        <div id="scheda-payments-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Impostazioni -->
+            <div id="scheda-tab-settings" class="p-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    <!-- Colonna sinistra: dati anagrafici -->
+                    <div class="space-y-5">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 text-sm mb-3 flex items-center gap-2">
+                                <span class="w-5 h-5 bg-blue-100 text-blue-600 rounded flex items-center justify-center text-xs">👤</span>
+                                Dati Anagrafici
+                            </h4>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="col-span-2">
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Nome Struttura *</label>
+                                        <input type="text" id="scheda-edit-name"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Tipo</label>
+                                        <select id="scheda-edit-type" class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm">
+                                            <option value="hotel">Hotel / B&B</option>
+                                            <option value="bar">Bar / Caffè</option>
+                                            <option value="restaurant">Ristorante</option>
+                                            <option value="tour_operator">Agenzia Viaggi</option>
+                                            <option value="other">Altro</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Codice Referral</label>
+                                        <input type="text" id="scheda-edit-ref"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Email</label>
+                                        <input type="email" id="scheda-edit-email"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Telefono</label>
+                                        <input type="tel" id="scheda-edit-phone"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Partita IVA / CF</label>
+                                        <input type="text" id="scheda-edit-vat"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Sito Web</label>
+                                        <input type="url" id="scheda-edit-website"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm" placeholder="https://...">
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Indirizzo</label>
+                                        <input type="text" id="scheda-edit-address"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm" placeholder="Via, Città, CAP">
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Note interne</label>
+                                        <textarea id="scheda-edit-notes" rows="2"
+                                            class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm resize-none"
+                                            placeholder="Accordi particolari, contatti aggiuntivi..."></textarea>
+                                    </div>
+                                </div>
+                                <button onclick="window.savePartnerInfo()"
+                                    class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-medium text-sm transition">
+                                    Salva Dati
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Colonna destra: rate + pericolo -->
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 text-sm mb-1 flex items-center gap-2">
+                                <span class="w-5 h-5 bg-green-100 text-green-600 rounded flex items-center justify-center text-xs">%</span>
+                                Rate Commissioni
+                            </h4>
+                            <p class="text-xs text-gray-400 mb-3">Il calcolo futuro userà i nuovi valori. Lo storico non cambia.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">🧳 % Bagagli</label>
+                                    <input type="number" id="scheda-rate-luggage" min="0" max="100" step="0.5"
+                                        class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">📋 % Altro</label>
+                                    <input type="number" id="scheda-rate-other" min="0" max="100" step="0.5"
+                                        class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border text-sm">
+                                </div>
+                            </div>
+                            <button onclick="window.savePartnerRates()"
+                                class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 font-medium text-sm transition">
+                                Salva Rate
+                            </button>
+                        </div>
+
+                        <div class="pt-5 border-t">
+                            <h4 class="font-semibold text-gray-800 text-sm mb-1 flex items-center gap-2">
+                                <span class="w-5 h-5 bg-red-100 text-red-500 rounded flex items-center justify-center text-xs">⚠</span>
+                                Zona Pericolosa
+                            </h4>
+                            <p class="text-xs text-gray-400 mb-3">L'eliminazione è definitiva e rimuove il collegamento da tutte le prenotazioni associate.</p>
+                            <button id="scheda-delete-btn"
+                                class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-100 font-medium text-sm transition">
+                                🗑️ Elimina Partner
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end p-4 border-t bg-gray-50 rounded-b-2xl">
+                <button onclick="window.closePartnerScheda()" class="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium text-sm transition">Chiudi</button>
             </div>
         </div>
     </div>
@@ -1625,7 +1980,85 @@
         </div>
     </div>
 
-    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <!-- Modal Fornitori -->
+    <div id="modal-supplier" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[100] px-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh] my-4">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-xl font-bold text-gray-900" id="supplier-modal-title">Aggiungi Fornitore</h3>
+                <button type="button" onclick="window.closeSupplierModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+            <form id="supplier-form" class="space-y-4">
+                <input type="hidden" id="supplier-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nome Azienda / Fornitore <span class="text-red-500">*</span></label>
+                        <input type="text" id="supplier-name" required
+                            class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="es. Mario Rossi Forniture">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                        <select id="supplier-category" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm">
+                            <option value="cibo">Cibo & Bevande</option>
+                            <option value="materiali">Materiali & Forniture</option>
+                            <option value="trasporti">Trasporti & Logistica</option>
+                            <option value="servizi">Servizi Professionali</option>
+                            <option value="tecnologia">Tecnologia & Software</option>
+                            <option value="altro">Altro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Referente</label>
+                        <input type="text" id="supplier-contact" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="Nome e Cognome">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Telefono</label>
+                        <input type="tel" id="supplier-phone" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="+39 ...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="supplier-email" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="email@esempio.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Sito Web</label>
+                        <input type="url" id="supplier-website" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="https://...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Indirizzo</label>
+                        <input type="text" id="supplier-address" class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm" placeholder="Via, Città">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Note</label>
+                        <textarea id="supplier-notes" rows="3"
+                            class="w-full rounded-md border-gray-300 shadow-sm p-2 border text-sm resize-none"
+                            placeholder="Condizioni di pagamento, dettagli contratto, ecc."></textarea>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="supplier-active" checked class="rounded border-gray-300 text-blue-600">
+                        <label for="supplier-active" class="text-sm font-medium text-gray-700">Fornitore Attivo</label>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t mt-2">
+                    <button type="button" onclick="window.closeSupplierModal()"
+                        class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium text-sm transition-colors">Annulla</button>
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="input-modal" class="fixed inset-0 z-[210] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
+            <p id="input-modal-msg" class="text-gray-800 font-medium text-sm mb-3"></p>
+            <input id="input-modal-field" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-5" placeholder="">
+            <div class="flex gap-3 justify-end">
+                <button id="input-modal-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 font-semibold hover:bg-gray-50 transition-colors text-sm">Annulla</button>
+                <button id="input-modal-ok" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors text-sm">Escludi</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
             <p id="confirm-msg" class="text-gray-800 font-medium text-base leading-relaxed mb-6"></p>
             <div class="flex gap-3 justify-end">
