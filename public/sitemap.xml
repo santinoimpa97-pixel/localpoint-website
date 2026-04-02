@@ -25,31 +25,67 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://localpoint.it/service-details.html?cat=noleggi&id=scooter</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://localpoint.it/service-details.html?cat=noleggi&id=motoacqua</loc>
     <lastmod>2026-03-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://localpoint.it/service-details.html?cat=noleggi&id=noleggio-auto</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=transfer&id=ncc-auto</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://localpoint.it/service-details.html?cat=bagagli&id=deposito-singolo</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=parcheggio&id=autobus</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=cataolo</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=transfer&id=limousine</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=parcheggio&id=auto-coperto</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=jalari</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=castro</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=minicrocierabynight</loc>
+    <lastmod>2026-03-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=cannistra</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=parcheggio&id=settimanale</loc>
     <lastmod>2026-03-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -67,19 +103,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://localpoint.it/service-details.html?cat=parcheggio&id=autobus</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=transfer&id=limousine</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=parcheggio&id=settimanale</loc>
+    <loc>https://localpoint.it/service-details.html?cat=noleggi&id=scooter</loc>
     <lastmod>2026-03-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -91,7 +115,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=cataolo</loc>
+    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=minicrocieraliparievulcano</loc>
+    <lastmod>2026-03-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://localpoint.it/service-details.html?cat=transfer&id=ncc-auto</loc>
     <lastmod>2026-03-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -103,50 +133,20 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://localpoint.it/service-details.html?cat=parcheggio&id=auto-coperto</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=cannistra</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://localpoint.it/service-details.html?cat=transfer&id=navetta-aereoporto-catania</loc>
     <lastmod>2026-03-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://localpoint.it/service-details.html?cat=noleggi&id=noleggio-auto</loc>
+    <lastmod>2026-03-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://localpoint.it/service-details.html?cat=escursioni&id=tramonto-capo-milazzo</loc>
     <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=castro</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=jalari</loc>
-    <lastmod>2026-03-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=minicrocierabynight</loc>
-    <lastmod>2026-03-31</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://localpoint.it/service-details.html?cat=escursioni&id=minicrocieraliparievulcano</loc>
-    <lastmod>2026-03-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

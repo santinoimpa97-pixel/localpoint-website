@@ -5,7 +5,11 @@
       "Bash(python3:*)",
       "Bash(node:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(grep -rn \"\\\\.html\" /c/Users/projo/.gemini/antigravity/scratch/localpoint/*.html /c/Users/projo/.gemini/antigravity/scratch/localpoint/src/)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
