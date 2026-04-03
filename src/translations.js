@@ -869,6 +869,13 @@ export const translations = {
   "ts.ref.banner": { it: "Tariffe convenzionate attive per te", en: "Discounted rates active for you", de: "Rabattpreise aktiv für dich", es: "Tarifas especiales activas para ti", fr: "Tarifs conventionnés actifs pour vous" },
   "ts.lug.close": { it: "Chiudi", en: "Close", de: "Schließen", es: "Cerrar", fr: "Fermer" },
   "ts.lug.success.notice": { it: "Presenta il codice al momento del check-in.", en: "Show this code at check-in.", de: "Zeige diesen Code beim Check-in vor.", es: "Presenta este código en el check-in.", fr: "Présentez ce code lors du check-in." },
+  "ts.lug.consent": {
+    it: "Ho letto e accetto la <a href=\"/privacy-policy\" target=\"_blank\" style=\"color:var(--primary-blue);font-weight:600;\">Privacy Policy</a> e acconsento al trattamento dei miei dati personali per la gestione della prenotazione.",
+    en: "I have read and accept the <a href=\"/privacy-policy\" target=\"_blank\" style=\"color:var(--primary-blue);font-weight:600;\">Privacy Policy</a> and I consent to the processing of my personal data for booking management.",
+    de: "Ich habe die <a href=\"/privacy-policy\" target=\"_blank\" style=\"color:var(--primary-blue);font-weight:600;\">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner personenbezogenen Daten für die Buchungsverwaltung zu.",
+    es: "He leído y acepto la <a href=\"/privacy-policy\" target=\"_blank\" style=\"color:var(--primary-blue);font-weight:600;\">Política de Privacidad</a> y doy mi consentimiento para el tratamiento de mis datos personales para la gestión de la reserva.",
+    fr: "J'ai lu et j'accepte la <a href=\"/privacy-policy\" target=\"_blank\" style=\"color:var(--primary-blue);font-weight:600;\">Politique de Confidentialité</a> et je consens au traitement de mes données personnelles pour la gestion de la réservation."
+  },
   "ts.book.ref": { it: "Tariffa convenzionata partner applicata", en: "Discounted partner rate applied", de: "Vergünstigter Partnertarif angewandt", es: "Tarifa de socio aplicada", fr: "Tarif partenaire conventionné appliqué" },
   "ts.book.name": { it: "Nome e Cognome", en: "Full Name", de: "Vollständiger Name", es: "Nombre y Apellido", fr: "Nom et Prénom" },
   "ts.book.date": { it: "Data Preferita", en: "Preferred Date", de: "Gewünschtes Datum", es: "Fecha Preferida", fr: "Date Souhaitée" },

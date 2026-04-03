@@ -383,6 +383,10 @@
                             <label for="p-notes">Note Aggiuntive</label>
                             <textarea id="p-notes" rows="4" placeholder="Parlaci brevemente della tua attività..."></textarea>
                         </div>
+                        <div style="grid-column:1/-1;display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;margin-bottom:0.5rem;">
+                            <input type="checkbox" id="p-consent" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:#8cc63f;cursor:pointer;" required>
+                            <label for="p-consent" style="font-size:0.88rem;line-height:1.55;color:rgba(255,255,255,0.8);cursor:pointer;">Ho letto e accetto la <a href="/privacy-policy" target="_blank" style="color:#8cc63f;font-weight:600;">Privacy Policy</a> e acconsento al trattamento dei miei dati personali per la gestione della candidatura.</label>
+                        </div>
                         <button type="submit" id="p-submit" class="submit-btn">
                             Invia Candidatura <i class="fa-solid fa-paper-plane"></i>
                         </button>
@@ -417,8 +421,6 @@
                     <li><a href="/tourist-services.html">Servizi Turistici</a></li>
                     <li><a href="/#shipping">Spedizioni</a></li>
                     <li><a href="/#luggage">Deposito Bagagli</a></li>
-                    <li><a href="/privacy-policy" data-i18n="footer.links.privacy">Privacy Policy</a></li>
-                    <li><a href="/privacy-policy#cookie-policy" data-i18n="footer.links.cookie">Cookie Policy</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -451,6 +453,10 @@
             
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                if (!document.getElementById('p-consent')?.checked) {
+                    document.getElementById('p-consent').focus();
+                    return;
+                }
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso...';
                 
