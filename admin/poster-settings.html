@@ -400,16 +400,33 @@ ON CONFLICT (id) DO NOTHING;</pre>
                     qr_size,
                 };
 
-                const { error } = await supabase
+                // Check if row exists first to avoid onConflict issues
+                const { data: existing } = await supabase
                     .from('settings')
-                    .upsert({ key: 'poster_config', value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+                    .select('key')
+                    .eq('key', 'poster_config')
+                    .maybeSingle();
 
-                if (error) throw error;
+                let saveError;
+                if (existing) {
+                    const { error } = await supabase
+                        .from('settings')
+                        .update({ value })
+                        .eq('key', 'poster_config');
+                    saveError = error;
+                } else {
+                    const { error } = await supabase
+                        .from('settings')
+                        .insert({ key: 'poster_config', value });
+                    saveError = error;
+                }
+
+                if (saveError) throw saveError;
 
                 showAlert('Configurazione salvata con successo!', 'success');
             } catch (err) {
                 console.error(err);
-                showAlert('Errore salvataggio: ' + (err.message || 'verifica che la tabella "settings" esista (vedi istruzioni sotto).'), 'error');
+                showAlert('Errore salvataggio: ' + (err.message || err.details || 'verifica che la tabella "settings" esista (vedi istruzioni sotto).'), 'error');
             } finally {
                 btn.disabled = false;
                 btnText.textContent = 'Salva Configurazione';
