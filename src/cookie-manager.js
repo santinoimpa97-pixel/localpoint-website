@@ -130,8 +130,9 @@ function showCookieBanner() {
                 <div class="cb-content">
                     <h3><span>🍪</span> Personalizza la tua esperienza</h3>
                     <p>
-                        Usiamo i cookie per ottimizzare il sito e analizzare il traffico in modo anonimo. 
+                        Usiamo i cookie per ottimizzare il sito e analizzare il traffico in modo anonimo.
                         La tua privacy è importante per noi: scegli come procedere per navigare al meglio.
+                        <a href="/privacy-policy#cookie-policy" style="color:rgba(255,255,255,0.8);text-decoration:underline;font-weight:600;">Leggi la Cookie Policy</a>
                     </p>
                 </div>
                 <div class="cb-actions">

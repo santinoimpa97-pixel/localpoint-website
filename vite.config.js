@@ -9,6 +9,7 @@ export default defineConfig({
                 tourist_services: resolve(__dirname, 'tourist-services.html'),
                 service_details: resolve(__dirname, 'service-details.html'),
                 become_partner: resolve(__dirname, 'become-partner.html'),
+                privacy_policy: resolve(__dirname, 'privacy-policy.html'),
                 admin_login: resolve(__dirname, 'admin/index.html'),
                 admin_dashboard: resolve(__dirname, 'admin/dashboard.html'),
                 admin_partner_portal: resolve(__dirname, 'admin/partner-portal.html'),

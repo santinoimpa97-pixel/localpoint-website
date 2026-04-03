@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>Privacy Policy — LocalPoint Milazzo</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Main Style -->
+    <link rel="stylesheet" href="/src/style.css">
+    <script type="module" src="/src/cookie-manager.js"></script>
+
+    <style>
+        html { background: #fff; }
+        @view-transition { navigation: auto; }
+
+        body {
+            background-color: #f8fafc;
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Page Hero */
+        .pp-hero {
+            background: linear-gradient(135deg, #003a6e 0%, #004e92 50%, #00a0a0 100%);
+            padding: 120px 20px 60px;
+            color: white;
+            text-align: center;
+        }
+
+        .pp-hero .breadcrumb {
+            font-size: 0.9rem;
+            opacity: 0.75;
+            margin-bottom: 20px;
+        }
+
+        .pp-hero .breadcrumb a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+        }
+
+        .pp-hero .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .pp-hero .breadcrumb span {
+            margin: 0 8px;
+            opacity: 0.5;
+        }
+
+        .pp-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .pp-hero .pp-meta {
+            font-size: 0.95rem;
+            opacity: 0.75;
+        }
+
+        /* Table of Contents */
+        .pp-toc {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 30px 35px;
+            margin-bottom: 40px;
+        }
+
+        .pp-toc h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #004e92;
+            margin-bottom: 16px;
+        }
+
+        .pp-toc ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .pp-toc li {
+            margin-bottom: 8px;
+        }
+
+        .pp-toc a {
+            color: #00a0a0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .pp-toc a:hover {
+            text-decoration: underline;
+            color: #004e92;
+        }
+
+        /* Main Content */
+        .pp-content {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 60px 20px 80px;
+        }
+
+        .pp-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 45px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 78, 146, 0.05);
+        }
+
+        .pp-section h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #004e92;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pp-section h2 .section-num {
+            background: linear-gradient(135deg, #004e92, #00a0a0);
+            color: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .pp-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 24px 0 10px;
+        }
+
+        .pp-section p {
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 14px;
+            font-size: 0.975rem;
+        }
+
+        .pp-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .pp-section ul, .pp-section ol {
+            color: #475569;
+            line-height: 1.75;
+            padding-left: 20px;
+            margin-bottom: 14px;
+        }
+
+        .pp-section li {
+            margin-bottom: 6px;
+            font-size: 0.975rem;
+        }
+
+        .pp-section strong {
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .pp-section a {
+            color: #00a0a0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .pp-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Highlight box */
+        .pp-highlight {
+            background: linear-gradient(135deg, rgba(0, 78, 146, 0.05), rgba(0, 160, 160, 0.05));
+            border-left: 4px solid #00a0a0;
+            border-radius: 0 12px 12px 0;
+            padding: 18px 22px;
+            margin: 18px 0;
+        }
+
+        .pp-highlight p {
+            margin-bottom: 0 !important;
+        }
+
+        /* Cookie section special styling */
+        #cookie-policy {
+            border: 2px solid #00a0a0;
+        }
+
+        #cookie-policy h2 {
+            color: #00a0a0;
+            border-bottom-color: rgba(0, 160, 160, 0.25);
+        }
+
+        .cookie-type {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 16px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .cookie-type h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #004e92;
+            margin-bottom: 8px;
+        }
+
+        .cookie-type p {
+            margin-bottom: 0 !important;
+            font-size: 0.92rem;
+        }
+
+        /* Footer */
+        .pp-footer-bar {
+            background: #1e293b;
+            color: rgba(255,255,255,0.65);
+            text-align: center;
+            padding: 24px 20px;
+            font-size: 0.875rem;
+        }
+
+        .pp-footer-bar a {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 8px;
+        }
+
+        .pp-footer-bar a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .pp-section {
+                padding: 28px 22px;
+            }
+            .pp-toc {
+                padding: 22px 20px;
+            }
+        }
+    </style>
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","w5cibyg3ds");
+    </script>
+</head>
+<body>
+
+    <header id="header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="/">
+                    <img src="/logo.png" alt="LocalPoint Milazzo Logo" class="logo-img">
+                </a>
+            </div>
+
+            <nav id="nav">
+                <ul>
+                    <li><a href="/index.html"><span aria-hidden="true">🏠</span> Home</a></li>
+                    <li><a href="/tourist-services.html"><span aria-hidden="true">🌴</span> Servizi Turistici</a></li>
+                    <li><a href="/#contact"><span aria-hidden="true">📍</span> Contatti</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <button id="mobile-menu-btn" class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="pp-hero">
+            <div class="breadcrumb">
+                <a href="/">Home</a>
+                <span>›</span>
+                Privacy Policy
+            </div>
+            <h1>Privacy Policy</h1>
+            <p class="pp-meta">Ultimo aggiornamento: Aprile 2026 · Regolamento UE 2016/679 (GDPR)</p>
+        </section>
+
+        <!-- CONTENT -->
+        <div class="pp-content">
+
+            <!-- Table of Contents -->
+            <div class="pp-toc">
+                <h2><i class="fa-solid fa-list" style="color:#00a0a0;margin-right:8px;"></i>Indice</h2>
+                <ol>
+                    <li><a href="#titolare">Titolare del Trattamento</a></li>
+                    <li><a href="#dati-raccolti">Tipi di Dati Raccolti</a></li>
+                    <li><a href="#finalita">Finalità e Base Giuridica</a></li>
+                    <li><a href="#responsabili">Responsabili del Trattamento Esterni</a></li>
+                    <li><a href="#conservazione">Durata della Conservazione</a></li>
+                    <li><a href="#diritti">Diritti dell'Interessato</a></li>
+                    <li><a href="#cookie-policy">Cookie Policy</a></li>
+                    <li><a href="#modifiche">Modifiche alla Policy</a></li>
+                </ol>
+            </div>
+
+            <!-- 1. Titolare del Trattamento -->
+            <section class="pp-section" id="titolare">
+                <h2><span class="section-num">1</span>Titolare del Trattamento</h2>
+                <p>
+                    Il Titolare del trattamento dei dati personali raccolti attraverso il sito web
+                    <strong>www.localpointmilazzo.it</strong> e i relativi servizi è:
+                </p>
+                <div class="pp-highlight">
+                    <p>
+                        <strong>LocalPoint Milazzo</strong><br>
+                        Via Tenente Brigiano, 6 — 98057 Milazzo (ME)<br>
+                        P.IVA: <strong>IT03800970836</strong><br>
+                        Email: <a href="mailto:localpointmilazzo@gmail.com">localpointmilazzo@gmail.com</a><br>
+                        Tel: <a href="tel:+393793283803">+39 379 3283803</a>
+                    </p>
+                </div>
+                <p>
+                    Il Titolare è responsabile del trattamento dei dati personali degli utenti in conformità
+                    al Regolamento (UE) 2016/679 del Parlamento Europeo e del Consiglio ("GDPR") e alla
+                    normativa nazionale applicabile in materia di protezione dei dati personali.
+                </p>
+            </section>
+
+            <!-- 2. Tipi di Dati Raccolti -->
+            <section class="pp-section" id="dati-raccolti">
+                <h2><span class="section-num">2</span>Tipi di Dati Raccolti</h2>
+                <p>
+                    LocalPoint Milazzo raccoglie i seguenti tipi di dati personali nell'ambito dell'erogazione
+                    dei propri servizi:
+                </p>
+
+                <h3>Dati forniti direttamente dall'utente</h3>
+                <ul>
+                    <li><strong>Dati anagrafici:</strong> nome e cognome</li>
+                    <li><strong>Dati di contatto:</strong> indirizzo email, numero di telefono e/o WhatsApp</li>
+                    <li><strong>Dati relativi alle prenotazioni:</strong> date, tipologia di servizio richiesto,
+                        numero di persone/articoli, note aggiuntive</li>
+                    <li><strong>Dati relativi al deposito bagagli:</strong> numero e tipologia dei bagagli,
+                        orari di consegna e ritiro</li>
+                    <li><strong>Dati aziendali (per i Partner):</strong> nome dell'attività, tipo di attività,
+                        email aziendale, informazioni sulla struttura</li>
+                </ul>
+
+                <h3>Dati raccolti automaticamente</h3>
+                <ul>
+                    <li><strong>Dati di navigazione:</strong> indirizzo IP (in forma anonimizzata),
+                        tipo di browser, sistema operativo, pagine visitate, durata della sessione</li>
+                    <li><strong>Dati di preferenza:</strong> lingua selezionata, preferenze sui cookie
+                        (salvati in localStorage del browser)</li>
+                </ul>
+
+                <p>
+                    I dati contrassegnati come obbligatori nei moduli di contatto sono necessari per l'erogazione
+                    del servizio richiesto. Il mancato conferimento di tali dati potrebbe rendere impossibile
+                    fornire il servizio.
+                </p>
+            </section>
+
+            <!-- 3. Finalità e Base Giuridica -->
+            <section class="pp-section" id="finalita">
+                <h2><span class="section-num">3</span>Finalità e Base Giuridica</h2>
+                <p>
+                    I dati personali vengono trattati per le seguenti finalità, ciascuna fondata su
+                    un'appropriata base giuridica ai sensi dell'Art. 6 del GDPR:
+                </p>
+
+                <h3>3.1 Gestione delle prenotazioni e dei servizi</h3>
+                <p>
+                    I dati sono trattati per la gestione delle prenotazioni di deposito bagagli, transfer,
+                    escursioni e altri servizi turistici richiesti dall'utente.
+                </p>
+                <p>
+                    <strong>Base giuridica:</strong> Esecuzione di un contratto (Art. 6, par. 1, lett. b GDPR).
+                </p>
+
+                <h3>3.2 Comunicazioni operative</h3>
+                <p>
+                    Invio di conferme di prenotazione, aggiornamenti sullo stato del servizio, notifiche
+                    operative e risposte a richieste di assistenza.
+                </p>
+                <p>
+                    <strong>Base giuridica:</strong> Esecuzione di un contratto e legittimo interesse del
+                    Titolare (Art. 6, par. 1, lett. b e f GDPR).
+                </p>
+
+                <h3>3.3 Adempimento di obblighi legali e fiscali</h3>
+                <p>
+                    Conservazione di documenti contabili e fiscali relativi alle transazioni commerciali
+                    effettuate, in adempimento degli obblighi previsti dalla normativa fiscale italiana.
+                </p>
+                <p>
+                    <strong>Base giuridica:</strong> Adempimento di un obbligo legale (Art. 6, par. 1, lett. c GDPR).
+                </p>
+
+                <h3>3.4 Miglioramento del sito e analisi del traffico</h3>
+                <p>
+                    Analisi statistica del comportamento degli utenti sul sito web, in forma aggregata e
+                    anonimizzata, al fine di migliorare i contenuti e l'esperienza di navigazione.
+                </p>
+                <p>
+                    <strong>Base giuridica:</strong> Legittimo interesse del Titolare (Art. 6, par. 1, lett. f GDPR)
+                    — solo previo consenso dell'utente per i cookie analitici di Google Analytics.
+                </p>
+
+                <h3>3.5 Programma Partner</h3>
+                <p>
+                    Gestione delle candidature, attivazione e amministrazione del programma di affiliazione
+                    riservato alle strutture ricettive e attività commerciali partner.
+                </p>
+                <p>
+                    <strong>Base giuridica:</strong> Esecuzione di un contratto e legittimo interesse (Art. 6,
+                    par. 1, lett. b e f GDPR).
+                </p>
+            </section>
+
+            <!-- 4. Responsabili del Trattamento Esterni -->
+            <section class="pp-section" id="responsabili">
+                <h2><span class="section-num">4</span>Responsabili del Trattamento Esterni</h2>
+                <p>
+                    Per l'erogazione dei propri servizi, LocalPoint Milazzo si avvale di fornitori terzi
+                    che trattano dati personali in qualità di Responsabili del Trattamento, ai sensi
+                    dell'Art. 28 del GDPR. Di seguito si elencano i principali:
+                </p>
+
+                <h3>Supabase Inc.</h3>
+                <p>
+                    Fornitore di servizi di database cloud utilizzato per l'archiviazione sicura dei dati
+                    relativi alle prenotazioni e al programma partner. I dati sono conservati su server
+                    con sede nell'Unione Europea.
+                </p>
+                <p>
+                    <strong>Sede legale:</strong> 970 Toa Payoh North, #07-04, Singapore 318992<br>
+                    <strong>Sito web:</strong> <a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a>
+                </p>
+
+                <h3>EmailJS</h3>
+                <p>
+                    Servizio di invio email utilizzato per la trasmissione delle conferme di prenotazione
+                    e delle notifiche operative ai clienti e al team di LocalPoint Milazzo.
+                </p>
+                <p>
+                    <strong>Sito web:</strong> <a href="https://www.emailjs.com/legal/privacy-policy/" target="_blank" rel="noopener">emailjs.com/legal/privacy-policy</a>
+                </p>
+
+                <h3>Google Analytics (Google LLC)</h3>
+                <p>
+                    Servizio di analisi del traffico web che consente di monitorare e analizzare
+                    l'utilizzo del sito in forma anonimizzata. Google Analytics viene attivato
+                    <strong>esclusivamente previo consenso esplicito</strong> dell'utente tramite il banner
+                    cookie. Il Titolare ha configurato il servizio con IP anonymization attiva.
+                </p>
+                <p>
+                    <strong>ID di misurazione:</strong> G-LJXG9E7JG2<br>
+                    <strong>Sede legale:</strong> Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA<br>
+                    <strong>Informativa:</strong> <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>
+                </p>
+
+                <h3>Microsoft Clarity (Microsoft Corporation)</h3>
+                <p>
+                    Servizio di analisi comportamentale del sito che registra sessioni di navigazione
+                    in forma anonimizzata per il miglioramento dell'esperienza utente.
+                </p>
+                <p>
+                    <strong>Sito web:</strong> <a href="https://privacy.microsoft.com/it-it/privacystatement" target="_blank" rel="noopener">privacy.microsoft.com</a>
+                </p>
+            </section>
+
+            <!-- 5. Durata della Conservazione -->
+            <section class="pp-section" id="conservazione">
+                <h2><span class="section-num">5</span>Durata della Conservazione</h2>
+                <p>
+                    I dati personali sono conservati per il tempo strettamente necessario alle finalità
+                    per cui sono stati raccolti, nel rispetto del principio di minimizzazione previsto
+                    dall'Art. 5 del GDPR.
+                </p>
+
+                <h3>Dati relativi alle prenotazioni e alle transazioni</h3>
+                <p>
+                    Conservati per <strong>10 anni</strong> dalla data della transazione, in adempimento
+                    degli obblighi fiscali e contabili previsti dalla normativa italiana (art. 2220 c.c.
+                    e D.P.R. n. 600/1973).
+                </p>
+
+                <h3>Dati relativi alle candidature Partner</h3>
+                <p>
+                    Conservati per la durata del rapporto contrattuale e per un periodo di <strong>5 anni</strong>
+                    successivo alla sua cessazione, salvo diversi obblighi legali.
+                </p>
+
+                <h3>Dati di analisi e navigazione (Google Analytics)</h3>
+                <p>
+                    Conservati per un massimo di <strong>14 mesi</strong> dalla raccolta, secondo le
+                    impostazioni predefinite di Google Analytics configurate dal Titolare.
+                </p>
+
+                <h3>Dati di marketing e comunicazioni promozionali</h3>
+                <p>
+                    Conservati fino alla <strong>revoca del consenso</strong> da parte dell'interessato,
+                    con possibilità di cancellazione immediata su semplice richiesta.
+                </p>
+
+                <h3>Preferenze cookie (localStorage)</h3>
+                <p>
+                    Le preferenze relative ai cookie sono conservate nel browser dell'utente fino alla
+                    cancellazione manuale dei dati di navigazione o alla modifica delle impostazioni.
+                </p>
+            </section>
+
+            <!-- 6. Diritti dell'Interessato -->
+            <section class="pp-section" id="diritti">
+                <h2><span class="section-num">6</span>Diritti dell'Interessato</h2>
+                <p>
+                    Ai sensi degli artt. 15–22 del Regolamento (UE) 2016/679 (GDPR), l'interessato
+                    ha il diritto di:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Accesso (Art. 15):</strong> ottenere conferma dell'esistenza di un
+                        trattamento e accedere ai propri dati personali, nonché alle informazioni
+                        relative alle finalità, categorie di dati e destinatari.
+                    </li>
+                    <li>
+                        <strong>Rettifica (Art. 16):</strong> ottenere la correzione di dati personali
+                        inesatti o incompleti.
+                    </li>
+                    <li>
+                        <strong>Cancellazione ("diritto all'oblio") (Art. 17):</strong> ottenere la
+                        cancellazione dei propri dati personali quando non siano più necessari o quando
+                        venga revocato il consenso, salvo obblighi legali di conservazione.
+                    </li>
+                    <li>
+                        <strong>Limitazione del trattamento (Art. 18):</strong> ottenere la limitazione
+                        del trattamento nei casi previsti dal GDPR.
+                    </li>
+                    <li>
+                        <strong>Portabilità dei dati (Art. 20):</strong> ricevere i propri dati in un
+                        formato strutturato, di uso comune e leggibile da dispositivo automatico.
+                    </li>
+                    <li>
+                        <strong>Opposizione (Art. 21):</strong> opporsi in qualsiasi momento al
+                        trattamento dei propri dati personali per finalità di marketing diretto o
+                        basato su legittimo interesse.
+                    </li>
+                    <li>
+                        <strong>Revoca del consenso (Art. 7):</strong> revocare in qualsiasi momento
+                        il consenso prestato, senza pregiudicare la liceità del trattamento basato
+                        sul consenso prima della revoca.
+                    </li>
+                    <li>
+                        <strong>Reclamo all'Autorità di controllo (Art. 77):</strong> proporre reclamo
+                        al Garante per la Protezione dei Dati Personali (www.garanteprivacy.it).
+                    </li>
+                </ul>
+
+                <div class="pp-highlight">
+                    <p>
+                        Per esercitare i propri diritti, l'interessato può contattare il Titolare del
+                        Trattamento al seguente indirizzo email: <strong>
+                        <a href="mailto:localpointmilazzo@gmail.com">localpointmilazzo@gmail.com</a></strong>.
+                        Il Titolare risponderà alla richiesta entro <strong>30 giorni</strong> dal ricevimento,
+                        salvo casi di complessità che potrebbero richiedere un'ulteriore proroga di 60 giorni,
+                        di cui sarà data comunicazione.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 7. Cookie Policy -->
+            <section class="pp-section" id="cookie-policy">
+                <h2><span class="section-num">7</span>Cookie Policy</h2>
+                <p>
+                    Il sito web di LocalPoint Milazzo utilizza cookie e tecnologie similari per garantire
+                    il corretto funzionamento del sito, migliorare l'esperienza di navigazione e, previo
+                    consenso dell'utente, analizzare il traffico. Di seguito si fornisce una descrizione
+                    dettagliata dei cookie utilizzati.
+                </p>
+
+                <h3>Cosa sono i cookie</h3>
+                <p>
+                    I cookie sono piccoli file di testo che i siti web visitati dall'utente inviano al
+                    suo terminale (computer, tablet, smartphone), dove vengono memorizzati per essere
+                    ritrasmessi agli stessi siti alla visita successiva. I cookie permettono al sito di
+                    ricordare le azioni e le preferenze dell'utente (come la lingua, le dimensioni dei
+                    caratteri, altre impostazioni di visualizzazione) in modo da non doverle reinserire
+                    quando si torna a visitare il sito.
+                </p>
+
+                <h3>Tipologie di cookie utilizzati</h3>
+
+                <div class="cookie-type">
+                    <h4>Cookie tecnici necessari (senza consenso)</h4>
+                    <p>
+                        Questi cookie sono strettamente necessari al funzionamento del sito e non richiedono
+                        il consenso dell'utente. Il sito utilizza il <strong>localStorage</strong> del browser
+                        per memorizzare:
+                    </p>
+                    <ul style="margin-top:10px;margin-bottom:0;">
+                        <li><strong>localpoint-lang</strong> — preferenza della lingua selezionata dall'utente
+                            (it, en, de, es, fr). Conservato fino alla cancellazione manuale.</li>
+                        <li><strong>cookieConsent</strong> — stato del consenso dell'utente per i cookie
+                            analitici ("accepted" o "rejected"). Conservato fino alla cancellazione manuale.</li>
+                    </ul>
+                </div>
+
+                <div class="cookie-type">
+                    <h4>Cookie analitici di terze parti — Google Analytics (solo con consenso)</h4>
+                    <p>
+                        Il sito utilizza <strong>Google Analytics</strong> (ID: G-LJXG9E7JG2), un servizio
+                        di analisi web fornito da Google LLC, per raccogliere informazioni statistiche
+                        sull'utilizzo del sito in forma anonimizzata. Questi cookie vengono attivati
+                        <strong>esclusivamente</strong> se l'utente accetta i cookie analitici tramite
+                        il banner di consenso.
+                    </p>
+                    <p style="margin-top:8px;">
+                        I cookie di Google Analytics raccolgono informazioni quali: numero di visitatori,
+                        pagine visitate, durata della sessione, provenienza geografica approssimativa
+                        (con IP anonimizzato), tipo di dispositivo e browser. Questi dati sono trattati
+                        in forma aggregata e non consentono l'identificazione del singolo utente.
+                    </p>
+                    <p style="margin-top:8px;">
+                        Per maggiori informazioni: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>
+                    </p>
+                </div>
+
+                <h3>Come gestire e revocare il consenso</h3>
+                <p>
+                    Al primo accesso al sito, viene mostrato un banner di consenso che consente all'utente
+                    di scegliere se accettare tutti i cookie ("Accetta tutti") o limitarsi ai soli cookie
+                    tecnici necessari ("Solo necessari").
+                </p>
+                <p>
+                    L'utente può modificare o revocare il proprio consenso in qualsiasi momento con le
+                    seguenti modalità:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Tramite il browser:</strong> è possibile cancellare i cookie memorizzati
+                        e bloccare l'installazione di nuovi cookie accedendo alle impostazioni del browser.
+                        Nota: la disabilitazione di tutti i cookie potrebbe compromettere alcune funzionalità
+                        del sito.
+                    </li>
+                    <li>
+                        <strong>Tramite il localStorage:</strong> cancellando i dati di navigazione del browser
+                        (incluso il localStorage), il banner di consenso sarà nuovamente mostrato alla
+                        visita successiva.
+                    </li>
+                    <li>
+                        <strong>Opt-out di Google Analytics:</strong> è possibile installare il componente
+                        aggiuntivo per il browser fornito da Google disponibile all'indirizzo
+                        <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">tools.google.com/dlpage/gaoptout</a>.
+                    </li>
+                </ul>
+
+                <p>
+                    Per informazioni su come gestire i cookie nei principali browser, consultare le guide
+                    ufficiali di Chrome, Firefox, Safari, Edge o altri browser utilizzati.
+                </p>
+            </section>
+
+            <!-- 8. Modifiche -->
+            <section class="pp-section" id="modifiche">
+                <h2><span class="section-num">8</span>Modifiche alla Policy</h2>
+                <p>
+                    LocalPoint Milazzo si riserva il diritto di apportare modifiche alla presente
+                    Informativa sulla Privacy in qualsiasi momento, dandone comunicazione agli utenti
+                    attraverso il sito web.
+                </p>
+                <p>
+                    Si invita pertanto a consultare periodicamente questa pagina per verificare eventuali
+                    aggiornamenti. In caso di modifiche sostanziali che incidano sui diritti degli utenti,
+                    sarà fornita una comunicazione adeguata.
+                </p>
+                <p>
+                    La continuazione dell'utilizzo del sito web e dei servizi di LocalPoint Milazzo
+                    successivamente alla pubblicazione delle modifiche costituisce accettazione delle
+                    stesse.
+                </p>
+                <div class="pp-highlight">
+                    <p>
+                        <strong>Data di ultimo aggiornamento:</strong> Aprile 2026<br>
+                        Versione della presente informativa: 1.0
+                    </p>
+                </div>
+            </section>
+
+        </div><!-- /.pp-content -->
+    </main>
+
+    <!-- Simplified Footer -->
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <img src="/logo.png" alt="LocalPoint Logo" class="footer-logo">
+                <p class="footer-tagline">Il tuo punto di riferimento a Milazzo,<br>a pochi passi dal porto.</p>
+                <div class="socials">
+                    <a href="https://www.facebook.com/localpointmilazz" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/localpointmilazzo" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://wa.me/393793283803" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Link Utili</h4>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/tourist-services.html">Servizi Turistici</a></li>
+                    <li><a href="/#shipping">Spedizioni</a></li>
+                    <li><a href="/#luggage">Deposito Bagagli</a></li>
+                    <li><a href="/become-partner.html">Diventa Partner</a></li>
+                    <li><a href="/privacy-policy">Privacy Policy</a></li>
+                    <li><a href="/privacy-policy#cookie-policy">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Contatti &amp; Orari</h4>
+                <ul class="footer-contact-list">
+                    <li><i class="fa-solid fa-location-dot"></i><span>Via Tenente Brigiano 6, 98057 Milazzo</span></li>
+                    <li><a href="tel:+393793283803"><i class="fa-solid fa-phone"></i><span>+39 379 328 3803</span></a></li>
+                    <li><a href="mailto:localpointmilazzo@gmail.com"><i class="fa-solid fa-envelope"></i><span>localpointmilazzo@gmail.com</span></a></li>
+                    <li><i class="fa-regular fa-clock"></i><span>Lun – Sab: 09:00–13:30 / 15:30–19:00</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2026 LocalPoint Milazzo · P.IVA IT03800970836 · Tutti i diritti riservati.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/src/main.js" type="module"></script>
+</body>
+</html>

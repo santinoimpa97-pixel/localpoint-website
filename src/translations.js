@@ -638,11 +638,11 @@ export const translations = {
 
   // Footer
   "footer.copyright": {
-    it: "© 2026 LocalPoint Milazzo. Tutti i diritti riservati. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Diventa Partner</a>",
-    en: "© 2026 LocalPoint Milazzo. All rights reserved. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Become a Partner</a>",
-    de: "© 2026 LocalPoint Milazzo. Alle Rechte vorbehalten. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Partner werden</a>",
-    es: "© 2026 LocalPoint Milazzo. Todos los derechos reservados. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Hazte socio</a>",
-    fr: "© 2026 LocalPoint Milazzo. Tous droits réservés. <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Devenir Partenaire</a>"
+    it: "© 2026 LocalPoint Milazzo · P.IVA IT03800970836 · <a href=\"/privacy-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Privacy Policy</a> · <a href=\"/privacy-policy#cookie-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Cookie Policy</a> · <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Diventa Partner</a>",
+    en: "© 2026 LocalPoint Milazzo · P.IVA IT03800970836 · <a href=\"/privacy-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Privacy Policy</a> · <a href=\"/privacy-policy#cookie-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Cookie Policy</a> · <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Become a Partner</a>",
+    de: "© 2026 LocalPoint Milazzo · P.IVA IT03800970836 · <a href=\"/privacy-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Privacy Policy</a> · <a href=\"/privacy-policy#cookie-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Cookie Policy</a> · <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Partner werden</a>",
+    es: "© 2026 LocalPoint Milazzo · P.IVA IT03800970836 · <a href=\"/privacy-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Privacy Policy</a> · <a href=\"/privacy-policy#cookie-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Cookie Policy</a> · <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Hazte socio</a>",
+    fr: "© 2026 LocalPoint Milazzo · P.IVA IT03800970836 · <a href=\"/privacy-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Privacy Policy</a> · <a href=\"/privacy-policy#cookie-policy\" style=\"color:rgba(255,255,255,0.6);margin-left:10px;text-decoration:none;font-size:0.85em;\">Cookie Policy</a> · <a href=\"/become-partner.html\" style=\"color:#8cc63f; margin-left:15px; text-decoration:none; font-weight:700;\">Devenir Partenaire</a>"
   },
 
   // Cookie Banner
@@ -920,7 +920,9 @@ export const translations = {
   "footer.links.luggage": { it: "Deposito Bagagli", en: "Luggage Storage", de: "Gepäckaufbewahrung", es: "Consigna de Equipajes", fr: "Consigne à Bagages" },
   "footer.links.partner": { it: "Diventa Partner", en: "Become a Partner", de: "Partner werden", es: "Hazte socio", fr: "Devenir Partenaire" },
   "footer.hours": { it: "Lun – Sab: 09:00–13:30 / 15:30–19:00", en: "Mon – Sat: 09:00–13:30 / 15:30–19:00", de: "Mo – Sa: 09:00–13:30 / 15:30–19:00", es: "Lun – Sáb: 09:00–13:30 / 15:30–19:00", fr: "Lun – Sam : 09:00–13:30 / 15:30–19:00" },
-  "luggage.cta": { it: "Prenota Ora", en: "Book Now", de: "Jetzt buchen", es: "Reserva Ahora", fr: "Réserver Maintenant" }
+  "luggage.cta": { it: "Prenota Ora", en: "Book Now", de: "Jetzt buchen", es: "Reserva Ahora", fr: "Réserver Maintenant" },
+  "footer.links.privacy": { it: "Privacy Policy", en: "Privacy Policy", de: "Datenschutz", es: "Política de Privacidad", fr: "Politique de Confidentialité" },
+  "footer.links.cookie": { it: "Cookie Policy", en: "Cookie Policy", de: "Cookie-Richtlinie", es: "Política de Cookies", fr: "Politique de Cookies" }
 };
 
 // Language names and flags
