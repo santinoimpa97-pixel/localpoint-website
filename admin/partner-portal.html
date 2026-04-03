@@ -367,8 +367,6 @@
             document.getElementById('ref-link').value = refUrl;
             document.getElementById('qr-container').innerHTML =
                 `<img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=${encodeURIComponent(refUrl)}" alt="QR" class="rounded-lg border border-slate-200">`;
-            const printKitUrl = `${window.location.origin}/admin/print-kit.html?ref=${p.referral_code}&name=${encodeURIComponent(p.name)}`;
-            document.getElementById('btn-print-kit').href = printKitUrl;
 
             // Rates display
             document.getElementById('rate-luggage').textContent = rateL + '%';
