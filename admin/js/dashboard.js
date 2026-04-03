@@ -4104,11 +4104,11 @@ document.getElementById('partner-form')?.addEventListener('submit', async (e) =>
             '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:540px;margin:0 auto;background:#f0f4f3;padding:20px;">' +
             '<div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(27,58,92,0.12);">' +
             '<div style="background:linear-gradient(90deg,#004e92,#00a0a0);height:6px;"></div>' +
-            '<div style="background:linear-gradient(135deg,#1B3A5C 0%,#004e92 60%,#0f4c75 100%);padding:32px 24px;text-align:center;">' +
+            '<div style="background:#fff;padding:28px 24px;text-align:center;border-bottom:1px solid #eef2f0;">' +
             '<img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width:160px;height:auto;display:block;margin:0 auto;">' +
-            '<p style="color:rgba(255,255,255,0.75);margin:10px 0 0;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Milazzo</p>' +
-            '<div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:8px 20px;margin-top:14px;">' +
-            '<span style="color:#8cc63f;font-size:14px;font-weight:700;">🤝 Benvenuto nel Programma Partner</span>' +
+            '<p style="color:#2A9D8F;margin:8px 0 0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Milazzo</p>' +
+            '<div style="display:inline-block;background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:1px solid #00a0a0;border-radius:50px;padding:7px 18px;margin-top:12px;">' +
+            '<span style="color:#004e92;font-size:13px;font-weight:700;">\uD83E\uDD1D Benvenuto nel Programma Partner</span>' +
             '</div>' +
             '</div>' +
             '<div style="padding:28px 24px;">' +
