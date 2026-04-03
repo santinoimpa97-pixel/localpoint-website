@@ -268,17 +268,17 @@ ON CONFLICT (id) DO NOTHING;</pre>
         }
 
         function loadPreviewImage(url) {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
-                _previewImg = img;
-                drawPreview();
-            };
-            img.onerror = () => {
-                // Silently fail — canvas will show placeholder
-                drawPreview();
-            };
-            img.src = url;
+            // Use fetch→blob→objectURL to avoid CORS issues on canvas
+            fetch(url)
+                .then(r => r.ok ? r.blob() : Promise.reject('fetch failed'))
+                .then(blob => {
+                    const objUrl = URL.createObjectURL(blob);
+                    const img = new Image();
+                    img.onload = () => { _previewImg = img; drawPreview(); };
+                    img.onerror = () => drawPreview();
+                    img.src = objUrl;
+                })
+                .catch(() => drawPreview());
         }
 
         function drawPreview() {
@@ -371,7 +371,19 @@ ON CONFLICT (id) DO NOTHING;</pre>
                 _templateUrl = urlData.publicUrl;
                 showTemplatePreview(_templateUrl);
                 loadPreviewImage(_templateUrl);
-                showAlert('Template caricato con successo!', 'success');
+
+                // Auto-save the URL to settings immediately after upload
+                const qr_x    = parseInt(document.getElementById('qr-x').value)    || DEFAULT_CONFIG.qr_x;
+                const qr_y    = parseInt(document.getElementById('qr-y').value)    || DEFAULT_CONFIG.qr_y;
+                const qr_size = parseInt(document.getElementById('qr-size').value) || DEFAULT_CONFIG.qr_size;
+                const { data: existing } = await supabase.from('settings').select('key').eq('key', 'poster_config').maybeSingle();
+                if (existing) {
+                    await supabase.from('settings').update({ value: { template_url: _templateUrl, qr_x, qr_y, qr_size } }).eq('key', 'poster_config');
+                } else {
+                    await supabase.from('settings').insert({ key: 'poster_config', value: { template_url: _templateUrl, qr_x, qr_y, qr_size } });
+                }
+
+                showAlert('Template caricato e salvato con successo!', 'success');
             } catch (err) {
                 console.error(err);
                 showAlert('Errore upload: ' + (err.message || 'controlla il bucket "posters" in Supabase Storage.'), 'error');
