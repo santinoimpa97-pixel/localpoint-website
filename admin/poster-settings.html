@@ -391,7 +391,7 @@ ON CONFLICT (id) DO NOTHING;</pre>
                           p.y >= q.y && p.y <= q.y + q.size;
             if (inHandle) {
                 _drag = 'resize';
-                _dragStart = { qx: q.x, qy: q.y };
+                _dragStart = { qx: q.x, qy: q.y, startMx: p.x, startSize: q.size };
                 _canvas.style.cursor = 'nwse-resize';
             } else if (inBox) {
                 _drag = 'move';
@@ -420,8 +420,8 @@ ON CONFLICT (id) DO NOTHING;</pre>
                 const dy = p.y - _dragStart.py;
                 _setQR(_dragStart.qx + dx, _dragStart.qy + dy, q.size);
             } else if (_drag === 'resize') {
-                const newSize = Math.max(p.x - _dragStart.qx, p.y - _dragStart.qy);
-                _setQR(_dragStart.qx, _dragStart.qy, newSize);
+                const delta = p.x - _dragStart.startMx;
+                _setQR(_dragStart.qx, _dragStart.qy, _dragStart.startSize + delta);
             }
         });
 
