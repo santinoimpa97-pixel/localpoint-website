@@ -15,6 +15,7 @@ export default defineConfig({
                 admin_partners: resolve(__dirname, 'admin/partners.html'),
                 admin_reset_password: resolve(__dirname, 'admin/reset-password.html'),
                 admin_print_kit: resolve(__dirname, 'admin/print-kit.html'),
+                admin_poster_settings: resolve(__dirname, 'admin/poster-settings.html'),
             },
         },
     },

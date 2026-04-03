@@ -145,6 +145,10 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
                             Kit QR
                         </a>
+                        <button id="btn-download-poster" onclick="window.downloadPoster()" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition flex items-center gap-2 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <span id="btn-poster-text">Scarica la tua locandina</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -309,6 +313,7 @@
         let _reservations = [];
         let _luggage = [];
         let _payments = [];
+        let _refUrl = '';
 
         function fmt(n) {
             return '€ ' + (n || 0).toFixed(2).replace('.', ',');
@@ -360,7 +365,8 @@
                 [p.type, p.referral_code ? `Codice: ${p.referral_code}` : ''].filter(Boolean).join(' · ');
 
             // Referral
-            const refUrl = window.location.origin + '/tourist-services.html?ref=' + p.referral_code;
+            _refUrl = window.location.origin + '/tourist-services.html?ref=' + p.referral_code;
+            const refUrl = _refUrl;
             document.getElementById('ref-link').value = refUrl;
             document.getElementById('qr-container').innerHTML =
                 `<img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=${encodeURIComponent(refUrl)}" alt="QR" class="rounded-lg border border-slate-200">`;
@@ -665,6 +671,105 @@ ${_payments.length > 0 ? `<h2>Pagamenti Ricevuti</h2>
             w.document.close();
             setTimeout(() => w.print(), 600);
         };
+
+        // ── Download Poster ───────────────────────────────────────────────────
+        window.downloadPoster = async () => {
+            const btn = document.getElementById('btn-download-poster');
+            const btnText = document.getElementById('btn-poster-text');
+
+            btn.disabled = true;
+            btnText.textContent = 'Generazione...';
+
+            try {
+                // 1. Fetch poster config
+                const { data: settingRow, error: settingErr } = await supabase
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'poster_config')
+                    .maybeSingle();
+
+                if (settingErr || !settingRow?.value) {
+                    alert('Locandina non ancora configurata. Contatta LocalPoint.');
+                    return;
+                }
+
+                const config = settingRow.value;
+                if (!config.template_url) {
+                    alert('Locandina non ancora configurata. Contatta LocalPoint.');
+                    return;
+                }
+
+                btnText.textContent = 'Scaricamento immagini...';
+
+                // 2. Load template via fetch → blob → objectURL (avoids CORS issues on canvas)
+                const templateResp = await fetch(config.template_url);
+                if (!templateResp.ok) throw new Error('Impossibile scaricare il template locandina.');
+                const templateBlob = await templateResp.blob();
+                const templateObjUrl = URL.createObjectURL(templateBlob);
+
+                // 3. Load QR code via fetch → blob → objectURL
+                const qrSize = config.qr_size || 350;
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(_refUrl)}`;
+                const qrResp = await fetch(qrApiUrl);
+                if (!qrResp.ok) throw new Error('Impossibile generare il QR code.');
+                const qrBlob = await qrResp.blob();
+                const qrObjUrl = URL.createObjectURL(qrBlob);
+
+                btnText.textContent = 'Composizione locandina...';
+
+                // 4. Load both images
+                const [templateImg, qrImg] = await Promise.all([
+                    loadImg(templateObjUrl),
+                    loadImg(qrObjUrl),
+                ]);
+
+                // 5. Draw on canvas
+                const canvas = document.createElement('canvas');
+                canvas.width  = templateImg.naturalWidth;
+                canvas.height = templateImg.naturalHeight;
+                const ctx = canvas.getContext('2d');
+
+                ctx.drawImage(templateImg, 0, 0);
+                ctx.drawImage(
+                    qrImg,
+                    config.qr_x   || 483,
+                    config.qr_y   || 207,
+                    config.qr_size || 350,
+                    config.qr_size || 350
+                );
+
+                // 6. Trigger download
+                btnText.textContent = 'Download...';
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `locandina-${_partner?.referral_code || 'partner'}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    URL.revokeObjectURL(templateObjUrl);
+                    URL.revokeObjectURL(qrObjUrl);
+                }, 'image/png');
+
+            } catch (err) {
+                console.error('downloadPoster error:', err);
+                alert('Errore durante la generazione della locandina: ' + (err.message || 'Riprova più tardi.'));
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Scarica la tua locandina';
+            }
+        };
+
+        function loadImg(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Impossibile caricare immagine: ' + src));
+                img.src = src;
+            });
+        }
 
         initPortal();
     </script>
