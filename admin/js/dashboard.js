@@ -4099,7 +4099,77 @@ document.getElementById('partner-form')?.addEventListener('submit', async (e) =>
 
     if (email) {
         const magicLink = `${window.location.origin}/admin/partner-portal.html?key=${secretToken}`
-        const htmlBody = `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto"><div style="background:linear-gradient(135deg,#1B3A5C,#2A9D8F);padding:32px 24px;text-align:center;border-radius:16px 16px 0 0"><img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width:180px;margin:0 auto;display:block"><div style="background:rgba(255,255,255,0.2);border-radius:20px;display:inline-block;padding:8px 24px;margin-top:12px"><span style="color:white;font-size:15px;font-weight:700">🤝 Benvenuto Partner!</span></div></div><div style="background:white;padding:28px 24px;border-radius:0 0 16px 16px"><p style="color:#1B3A5C;font-size:18px;font-weight:700;margin:0 0 10px">Benvenuto in LocalPoint, ${name}!</p><div style="background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:2px solid #2A9D8F;border-radius:14px;padding:24px;text-align:center;margin:20px 0"><p style="color:#2A9D8F;font-size:11px;margin:0 0 8px;text-transform:uppercase;font-weight:600">Il Tuo Codice Referral</p><p style="color:#1B3A5C;font-size:24px;font-weight:900;font-family:monospace;letter-spacing:2px;margin:0 0 20px">${ref}</p><a href="${magicLink}" style="display:inline-block;background:linear-gradient(135deg,#2A9D8F,#7BC142);color:white;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:700">Accedi al Tuo Portale</a></div></div></div>`
+        const refUrl = `${window.location.origin}/tourist-services?ref=${ref}`
+        const htmlBody =
+            '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:540px;margin:0 auto;background:#f0f4f3;padding:20px;">' +
+            '<div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(27,58,92,0.12);">' +
+            '<div style="background:linear-gradient(90deg,#004e92,#00a0a0);height:6px;"></div>' +
+            '<div style="background:linear-gradient(135deg,#1B3A5C 0%,#004e92 60%,#0f4c75 100%);padding:32px 24px;text-align:center;">' +
+            '<img src="https://local-point.it/logo.png" alt="LocalPoint" style="max-width:160px;height:auto;display:block;margin:0 auto;">' +
+            '<p style="color:rgba(255,255,255,0.75);margin:10px 0 0;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">Milazzo</p>' +
+            '<div style="display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:8px 20px;margin-top:14px;">' +
+            '<span style="color:#8cc63f;font-size:14px;font-weight:700;">🤝 Benvenuto nel Programma Partner</span>' +
+            '</div>' +
+            '</div>' +
+            '<div style="padding:28px 24px;">' +
+            '<p style="color:#1B3A5C;font-size:17px;font-weight:700;margin:0 0 8px;">Ciao ' + name + ', benvenuto in LocalPoint!</p>' +
+            '<p style="color:#4a5568;font-size:13px;line-height:1.6;margin:0 0 20px;">Siamo felici di averti come partner. Da oggi ogni cliente che ci mandi attraverso il tuo codice referral ti farà guadagnare una commissione automatica sui servizi prenotati.</p>' +
+
+            '<div style="background:linear-gradient(135deg,#e6f7f4,#edf6ff);border:2px solid #00a0a0;border-radius:14px;padding:20px;text-align:center;margin:0 0 20px;">' +
+            '<p style="color:#004e92;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 8px;">Il Tuo Codice Referral</p>' +
+            '<p style="color:#1B3A5C;font-size:28px;font-weight:900;font-family:monospace;letter-spacing:4px;margin:0 0 16px;">' + ref + '</p>' +
+            '<p style="color:#6b7280;font-size:11px;margin:0 0 12px;">Link diretto da condividere con i tuoi clienti:</p>' +
+            '<div style="background:#fff;border:1px solid #d1fae5;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;color:#004e92;word-break:break-all;">' + refUrl + '</div>' +
+            '</div>' +
+
+            '<div style="background:#f8fafc;border-radius:12px;padding:18px;margin:0 0 20px;">' +
+            '<p style="color:#1B3A5C;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 14px;">Le Tue Commissioni</p>' +
+            '<div style="display:flex;gap:12px;">' +
+            '<div style="flex:1;background:white;border:1px solid #e2e8f0;border-radius:10px;padding:14px;text-align:center;">' +
+            '<p style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin:0 0 4px;">🧳 Deposito Bagagli</p>' +
+            '<p style="color:#004e92;font-size:26px;font-weight:900;font-family:monospace;margin:0;">' + rateLuggage + '%</p>' +
+            '<p style="color:#6b7280;font-size:10px;margin:2px 0 0;">per ogni deposito</p>' +
+            '</div>' +
+            '<div style="flex:1;background:white;border:1px solid #e2e8f0;border-radius:10px;padding:14px;text-align:center;">' +
+            '<p style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin:0 0 4px;">📋 Altri Servizi</p>' +
+            '<p style="color:#004e92;font-size:26px;font-weight:900;font-family:monospace;margin:0;">' + rateOther + '%</p>' +
+            '<p style="color:#6b7280;font-size:10px;margin:2px 0 0;">per ogni prenotazione</p>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+
+            '<div style="background:#f8fafc;border-radius:12px;padding:18px;margin:0 0 24px;">' +
+            '<p style="color:#1B3A5C;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 14px;">Come funziona</p>' +
+            '<div style="display:flex;flex-direction:column;gap:10px;">' +
+            '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<div style="min-width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;">1</div>' +
+            '<p style="color:#4a5568;font-size:13px;margin:0;">Condividi il tuo codice o link con i tuoi clienti</p>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<div style="min-width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;">2</div>' +
+            '<p style="color:#4a5568;font-size:13px;margin:0;">Il cliente prenota un servizio LocalPoint</p>' +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:12px;">' +
+            '<div style="min-width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;">3</div>' +
+            '<p style="color:#4a5568;font-size:13px;margin:0;">Ricevi la tua commissione confermata via email</p>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+
+            '<div style="text-align:center;margin:0 0 20px;">' +
+            '<a href="' + magicLink + '" style="display:inline-block;background:linear-gradient(135deg,#004e92,#00a0a0);color:white;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:15px;font-weight:700;box-shadow:0 6px 20px rgba(0,78,146,0.3);">Accedi al Tuo Portale →</a>' +
+            '<p style="color:#9ca3af;font-size:11px;margin:10px 0 0;">Il link è personale — non condividerlo con altri</p>' +
+            '</div>' +
+
+            '</div>' +
+            '<div style="border-top:3px solid #8cc63f;background:#f7faf8;padding:18px 24px;text-align:center;">' +
+            '<p style="color:#1B3A5C;font-size:12px;font-weight:700;margin:0 0 4px;">Hai domande? Siamo qui!</p>' +
+            '<p style="color:#4a5568;font-size:12px;margin:0 0 10px;">+39 379 3283803 &nbsp;·&nbsp; localpointmilazzo@gmail.com</p>' +
+            '<a href="https://g.page/r/CQSpCw3gaeKjEAE/review" style="display:inline-block;background:transparent;border:1px solid #2A9D8F;color:#2A9D8F;padding:7px 18px;border-radius:50px;font-size:11px;font-weight:700;text-decoration:none;">⭐ Lascia una recensione su Google</a>' +
+            '<p style="color:#2A9D8F;font-size:11px;margin:12px 0 0;">Il Team LocalPoint — Milazzo · www.local-point.it</p>' +
+            '</div>' +
+            '</div>' +
+            '</div>'
         try {
             await emailjs.send('service_dmf1g2a', 'template_ihapitu', {
                 to_name: name, to_email: email, message: htmlBody,
