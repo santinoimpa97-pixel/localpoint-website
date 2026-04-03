@@ -322,14 +322,6 @@ ON CONFLICT (id) DO NOTHING;</pre>
             ctx.textBaseline = 'middle';
             ctx.fillText('QR', x + size / 2, y + size / 2);
 
-            // Resize handle (bottom-right corner)
-            const h = 16;
-            ctx.globalAlpha = 1;
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(x + size - h, y + size - h, h, h);
-            ctx.strokeStyle = '#dc2626';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(x + size - h, y + size - h, h, h);
             ctx.restore();
         }
 
@@ -354,8 +346,6 @@ ON CONFLICT (id) DO NOTHING;</pre>
         const _canvas = document.getElementById('preview-canvas');
         let _drag = null; // null | 'move' | 'resize'
         let _dragStart = null;
-
-        const HANDLE = 16; // resize handle size in canvas px
 
         function _toCanvas(e) {
             const r = _canvas.getBoundingClientRect();
@@ -385,15 +375,9 @@ ON CONFLICT (id) DO NOTHING;</pre>
         _canvas.addEventListener('mousedown', e => {
             const p = _toCanvas(e);
             const q = _getQR();
-            const inHandle = p.x >= q.x + q.size - HANDLE && p.x <= q.x + q.size + HANDLE &&
-                             p.y >= q.y + q.size - HANDLE && p.y <= q.y + q.size + HANDLE;
             const inBox = p.x >= q.x && p.x <= q.x + q.size &&
                           p.y >= q.y && p.y <= q.y + q.size;
-            if (inHandle) {
-                _drag = 'resize';
-                _dragStart = { qx: q.x, qy: q.y, startMx: p.x, startSize: q.size };
-                _canvas.style.cursor = 'nwse-resize';
-            } else if (inBox) {
+            if (inBox) {
                 _drag = 'move';
                 _dragStart = { px: p.x, py: p.y, qx: q.x, qy: q.y };
                 _canvas.style.cursor = 'grabbing';
@@ -403,26 +387,18 @@ ON CONFLICT (id) DO NOTHING;</pre>
 
         window.addEventListener('mousemove', e => {
             if (!_drag) {
-                // Update cursor hint
                 const p = _toCanvas(e);
                 const q = _getQR();
-                const inHandle = p.x >= q.x + q.size - HANDLE && p.x <= q.x + q.size + HANDLE &&
-                                 p.y >= q.y + q.size - HANDLE && p.y <= q.y + q.size + HANDLE;
                 const inBox = p.x >= q.x && p.x <= q.x + q.size &&
                               p.y >= q.y && p.y <= q.y + q.size;
-                _canvas.style.cursor = inHandle ? 'nwse-resize' : inBox ? 'grab' : 'default';
+                _canvas.style.cursor = inBox ? 'grab' : 'default';
                 return;
             }
             const p = _toCanvas(e);
             const q = _getQR();
-            if (_drag === 'move') {
-                const dx = p.x - _dragStart.px;
-                const dy = p.y - _dragStart.py;
-                _setQR(_dragStart.qx + dx, _dragStart.qy + dy, q.size);
-            } else if (_drag === 'resize') {
-                const delta = p.x - _dragStart.startMx;
-                _setQR(_dragStart.qx, _dragStart.qy, _dragStart.startSize + delta);
-            }
+            const dx = p.x - _dragStart.px;
+            const dy = p.y - _dragStart.py;
+            _setQR(_dragStart.qx + dx, _dragStart.qy + dy, q.size);
         });
 
         window.addEventListener('mouseup', () => {
