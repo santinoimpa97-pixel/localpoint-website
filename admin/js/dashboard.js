@@ -4142,15 +4142,15 @@ document.getElementById('partner-form')?.addEventListener('submit', async (e) =>
             '<p style="color:#1B3A5C;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 14px;">Come funziona</p>' +
             '<div style="display:flex;flex-direction:column;gap:10px;">' +
             '<div style="display:flex;align-items:center;gap:12px;">' +
-            '<div style="min-width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;">1</div>' +
+            '<div style="min-width:28px;width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:inline-block;text-align:center;line-height:28px;color:white;font-size:13px;font-weight:700;">1</div>' +
             '<p style="color:#4a5568;font-size:13px;margin:0;">Condividi il tuo codice o link con i tuoi clienti</p>' +
             '</div>' +
             '<div style="display:flex;align-items:center;gap:12px;">' +
-            '<div style="min-width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;">2</div>' +
+            '<div style="min-width:28px;width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:inline-block;text-align:center;line-height:28px;color:white;font-size:13px;font-weight:700;">2</div>' +
             '<p style="color:#4a5568;font-size:13px;margin:0;">Il cliente prenota un servizio LocalPoint</p>' +
             '</div>' +
             '<div style="display:flex;align-items:center;gap:12px;">' +
-            '<div style="min-width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;">3</div>' +
+            '<div style="min-width:28px;width:28px;height:28px;background:linear-gradient(135deg,#004e92,#00a0a0);border-radius:50%;display:inline-block;text-align:center;line-height:28px;color:white;font-size:13px;font-weight:700;">3</div>' +
             '<p style="color:#4a5568;font-size:13px;margin:0;">Ricevi la tua commissione confermata via email</p>' +
             '</div>' +
             '</div>' +
