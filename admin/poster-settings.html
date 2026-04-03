@@ -321,6 +321,15 @@ ON CONFLICT (id) DO NOTHING;</pre>
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('QR', x + size / 2, y + size / 2);
+
+            // Resize handle (bottom-right corner)
+            const h = 16;
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(x + size - h, y + size - h, h, h);
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x + size - h, y + size - h, h, h);
             ctx.restore();
         }
 
@@ -339,6 +348,88 @@ ON CONFLICT (id) DO NOTHING;</pre>
         // ── Live preview on input change ─────────────────────────────────────
         ['qr-x', 'qr-y', 'qr-size'].forEach(id => {
             document.getElementById(id).addEventListener('input', drawPreview);
+        });
+
+        // ── Drag & resize on canvas ──────────────────────────────────────────
+        const _canvas = document.getElementById('preview-canvas');
+        let _drag = null; // null | 'move' | 'resize'
+        let _dragStart = null;
+
+        const HANDLE = 16; // resize handle size in canvas px
+
+        function _toCanvas(e) {
+            const r = _canvas.getBoundingClientRect();
+            const scaleX = _canvas.width  / r.width;
+            const scaleY = _canvas.height / r.height;
+            return {
+                x: (e.clientX - r.left) * scaleX,
+                y: (e.clientY - r.top)  * scaleY,
+            };
+        }
+
+        function _getQR() {
+            return {
+                x:    parseInt(document.getElementById('qr-x').value)    || 0,
+                y:    parseInt(document.getElementById('qr-y').value)    || 0,
+                size: parseInt(document.getElementById('qr-size').value) || 100,
+            };
+        }
+
+        function _setQR(x, y, size) {
+            document.getElementById('qr-x').value    = Math.max(0, Math.round(x));
+            document.getElementById('qr-y').value    = Math.max(0, Math.round(y));
+            document.getElementById('qr-size').value = Math.max(20, Math.round(size));
+            drawPreview();
+        }
+
+        _canvas.addEventListener('mousedown', e => {
+            const p = _toCanvas(e);
+            const q = _getQR();
+            const inHandle = p.x >= q.x + q.size - HANDLE && p.x <= q.x + q.size + HANDLE &&
+                             p.y >= q.y + q.size - HANDLE && p.y <= q.y + q.size + HANDLE;
+            const inBox = p.x >= q.x && p.x <= q.x + q.size &&
+                          p.y >= q.y && p.y <= q.y + q.size;
+            if (inHandle) {
+                _drag = 'resize';
+                _dragStart = { px: p.x, py: p.y, size: q.size };
+                _canvas.style.cursor = 'nwse-resize';
+            } else if (inBox) {
+                _drag = 'move';
+                _dragStart = { px: p.x, py: p.y, qx: q.x, qy: q.y };
+                _canvas.style.cursor = 'grabbing';
+            }
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (!_drag) {
+                // Update cursor hint
+                const p = _toCanvas(e);
+                const q = _getQR();
+                const inHandle = p.x >= q.x + q.size - HANDLE && p.x <= q.x + q.size + HANDLE &&
+                                 p.y >= q.y + q.size - HANDLE && p.y <= q.y + q.size + HANDLE;
+                const inBox = p.x >= q.x && p.x <= q.x + q.size &&
+                              p.y >= q.y && p.y <= q.y + q.size;
+                _canvas.style.cursor = inHandle ? 'nwse-resize' : inBox ? 'grab' : 'default';
+                return;
+            }
+            const p = _toCanvas(e);
+            const q = _getQR();
+            if (_drag === 'move') {
+                const dx = p.x - _dragStart.px;
+                const dy = p.y - _dragStart.py;
+                _setQR(_dragStart.qx + dx, _dragStart.qy + dy, q.size);
+            } else if (_drag === 'resize') {
+                const dx = p.x - _dragStart.px;
+                const dy = p.y - _dragStart.py;
+                _setQR(q.x, q.y, _dragStart.size + Math.max(dx, dy));
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            _drag = null;
+            _dragStart = null;
+            _canvas.style.cursor = 'default';
         });
 
         // ── Upload template ──────────────────────────────────────────────────
